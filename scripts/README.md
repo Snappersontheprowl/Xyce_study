@@ -1,9 +1,9 @@
-# Scripts
+# 脚本目录
 
-Place small helper scripts here for repetitive study tasks such as:
+这里用于放一些服务于源码学习的小脚本，例如：
 
-- searching for class definitions or call sites
-- building a local debug configuration
-- extracting a smaller file list for focused reading
+- 搜索类定义或调用位置
+- 构建本地调试配置
+- 提取更小的文件列表，方便聚焦阅读
 
-Keep scripts simple and documented so they remain useful across sessions.
+脚本尽量保持简单，并写清楚用途，这样在后续阅读阶段还能继续复用。

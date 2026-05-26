@@ -1,8 +1,7 @@
-# Vendor
+# 上游源码目录
 
-This directory holds local upstream source snapshots that are used for reading
-and experimentation but are not tracked by Git in this study repository.
+这个目录用于存放本地保留的上游源码快照，供阅读和实验使用，但不纳入当前学习仓库的版本控制。
 
-Current local snapshot:
+当前本地快照：
 
 - `Xyce-7.10.0/`

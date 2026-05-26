@@ -1,8 +1,7 @@
-# Source Archives
+# 源码归档
 
-This directory stores downloaded upstream release archives outside version
-control so the exact local source snapshot can be reconstructed if needed.
+这个目录用于存放下载得到的上游发布包，并保持在版本控制之外。这样如果以后需要，可以重新还原当前对应的本地源码快照。
 
-Current local archive:
+当前本地归档：
 
 - `Release-7.10.0.tar.gz`

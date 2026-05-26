@@ -1,13 +1,12 @@
-# Docs
+# 文档目录
 
-Use this directory for topic-oriented study material that should remain stable
-across multiple reading sessions.
+这个目录用于存放按主题整理的学习资料，适合跨多个阅读阶段持续维护。
 
-Suggested files:
+建议逐步补齐这些文档：
 
-- `learning-outline.md`: staged learning roadmap based on current background
-- `reading-plan.md`: the current roadmap for source exploration
-- `architecture.md`: package-level structure and high-level flow
-- `parser.md`: netlist parsing and setup notes
-- `devices.md`: device model tracing notes
-- `solver.md`: matrix assembly and solver interaction notes
+- `learning-outline.md`：基于当前基础制定的阶段性学习大纲
+- `reading-plan.md`：当前这段时间的具体阅读计划
+- `architecture.md`：源码包结构和高层流程总结
+- `parser.md`：netlist 解析与电路构建相关笔记
+- `devices.md`：器件模型追踪笔记
+- `solver.md`：矩阵装配与求解器接口笔记

@@ -1,16 +1,16 @@
-# Notes
+# 笔记目录
 
-Use this directory for session-level notes.
+这个目录用于存放按阅读会话记录的笔记。
 
-Recommended naming:
+建议命名方式：
 
 - `YYYY-MM-DD-entry-flow.md`
 - `YYYY-MM-DD-parser-trace.md`
 - `YYYY-MM-DD-device-resistor.md`
 
-Keep each note short:
+每份笔记尽量保持简洁，至少回答这些问题：
 
-- what file you read
-- what question you had
-- what conclusion you reached
-- what should be traced next
+- 这次读了哪些文件
+- 带着什么问题去读
+- 当前得出了什么结论
+- 下一步还要继续追踪什么

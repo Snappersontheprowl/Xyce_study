@@ -1,14 +1,14 @@
-# Reading Plan
+# 阅读计划
 
-## Current Focus
+## 当前重点
 
-1. Find the executable entry path and top-level control flow.
-2. Locate netlist parsing and circuit setup.
-3. Trace one simple device from parse to stamping.
-4. Identify where linear system assembly and solver calls happen.
+1. 找到可执行程序入口和顶层控制流。
+2. 定位 netlist 解析与电路构建入口。
+3. 追踪一个简单器件从解析到 stamping 的全过程。
+4. 确认线性系统装配和求解器调用发生的位置。
 
-## Working Notes
+## 工作方式
 
-- Start from the top-level binary entry and follow constructor and initialization flow.
-- Prefer one small vertical slice at a time instead of scanning every package.
-- Record file paths and short conclusions in `notes/` as you go.
+- 从顶层可执行入口开始，顺着构造、初始化和调度流程往下跟。
+- 优先打通一条小而完整的纵向链路，不要一开始就扫完整个 package。
+- 阅读过程中，把文件路径和阶段性结论随手记录到 `notes/` 中。

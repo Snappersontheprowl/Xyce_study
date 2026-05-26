@@ -1,236 +1,232 @@
-# Xyce Learning Outline
+# Xyce 学习大纲
 
-This document is the long-term study outline for reading the Xyce source code.
+这份文档用于整理阅读 Xyce 源码的长期学习路线。
 
-Current starting point:
+当前起点：
 
-- can read basic C++ syntax
-- understands the broad purpose of a circuit simulator
+- 能看懂 C++ 基础语法
+- 了解电路仿真器的大致作用
 
-The main goal of the first pass is not to understand every implementation detail.
-The main goal is to build a reliable mental map:
+第一轮阅读的目标不是吃透每一个实现细节，而是先建立一张可靠的“认知地图”：
 
-- where the program starts
-- how a netlist enters the system
-- how a device becomes equations
-- where the solver is invoked
+- 程序从哪里启动
+- netlist 如何进入系统
+- 器件如何变成方程
+- 求解器在什么位置被调用
 
-## Study Strategy
+## 学习策略
 
-Use this order:
+建议按下面的顺序推进：
 
-1. Build a high-level map first.
-2. Follow one simple end-to-end vertical slice.
-3. Return to major subsystems with clearer context.
-4. Only then fill in C++ and numerical details as needed.
+1. 先建立整体地图。
+2. 再打通一条简单的纵向链路。
+3. 带着上下文回头看主要子系统。
+4. 最后按需补 C++ 细节和数值方法细节。
 
-This keeps the reading grounded in control flow and data flow instead of getting
-stuck in isolated implementation details.
+这样做的好处是，阅读始终围绕控制流和数据流展开，不容易陷进零散实现细节里出不来。
 
-## Stage 1: Build the Overall Map
+## 第一阶段：建立整体地图
 
-Goal:
+目标：
 
-- understand the major source directories and subsystem boundaries
-- know which parts are startup, parsing, device modeling, analysis, and solving
+- 了解主要源码目录和子系统边界
+- 初步区分启动、解析、器件建模、分析流程和求解相关代码
 
-Questions to answer:
+需要回答的问题：
 
-- What are the major packages under `src/`?
-- Which package appears to own top-level orchestration?
-- Which packages look device-related, parser-related, or solver-related?
+- `src/` 下有哪些主要 package？
+- 哪个 package 看起来负责顶层调度？
+- 哪些 package 更像是器件、parser 或 solver 相关？
 
-Suggested output:
+建议产出：
 
-- one page of package-level notes
-- a short list of important classes and files
+- 一页 package 级别的结构笔记
+- 一份关键类和关键文件的简短列表
 
-## Stage 2: Read Program Startup Flow
+## 第二阶段：阅读程序启动流程
 
-Goal:
+目标：
 
-- understand what happens from process start to the point where simulation work begins
+- 弄清从进程启动到真正开始仿真之间发生了什么
 
-Questions to answer:
+需要回答的问题：
 
-- Where is `main()`?
-- How are command-line arguments handled?
-- Where are global options and runtime objects initialized?
-- At what point does netlist loading begin?
+- `main()` 在哪里？
+- 命令行参数是如何处理的？
+- 全局选项和运行时对象在哪里初始化？
+- netlist 加载是在什么阶段开始的？
 
-Suggested output:
+建议产出：
 
-- a startup sequence such as `main -> setup -> parse -> build -> analyze`
-- file paths for each major step
+- 一条类似 `main -> setup -> parse -> build -> analyze` 的启动时序
+- 每一步对应的关键文件路径
 
-## Stage 3: Read Netlist Parsing and Circuit Construction
+## 第三阶段：阅读 netlist 解析与电路构建
 
-Goal:
+目标：
 
-- understand how text input becomes internal circuit data structures
+- 理解文本输入如何转成电路内部数据结构
 
-Questions to answer:
+需要回答的问题：
 
-- Where is the netlist parser entry?
-- How are device lines and control statements separated?
-- Where are nodes, devices, and models created or registered?
-- What internal objects represent the parsed circuit?
+- netlist parser 的入口在哪里？
+- 器件语句和控制语句如何区分？
+- 节点、器件和模型在哪一步被创建或注册？
+- 解析后的电路由哪些内部对象表示？
 
-Suggested output:
+建议产出：
 
-- a diagram from netlist text to in-memory circuit objects
-- a short list of the core parsing and setup data structures
+- 一张从 netlist 文本到内存中电路对象的转换图
+- 一份核心解析与建模数据结构的简短清单
 
-## Stage 4: Trace One Simple Device End-to-End
+## 第四阶段：追踪一个简单器件的完整链路
 
-Goal:
+目标：
 
-- complete one full vertical slice from parse to matrix contribution
+- 打通从解析到矩阵贡献的一条完整纵向路径
 
-Recommended first device:
+建议第一个器件选：
 
-- resistor
+- 电阻
 
-Questions to answer:
+需要回答的问题：
 
-- Which code parses a resistor instance?
-- Where is the device object created?
-- Where are its parameters stored?
-- Which function performs its load or stamp behavior?
-- How does it affect matrix entries or the right-hand side?
+- 电阻实例由哪段代码解析？
+- 器件对象在哪里创建？
+- 参数值保存在哪里？
+- 哪个函数负责它的 load 或 stamp 行为？
+- 它如何影响矩阵项或右端项？
 
-Suggested output:
+建议产出：
 
-- one trace note that follows `parse -> instantiate -> setup -> load`
+- 一份沿着 `parse -> instantiate -> setup -> load` 展开的追踪笔记
 
-## Stage 5: Read Analysis Flow
+## 第五阶段：阅读分析流程
 
-Goal:
+目标：
 
-- understand how Xyce organizes different analysis modes
+- 理解 Xyce 如何组织不同的分析类型
 
-Questions to answer:
+需要回答的问题：
 
-- Where are `.OP`, `.DC`, and `.TRAN` handled?
-- What part of the code dispatches the analysis type?
-- What common infrastructure is reused across analyses?
-- How do operating point solve and transient stepping relate?
+- `.OP`、`.DC`、`.TRAN` 分别在哪里处理？
+- 分析类型由哪部分代码分发？
+- 各种分析共用了哪些基础设施？
+- 直流工作点求解和瞬态步进之间是什么关系？
 
-Suggested output:
+建议产出：
 
-- a comparison note for major analysis types
-- a short time-step or iteration flow for transient analysis
+- 一份主要分析类型的对比笔记
+- 一份简短的瞬态时间步或迭代流程说明
 
-## Stage 6: Read Matrix Assembly and Solver Interface
+## 第六阶段：阅读矩阵装配与求解器接口
 
-Goal:
+目标：
 
-- understand how device equations are assembled and handed to solvers
+- 理解器件方程如何被装配并交给求解器
 
-Questions to answer:
+需要回答的问题：
 
-- Where is the matrix abstraction defined?
-- Do devices write directly into matrix structures or through helper layers?
-- Where is the nonlinear solve loop organized?
-- Where are linear solver calls made?
+- 矩阵抽象定义在哪里？
+- 器件是直接写入矩阵结构，还是通过中间抽象层？
+- 非线性求解循环在哪里组织？
+- 线性求解器调用出现在哪一层？
 
-Suggested output:
+建议产出：
 
-- one path diagram from device load functions to solver calls
-- a list of key assembly and solve interfaces
+- 一张从 device load 函数到 solver 调用的路径图
+- 一份关键装配接口和求解接口列表
 
-## Stage 7: Fill in the C++ Patterns That Matter
+## 第七阶段：补齐真正需要的 C++ 结构
 
-Goal:
+目标：
 
-- learn only the C++ mechanisms required to read this code productively
+- 只学习阅读这套源码真正需要的 C++ 机制
 
-Focus topics:
+重点关注：
 
-- inheritance and abstract interfaces
-- factory or registration mechanisms
-- ownership through pointers and references
-- package and header organization
-- template usage only when it directly blocks understanding
+- 继承关系和抽象接口
+- 工厂模式或注册机制
+- 指针、引用和对象所有权关系
+- package 与头文件组织方式
+- 只有在真正阻碍理解时才去深入模板用法
 
-Suggested output:
+建议产出：
 
-- a short note mapping each important C++ pattern to one real Xyce example
+- 一份把重要 C++ 模式映射到 Xyce 真实代码示例的短笔记
 
-## Stage 8: Build, Test, and Modify Safely
+## 第八阶段：建立安全的构建、测试和修改流程
 
-Goal:
+目标：
 
-- move from passive reading to controlled experiments
+- 从“能读”过渡到“能做受控实验”
 
-Questions to answer:
+需要回答的问题：
 
-- What is the smallest build path needed locally?
-- Where are tests or validation examples located?
-- If one device behavior changes, how should it be checked?
-- What is the smallest safe debug edit for tracing flow?
+- 本地最小构建路径是什么？
+- 测试或验证样例放在哪里？
+- 如果改了一个器件行为，应该如何验证？
+- 为了追踪流程，最小且安全的调试修改应当怎么做？
 
-Suggested output:
+建议产出：
 
-- a local workflow note for build, run, and verify
+- 一份本地 build、run、verify 的操作说明
 
-## Recommended Reading Order
+## 建议的阅读顺序
 
-For the current background, use this order:
+基于当前基础，建议按下面顺序进行：
 
-1. overall source tree and package map
-2. startup and top-level flow
-3. netlist parser entry and circuit setup
-4. resistor end-to-end trace
-5. analysis flow for `.DC` and `.TRAN`
-6. matrix assembly and solver interface
-7. C++ patterns encountered in the above code
-8. build, test, and controlled code experiments
+1. 整体源码树和 package 地图
+2. 启动流程和顶层控制流
+3. netlist parser 入口与电路构建
+4. 电阻器件的端到端追踪
+5. `.DC` 和 `.TRAN` 的分析流程
+6. 矩阵装配与求解器接口
+7. 在前面阅读中遇到的 C++ 结构
+8. 构建、测试和受控实验
 
-## Reading Checklist for Each File
+## 每读一个文件时的检查清单
 
-When reading a new file or class, focus on four questions:
+阅读一个新文件或类时，优先回答四个问题：
 
-1. Who creates this object?
-2. What important data does it hold?
-3. Who calls it, and at what stage?
-4. What effect does it have on later simulation flow?
+1. 谁创建了这个对象？
+2. 它持有哪些重要数据？
+3. 谁会在什么阶段调用它？
+4. 它会对后续仿真流程产生什么影响？
 
-If implementation details get heavy, answer these four questions first before
-digging deeper.
+如果实现细节太重，先把这四个问题回答出来，再决定是否继续深挖。
 
-## What Not to Do in the First Pass
+## 第一轮阅读中暂时不要做的事
 
-Avoid these traps early on:
+尽量避免这些常见陷阱：
 
-- trying to understand every class before tracing real flow
-- starting with the most complex device models
-- diving into solver internals before locating the call path
-- reading every option and corner feature before the core path is clear
+- 还没追踪真实流程，就想先理解所有类
+- 一上来就研究最复杂的器件模型
+- 在没定位调用路径前先钻进 solver 内部
+- 核心主线还没清楚，就先读所有选项和边角功能
 
-## Suggested First-Week Goal
+## 第一周建议目标
 
-A strong first milestone is:
+一个很好的第一阶段里程碑是：
 
-1. find the executable entry and top-level startup flow
-2. find the netlist parsing entry
-3. trace one simple device from parse to load or stamp
+1. 找到可执行程序入口和顶层启动流程
+2. 找到 netlist 解析入口
+3. 追踪一个简单器件从解析到 load 或 stamp 的路径
 
-If these three are clear, the rest of the codebase becomes much easier to
-navigate.
+只要这三件事清楚了，后面整个代码库就会容易导航得多。
 
-## Suggested Notes to Create
+## 建议创建的笔记
 
-As reading progresses, create notes such as:
+随着阅读推进，可以逐步建立这些笔记：
 
 - `notes/YYYY-MM-DD-entry-flow.md`
 - `notes/YYYY-MM-DD-parser-trace.md`
 - `notes/YYYY-MM-DD-device-resistor.md`
 - `notes/YYYY-MM-DD-analysis-flow.md`
 
-Keep each note focused on:
+每份笔记尽量围绕这几项展开：
 
-- files read
-- questions asked
-- conclusions reached
-- next trace targets
+- 读了哪些文件
+- 带着什么问题去读
+- 得到了什么结论
+- 下一步准备追踪什么
