@@ -13,10 +13,10 @@
 
 这一版导航地图主要基于以下信息整理：
 
-- [src/CMakeLists.txt](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CMakeLists.txt:1)
-- [src/Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/Xyce.C:1)
-- [src/CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h:1)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h:1)
+- [src/CMakeLists.txt](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CMakeLists.txt)
+- [src/Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/Xyce.C)
+- [src/CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
 - `src/` 下各 package 的目录名与代表文件名
 
 这里有两类结论：
@@ -28,12 +28,12 @@
 
 ### 已确认结论
 
-- `src/CMakeLists.txt` 定义了可执行程序 `Xyce`，其入口源文件是 [src/Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/Xyce.C:1)。
+- `src/CMakeLists.txt` 定义了可执行程序 `Xyce`，其入口源文件是 [src/Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/Xyce.C)。
 - `main()` 位于 [src/Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/Xyce.C:70) 附近。
 - 默认执行路径是：
   - 创建 `Xyce::Circuit::Simulator`
   - 调用 `xyce.run(argc, argv)`
-- 因此，第一阶段里最关键的顶层类是 [CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h:1) 中的 `Xyce::Circuit::Simulator`。
+- 因此，第一阶段里最关键的顶层类是 [CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 中的 `Xyce::Circuit::Simulator`。
 
 ### 入口主线
 
@@ -51,7 +51,7 @@ main()
 
 ## 顶层 simulator 的角色
 
-从 [N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h:1) 可以直接看到几条关键线索。
+从 [N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 可以直接看到几条关键线索。
 
 ### 已确认结论
 
@@ -88,8 +88,8 @@ main()
 
 代表文件：
 
-- [src/CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h:1)
-- [src/CircuitPKG/N_CIR_Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C:1)
+- [src/CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
+- [src/CircuitPKG/N_CIR_Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
 
 当前角色判断：
 
@@ -107,7 +107,7 @@ main()
 
 代表文件：
 
-- [src/AnalysisPKG/N_ANP_AnalysisManager.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h:1)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
 - `N_ANP_Op.h`
 - `N_ANP_DCSweep.h`
 - `N_ANP_Transient.h`
@@ -327,8 +327,8 @@ Xyce executable
 
 到目前为止，可以把下面这些视为已经比较稳的判断：
 
-1. 程序入口是 [src/Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/Xyce.C:1)。
-2. 顶层 simulator 类是 [CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h:1) 里的 `Xyce::Circuit::Simulator`。
+1. 程序入口是 [src/Xyce.C](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/Xyce.C)。
+2. 顶层 simulator 类是 [CircuitPKG/N_CIR_Xyce.h](/home/eda/my_lab/projects/study/xyce_study/vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 里的 `Xyce::Circuit::Simulator`。
 3. `CircuitPKG` 是总调度层，而不是具体数值算法层。
 4. `AnalysisPKG` 负责不同 analysis mode 的管理与分发。
 5. `DeviceModelPKG` 是器件抽象与具体模型实现的核心区域。
