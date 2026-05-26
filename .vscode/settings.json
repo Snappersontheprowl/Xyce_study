@@ -1,4 +1,5 @@
 {
+  "cmake.sourceDirectory": "${workspaceFolder}/vendor/Xyce-7.10.0",
   "cmake.configureOnOpen": true,
   "cmake.buildDirectory": "${workspaceFolder}/build",
   "cmake.configureSettings": {
