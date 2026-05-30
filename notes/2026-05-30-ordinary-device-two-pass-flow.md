@@ -56,7 +56,7 @@ Simulator::initializeEarly()
 
 在 [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C) 中，首先发生的是：
 
-- [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C:400)
+- [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C) 第 400 行附近
   `mainCircuitBlock_->parseNetlistFilePass1(options_manager);`
 
 这说明一开始做的是 “pass1”。
@@ -89,10 +89,10 @@ Simulator::initializeEarly()
 
 ## `handleLinePass1(...)` 在普通器件链路里的作用
 
-在 [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C:286) 的
+在 [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 286 行附近的
 `parseNetlistFilePass1(...)` 主循环里，会不断调用：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C:997)
+- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 997 行附近的
   `handleLinePass1(...)`
 
 对于普通器件，比如 `R1 n1 n2 1k`，这里会发生的事情主要是：
@@ -127,11 +127,11 @@ Simulator::initializeEarly()
 实际上在 [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C) 中，pass1 之后会继续做两件事：
 
 1. 创建 distribution tool
-   - [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C:442)
+   - [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C) 第 442 行附近
      `distributionTool_ = DistToolFactory::create(...)`
 
 2. 调用第二遍器件处理
-   - [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C:479)
+   - [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C) 第 479 行附近
      `distributionTool_->distributeDevices();`
 
 这说明 `DistToolBase` 不是随机插入的新层，而是：
@@ -149,12 +149,12 @@ Simulator::initializeEarly()
 
 关键位置在：
 
-- [N_IO_DistToolBase.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C:715)
+- [N_IO_DistToolBase.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C) 第 715 行附近的
   `DistToolBase::handleDeviceLine(...)`
 
 在这个函数里，会调用：
 
-- [N_IO_DistToolBase.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C:730)
+- [N_IO_DistToolBase.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C) 第 730 行附近的
   `device_.extractData(netlistFilename_, deviceLine, resolveParams, modelBinning, scale);`
 
 这就是普通器件第一次真正被送入 `DeviceBlock` 做详细解析的地方。
@@ -186,10 +186,10 @@ Simulator::initializeEarly()
 
 ## 进入 `DeviceBlock` 之后发生什么
 
-在 [N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C:246) 的
+在 [N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C) 第 246 行附近的
 `DeviceBlock::extractData(...)` 里，普通器件最终会走到：
 
-- [N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C:490)
+- [N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C) 第 490 行附近的
   `extractBasicDeviceData(...)`
 
 这一步才是真正把一行类似：
@@ -204,12 +204,12 @@ R1 n1 n2 1k
 
 器件行被 `DeviceBlock` 解析后，会通过：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C:780)
+- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 780 行附近的
   `CircuitBlock::addTableData(DeviceBlock &device)`
 
 再继续进入：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C:815)
+- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 815 行附近的
   `topology_.addDevice(deviceManager_, device.getDeviceData());`
 
 这说明普通器件不是解析完就直接变成最终 device instance，而是先：
@@ -252,7 +252,7 @@ constructCircuitFromNetlist(...)
 
 接下来最自然的一步是：
 
-- 专门盯住 [N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C:490)
+- 专门盯住 [N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C) 第 490 行附近的
   `extractBasicDeviceData(...)`
 
 目标是把：
