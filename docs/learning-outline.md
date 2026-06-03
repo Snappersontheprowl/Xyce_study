@@ -210,10 +210,10 @@
 
 随着阅读推进，可以逐步建立这些笔记：
 
-- `notes/YYYY-MM-DD-entry-flow.md`
-- `notes/YYYY-MM-DD-parser-trace.md`
-- `notes/YYYY-MM-DD-device-resistor.md`
-- `notes/YYYY-MM-DD-analysis-flow.md`
+- `notes/02-startup/01-startup-flow.md`
+- `notes/03-netlist-and-circuit-build/01-netlist-parsing-roadmap.md`
+- `notes/04-device-trace/03-resistor-end-to-end.md`
+- `notes/05-analysis-flow/01-analysis-flow.md`
 
 每份笔记尽量围绕这几项展开：
 

@@ -1,12 +1,14 @@
-# 2026-05-26 startup flow
+# startup flow
+
+记录日期：2026-05-26
 
 ## 这次读了哪些文件
 
-- [src/Xyce.C](../vendor/Xyce-7.10.0/src/Xyce.C)
-- [src/CircuitPKG/N_CIR_Xyce.h](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
-- [src/CircuitPKG/N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
-- [src/IOInterfacePKG/N_IO_CmdParse.h](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CmdParse.h)
-- [src/IOInterfacePKG/N_IO_CmdParse.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CmdParse.C)
+- [src/Xyce.C](../../vendor/Xyce-7.10.0/src/Xyce.C)
+- [src/CircuitPKG/N_CIR_Xyce.h](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
+- [src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [src/IOInterfacePKG/N_IO_CmdParse.h](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CmdParse.h)
+- [src/IOInterfacePKG/N_IO_CmdParse.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CmdParse.C)
 
 ## 这次带着什么问题去读
 
@@ -37,7 +39,7 @@ main()
 
 ### `main()` 在哪里
 
-- `main()` 位于 [src/Xyce.C](../vendor/Xyce-7.10.0/src/Xyce.C)
+- `main()` 位于 [src/Xyce.C](../../vendor/Xyce-7.10.0/src/Xyce.C)
 - 默认执行路径是：
   - 创建 `Xyce::Circuit::Simulator`
   - 调用 `xyce.run(argc, argv)`
@@ -45,8 +47,8 @@ main()
 
 ### 顶层启动入口在哪里
 
-- 顶层类是 [N_CIR_Xyce.h](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 中的 `Xyce::Circuit::Simulator`
-- 关键函数在 [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)：
+- 顶层类是 [N_CIR_Xyce.h](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 中的 `Xyce::Circuit::Simulator`
+- 关键函数在 [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)：
   - `Simulator::run()`
   - `Simulator::initialize()`
   - `Simulator::initializeEarly()`
@@ -85,7 +87,7 @@ PARALLEL_INIT
 
 实际解析实现位于：
 
-- [N_IO_CmdParse.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CmdParse.C)
+- [N_IO_CmdParse.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CmdParse.C)
 
 当前理解：
 
@@ -156,7 +158,7 @@ netlist_import_tool.constructCircuitFromNetlist(...)
 
 这一步位于：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
 
 这说明第二阶段的一个重要结论是：
 
@@ -168,7 +170,7 @@ netlist_import_tool.constructCircuitFromNetlist(...)
 
 这次阅读已经能稳定回答第二阶段的四个核心问题：
 
-1. `main()` 在 [src/Xyce.C](../vendor/Xyce-7.10.0/src/Xyce.C)
+1. `main()` 在 [src/Xyce.C](../../vendor/Xyce-7.10.0/src/Xyce.C)
 2. 命令行解析入口在 `commandLine_.parseCommandLine(...)`
 3. 运行时对象初始化主要在 `initializeEarly()` 和 `initializeLate()`
 4. `netlist` 导入从 `PARSE_NETLIST` 阶段开始，关键调用是 `constructCircuitFromNetlist(...)`

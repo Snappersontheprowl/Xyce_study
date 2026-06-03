@@ -1,15 +1,17 @@
-# 2026-05-30 device topology to instance
+# device topology to instance
+
+记录日期：2026-05-30
 
 ## 这次读了哪些文件
 
-- [src/IOInterfacePKG/N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C)
-- [src/TopoManagerPKG/N_TOP_Topology.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C)
-- [src/TopoManagerPKG/N_TOP_CktNode_Dev.h](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
-- [src/TopoManagerPKG/N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
-- [src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C)
-- [src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
-- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h)
-- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C)
+- [src/IOInterfacePKG/N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C)
+- [src/TopoManagerPKG/N_TOP_Topology.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C)
+- [src/TopoManagerPKG/N_TOP_CktNode_Dev.h](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
+- [src/TopoManagerPKG/N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
+- [src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C)
+- [src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
+- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h)
+- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C)
 
 ## 这次带着什么问题去读
 
@@ -86,7 +88,7 @@ parse
 
 从这里开始看：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 780 行附近
+- [N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 780 行附近
   `CircuitBlock::addTableData(DeviceBlock &device)`
 
 这个函数先做几件基础工作：
@@ -96,7 +98,7 @@ parse
 
 真正关键的一句是：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 815 行附近
+- [N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 815 行附近
   `topology_.addDevice(deviceManager_, device.getDeviceData());`
 
 这句的含义不是 “创建最终 resistor instance”，而是：
@@ -109,7 +111,7 @@ parse
 
 接着看：
 
-- [N_TOP_Topology.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 191 行附近
+- [N_TOP_Topology.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 191 行附近
   `Topology::addDevice(...)`
 
 这个函数做的事情很有代表性：
@@ -149,7 +151,7 @@ n1 ---- R1 ---- n2
 
 再往下看：
 
-- [N_TOP_CktNode_Dev.h](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h) 第 54 行附近
+- [N_TOP_CktNode_Dev.h](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h) 第 54 行附近
   `CktNode_Dev(...)`
 
 这个构造函数做了两个很关键的动作：
@@ -173,12 +175,12 @@ n1 ---- R1 ---- n2
 
 真正的实例化发生在：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 1125 行附近
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 1125 行附近
   `topology_->instantiateDevices();`
 
 再跳到：
 
-- [N_TOP_Topology.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 1211 行附近
+- [N_TOP_Topology.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 1211 行附近
   `Topology::instantiateDevices()`
 
 这里的逻辑是：
@@ -205,7 +207,7 @@ n1 ---- R1 ---- n2
 
 看这里：
 
-- [N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 96 行附近
+- [N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 96 行附近
   `CktNode_Dev::instantiate()`
 
 核心代码是：
@@ -230,7 +232,7 @@ deviceInstance_ = deviceManager_->addDeviceInstance(*instanceBlock_);
 
 继续看：
 
-- [N_DEV_DeviceMgr.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 1419 行附近
+- [N_DEV_DeviceMgr.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 1419 行附近
   `DeviceMgr::addDeviceInstance(...)`
 
 这一层的核心职责不是手写所有器件逻辑，而是：
@@ -253,7 +255,7 @@ deviceInstance_ = deviceManager_->addDeviceInstance(*instanceBlock_);
 
 看这里：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1488 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1488 行附近
   `registerDevice(...)`
 
 这里做了：
@@ -279,7 +281,7 @@ registerDevice
 
 再看：
 
-- [N_DEV_Resistor.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h) 第 100 行附近
+- [N_DEV_Resistor.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h) 第 100 行附近
   `struct Traits`
 
 这里直接定义了 resistor 的一些关键静态特征：
@@ -308,7 +310,7 @@ registerDevice
 
 看：
 
-- [N_DEV_DeviceMgr.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 1134 行附近
+- [N_DEV_DeviceMgr.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 1134 行附近
   `getDeviceByModelType(...)`
 
 这里不是直接 `new Resistor::Instance`，而是：
@@ -319,7 +321,7 @@ registerDevice
 
 对于 resistor，这一步最终会经过：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1466 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1466 行附近
   `Traits::factory(...)`
 
 返回的是：
@@ -336,7 +338,7 @@ new Master(...)
 
 看：
 
-- [N_DEV_DeviceMaster.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h) 第 478 行附近
+- [N_DEV_DeviceMaster.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h) 第 478 行附近
   `DeviceMaster<T>::addInstance(...)`
 
 这个模板函数做了：
@@ -360,7 +362,7 @@ new InstanceType(configuration_, instance_block, model, factory_block);
 
 最后看：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 282 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 282 行附近
   `Resistor::Instance::Instance(...)`
 
 这个构造函数吃进去的四样东西非常重要：

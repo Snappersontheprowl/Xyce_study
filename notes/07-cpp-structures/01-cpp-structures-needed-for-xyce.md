@@ -1,21 +1,23 @@
-# 2026-06-03 cpp structures needed for Xyce
+# cpp structures needed for Xyce
+
+记录日期：2026-06-03
 
 ## 这次读了哪些文件
 
 这次不是为了追一条新的仿真主线，而是为了回头总结“阅读 Xyce 真正需要的 C++ 结构”。这次选的文件都尽量来自前几阶段已经见过的地方：
 
-- [src/CircuitPKG/N_CIR_Xyce.h](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
-- [src/CircuitPKG/N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
-- [src/AnalysisPKG/N_ANP_RegisterAnalysis.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
-- [src/LoaderServicesPKG/N_LOA_Loader.h](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
-- [src/NonlinearSolverPKG/N_NLS_Manager.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
-- [src/NonlinearSolverPKG/N_NLS_Manager.C](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
-- [src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
-- [src/TopoManagerPKG/N_TOP_CktNode_Dev.h](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
-- [src/TopoManagerPKG/N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
+- [src/CircuitPKG/N_CIR_Xyce.h](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
+- [src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [src/AnalysisPKG/N_ANP_RegisterAnalysis.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [src/LoaderServicesPKG/N_LOA_Loader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
+- [src/NonlinearSolverPKG/N_NLS_Manager.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
+- [src/NonlinearSolverPKG/N_NLS_Manager.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
+- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
+- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
+- [src/TopoManagerPKG/N_TOP_CktNode_Dev.h](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
+- [src/TopoManagerPKG/N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
 
 ## 这次带着什么问题去读
 
@@ -51,7 +53,7 @@
 
 先看：
 
-- [N_NLS_NonLinearSolver.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
+- [N_NLS_NonLinearSolver.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
 
 这里的 `NonLinearSolver` 不是一个“完整算法类”，而是：
 
@@ -98,7 +100,7 @@
 
 比如在：
 
-- [N_NLS_NonLinearSolver.C](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
 
 里，`rhs_()`、`jacobian_()`、`newton_()` 这些公共逻辑，正是“基类统一做”的那一部分。
 
@@ -127,7 +129,7 @@ Manager 更多是调度 / 注册 / 生命周期管理，
 
 例如：
 
-- [N_NLS_Manager.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
+- [N_NLS_Manager.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
 
 这里的 `Manager` 持有：
 
@@ -175,7 +177,7 @@ Manager 类就是专门干这个的。
 
 最直接的例子是：
 
-- [N_ANP_RegisterAnalysis.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
+- [N_ANP_RegisterAnalysis.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
 
 这里的：
 
@@ -200,7 +202,7 @@ Manager 类就是专门干这个的。
 
 device 这一侧更典型的例子是：
 
-- [N_DEV_DeviceMaster.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
+- [N_DEV_DeviceMaster.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
 
 在这里你已经见过：
 
@@ -257,7 +259,7 @@ Xyce 是老牌大型 C++ 工程，所以你会看到非常多：
 
 在：
 
-- [N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
 
 里，析构函数会手工 `delete`：
 
@@ -281,8 +283,8 @@ AnalysisManager 负责它们的重建和释放
 
 在：
 
-- [N_TOP_CktNode_Dev.h](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
-- [N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
+- [N_TOP_CktNode_Dev.h](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
+- [N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
 
 里可以看到一个很有代表性的 ownership 变化：
 
@@ -323,7 +325,7 @@ AnalysisManager 负责它们的重建和释放
 
 在：
 
-- [N_LOA_NonlinearEquationLoader.h](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
+- [N_LOA_NonlinearEquationLoader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
 
 里可以看到它接收的是：
 
@@ -343,7 +345,7 @@ AnalysisManager 负责它们的重建和释放
 
 反过来看：
 
-- [N_NLS_NonLinearSolver.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
+- [N_NLS_NonLinearSolver.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
 
 这里很多成员是指针，并通过 `register...()` 函数后续设置：
 
@@ -377,7 +379,7 @@ AnalysisManager 负责它们的重建和释放
 
 ## 第六类：`*_fwd.h` 和前向声明，是大工程降耦合的基本手段
 
-这个点在 [N_CIR_Xyce.h](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 和 [N_NLS_Manager.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h) 里都很明显。
+这个点在 [N_CIR_Xyce.h](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 和 [N_NLS_Manager.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h) 里都很明显。
 
 你会看到一长串：
 

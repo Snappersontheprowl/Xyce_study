@@ -1,25 +1,27 @@
-# 2026-06-02 resistor end-to-end trace
+# resistor end-to-end trace
+
+记录日期：2026-06-02
 
 ## 这次读了哪些文件
 
 这次按普通电阻 `R1 n1 n2 1k` 的完整链路顺序回看了这些文件：
 
-- [src/CircuitPKG/N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
-- [src/IOInterfacePKG/N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C)
-- [src/IOInterfacePKG/N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C)
-- [src/IOInterfacePKG/N_IO_DistToolBase.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C)
-- [src/IOInterfacePKG/N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C)
-- [src/TopoManagerPKG/N_TOP_Topology.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C)
-- [src/TopoManagerPKG/N_TOP_CktNode_Dev.h](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
-- [src/TopoManagerPKG/N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
-- [src/TopoManagerPKG/N_TOP_CktGraphBasic.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktGraphBasic.C)
-- [src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C)
-- [src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
-- [src/DeviceModelPKG/Core/N_DEV_Device.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_Device.h)
-- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h)
-- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C)
-- [src/LoaderServicesPKG/N_LOA_CktLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+- [src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [src/IOInterfacePKG/N_IO_NetlistImportTool.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C)
+- [src/IOInterfacePKG/N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C)
+- [src/IOInterfacePKG/N_IO_DistToolBase.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C)
+- [src/IOInterfacePKG/N_IO_DeviceBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C)
+- [src/TopoManagerPKG/N_TOP_Topology.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C)
+- [src/TopoManagerPKG/N_TOP_CktNode_Dev.h](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h)
+- [src/TopoManagerPKG/N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C)
+- [src/TopoManagerPKG/N_TOP_CktGraphBasic.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktGraphBasic.C)
+- [src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C)
+- [src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h)
+- [src/DeviceModelPKG/Core/N_DEV_Device.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_Device.h)
+- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h)
+- [src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C)
+- [src/LoaderServicesPKG/N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
+- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
 
 ## 这次带着什么问题去读
 
@@ -63,7 +65,7 @@ netlist line
 
 这条链的顶层入口还是：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
   中的 `netlist_import_tool.constructCircuitFromNetlist(...)`
 
 从这里进入 netlist 系统之后，普通器件链就可以先记成：
@@ -95,17 +97,17 @@ Simulator::initializeEarly()
 
 真正的详细解析发生在第二遍：
 
-- [N_IO_DistToolBase.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C) 第 715 行附近
+- [N_IO_DistToolBase.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C) 第 715 行附近
   `DistToolBase::handleDeviceLine(...)`
 
 这里会调用：
 
-- [N_IO_DistToolBase.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C) 第 730 行附近
+- [N_IO_DistToolBase.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DistToolBase.C) 第 730 行附近
   `device_.extractData(...)`
 
 对普通电阻，最终进入：
 
-- [N_IO_DeviceBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C) 第 490 行附近
+- [N_IO_DeviceBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.C) 第 490 行附近
   `extractBasicDeviceData(...)`
 
 这里会把：
@@ -133,17 +135,17 @@ R1 n1 n2 1k
 
 而是先经过：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 780 行附近
+- [N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 780 行附近
   `CircuitBlock::addTableData(DeviceBlock &device)`
 
 再进入：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 815 行附近
+- [N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 第 815 行附近
   `topology_.addDevice(deviceManager_, device.getDeviceData());`
 
 接着看：
 
-- [N_TOP_Topology.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 191 行附近
+- [N_TOP_Topology.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 191 行附近
   `Topology::addDevice(...)`
 
 这里的本质是建图：
@@ -170,7 +172,7 @@ R1 n1 n2 1k
 
 `Topology::addDevice(...)` 里插入的 `CktNode_Dev`，会在构造时保存一份 `InstanceBlock` 副本：
 
-- [N_TOP_CktNode_Dev.h](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h) 第 54 行附近
+- [N_TOP_CktNode_Dev.h](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.h) 第 54 行附近
   `CktNode_Dev(...)`
 
 这说明，图里此时保存的还不是最终 `DeviceInstance`，而是：
@@ -181,17 +183,17 @@ R1 n1 n2 1k
 
 真正实例化发生在：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 1125 行附近
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 1125 行附近
   `topology_->instantiateDevices();`
 
 再继续到：
 
-- [N_TOP_Topology.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 1211 行附近
+- [N_TOP_Topology.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 1211 行附近
   `Topology::instantiateDevices()`
 
 这里会遍历 `_DNODE`，然后调用：
 
-- [N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 96 行附近
+- [N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 96 行附近
   `CktNode_Dev::instantiate()`
 
 核心代码是：
@@ -217,12 +219,12 @@ deviceInstance_ = deviceManager_->addDeviceInstance(*instanceBlock_);
 
 可以看：
 
-- [N_DEV_DeviceMgr.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 1419 行附近
+- [N_DEV_DeviceMgr.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 1419 行附近
   `DeviceMgr::addDeviceInstance(...)`
 
 它之所以能把 `R` 路由到 resistor，是因为 resistor 预先注册过：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1488 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1488 行附近
   `registerDevice(...)`
 
 这里声明了：
@@ -245,7 +247,7 @@ new Resistor::Instance(...)
 
 它先通过 `Configuration` 和 `Traits::factory(...)` 拿到 resistor 的 `Master` 对象：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1466 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1466 行附近
   `Traits::factory(...)`
 
 这个 factory 返回的是：
@@ -256,7 +258,7 @@ new Master(...)
 
 真正创建 instance 的位置在通用模板里：
 
-- [N_DEV_DeviceMaster.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h) 第 478 行附近
+- [N_DEV_DeviceMaster.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMaster.h) 第 478 行附近
   `DeviceMaster<T>::addInstance(...)`
 
 这里有一句最关键的话：
@@ -282,7 +284,7 @@ InstanceType *instance = new InstanceType(configuration_, instance_block, model,
 
 先看：
 
-- [N_DEV_Resistor.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h) 第 100 行附近
+- [N_DEV_Resistor.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.h) 第 100 行附近
   `Traits`
 
 这里定义了 resistor 的静态特征：
@@ -293,7 +295,7 @@ InstanceType *instance = new InstanceType(configuration_, instance_block, model,
 
 再看：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 111 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 111 行附近
   `Traits::loadInstanceParameters(...)`
 
 这里把实例参数元数据注册进去，其中最关键的是：
@@ -310,12 +312,12 @@ InstanceType *instance = new InstanceType(configuration_, instance_block, model,
 
 最后看：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 282 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 282 行附近
   `Resistor::Instance::Instance(...)`
 
 以及：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 469 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 469 行附近
   `Instance::processParams()`
 
 这里可以得到一个稳定认识：
@@ -346,37 +348,37 @@ InstanceType *instance = new InstanceType(configuration_, instance_block, model,
 
 先看：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 1261 行附近
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 1261 行附近
   `runState_ = SETUP_MATRIX_STRUCTURE;`
 
 然后调用：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 640 行附近
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 640 行附近
   `setUpMatrixStructure_()`
 
 这个函数里关键一步是：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 649 行附近
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C) 第 649 行附近
   `topology_->registerLIDswithDevs();`
 
 接着：
 
-- [N_TOP_Topology.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 240 行附近
+- [N_TOP_Topology.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_Topology.C) 第 240 行附近
   `Topology::registerLIDswithDevs()`
 
 再继续到：
 
-- [N_TOP_CktGraphBasic.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktGraphBasic.C) 第 374 行附近
+- [N_TOP_CktGraphBasic.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktGraphBasic.C) 第 374 行附近
   `CktGraphBasic::registerLIDswithDevs(...)`
 
 这里会遍历 `_DNODE`，然后经由：
 
-- [N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 223 行附近
+- [N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 223 行附近
   `registerLIDswithDev(...)`
 
 把局部索引最终交给：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 543 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 543 行附近
   `Instance::registerLIDs(...)`
 
 在这里，电阻会把：
@@ -388,12 +390,12 @@ InstanceType *instance = new InstanceType(configuration_, instance_block, model,
 
 同样，Jacobian offset 会通过：
 
-- [N_TOP_CktNode_Dev.C](../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 434 行附近
+- [N_TOP_CktNode_Dev.C](../../vendor/Xyce-7.10.0/src/TopoManagerPKG/N_TOP_CktNode_Dev.C) 第 434 行附近
   `registerJacLIDswithDev(...)`
 
 再进入：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 668 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 668 行附近
   `Instance::registerJacLIDs(...)`
 
 最后保存成：
@@ -417,37 +419,37 @@ InstanceType *instance = new InstanceType(configuration_, instance_block, model,
 
 从比较高的一层看：
 
-- [N_LOA_NonlinearEquationLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C) 第 418 行附近
+- [N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C) 第 418 行附近
   `loader_.loadDAEVectors(...)`
 
 以及：
 
-- [N_LOA_NonlinearEquationLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C) 第 533 行附近
+- [N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C) 第 533 行附近
   `loader_.loadDAEMatrices(...)`
 
 这里的 `loader_` 对应的是：
 
-- [N_LOA_CktLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
+- [N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
   里的 `CktLoader`
 
 它继续把调用转发给：
 
-- [N_LOA_CktLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C) 第 648 行附近
+- [N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C) 第 648 行附近
   `deviceManager_.loadDAEVectors(...)`
 
 和：
 
-- [N_LOA_CktLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C) 第 476 行附近
+- [N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C) 第 476 行附近
   `deviceManager_.loadDAEMatrices(...)`
 
 然后：
 
-- [N_DEV_DeviceMgr.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 4156 行附近
+- [N_DEV_DeviceMgr.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 4156 行附近
   `DeviceMgr::loadDAEVectors(...)`
 
 和：
 
-- [N_DEV_DeviceMgr.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 3980 行附近
+- [N_DEV_DeviceMgr.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.C) 第 3980 行附近
   `DeviceMgr::loadDAEMatrices(...)`
 
 再把调用下发到每个 `Device` 对象。
@@ -458,10 +460,10 @@ InstanceType *instance = new InstanceType(configuration_, instance_block, model,
 
 resistor 虽然定义了：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 798 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 798 行附近
   `Instance::loadDAEFVector()`
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 872 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 872 行附近
   `Instance::loadDAEdFdx()`
 
 但是注释里已经明确说了：
@@ -471,10 +473,10 @@ resistor 虽然定义了：
 
 也就是：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1211 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1211 行附近
   `Master::loadDAEVectors(...)`
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1306 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1306 行附近
   `Master::loadDAEMatrices(...)`
 
 这么做的原因很实际：
@@ -493,7 +495,7 @@ resistor 的 load / stamp 逻辑，语义上对应 Instance::loadDAEFVector 和 
 
 先看：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1211 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1211 行附近
   `Master::loadDAEVectors(...)`
 
 核心逻辑是：
@@ -527,7 +529,7 @@ fVec[li_Neg] += -(Vpos - Vneg) * G
 
 再看：
 
-- [N_DEV_Resistor.C](../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1306 行附近
+- [N_DEV_Resistor.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_Resistor.C) 第 1306 行附近
   `Master::loadDAEMatrices(...)`
 
 对于普通线性 resistor，核心 stamp 就是：

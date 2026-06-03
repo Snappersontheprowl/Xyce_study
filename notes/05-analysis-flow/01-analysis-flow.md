@@ -1,18 +1,20 @@
-# 2026-06-02 analysis flow
+# analysis flow
+
+记录日期：2026-06-02
 
 ## 这次读了哪些文件
 
 这次按“从 `Simulator::runSimulation()` 进入分析流程”的顺序读了这些文件：
 
-- [src/CircuitPKG/N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
-- [src/AnalysisPKG/N_ANP_RegisterAnalysis.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.h](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
-- [src/AnalysisPKG/N_ANP_DCSweep.h](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.h)
-- [src/AnalysisPKG/N_ANP_DCSweep.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
-- [src/AnalysisPKG/N_ANP_Transient.h](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.h)
-- [src/AnalysisPKG/N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+- [src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [src/AnalysisPKG/N_ANP_RegisterAnalysis.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [src/AnalysisPKG/N_ANP_DCSweep.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.h)
+- [src/AnalysisPKG/N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [src/AnalysisPKG/N_ANP_Transient.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.h)
+- [src/AnalysisPKG/N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
 
 ## 这次带着什么问题去读
 
@@ -60,7 +62,7 @@ Simulator::runSimulation()
 
 这一段的总入口在：
 
-- [N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
   中的 `Simulator::runSimulation()`
 
 虽然这次没有专门去展开整个 `runSimulation()` 的每一行，但从调用关系看，分析层真正的入口会落到：
@@ -69,7 +71,7 @@ Simulator::runSimulation()
 
 所以第五阶段最重要的第一个文件是：
 
-- [N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
 
 ## 为什么先看 `AnalysisManager`
 
@@ -79,7 +81,7 @@ Simulator::runSimulation()
 
 在头文件里就已经能看出来：
 
-- [N_ANP_AnalysisManager.h](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
+- [N_ANP_AnalysisManager.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
 
 这里最值得先注意的成员和接口有：
 
@@ -111,7 +113,7 @@ Simulator::runSimulation()
 
 先看：
 
-- [N_ANP_RegisterAnalysis.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
+- [N_ANP_RegisterAnalysis.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
 
 这个文件里有：
 
@@ -148,7 +150,7 @@ Simulator::runSimulation()
 
 在：
 
-- [N_ANP_DCSweep.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 第 1194 行附近
+- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 第 1194 行附近
   `registerDCSweepFactory(...)`
 
 这里注册了：
@@ -171,7 +173,7 @@ Simulator::runSimulation()
 
 在：
 
-- [N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 4529 行附近
+- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 4529 行附近
   `registerTransientFactory(...)`
 
 这里注册了：
@@ -197,7 +199,7 @@ Simulator::runSimulation()
 
 继续看：
 
-- [N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C) 第 580 行附近
+- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C) 第 580 行附近
   `allocateAnalysisObject(...)`
 
 这是第五阶段最重要的函数之一。
@@ -261,7 +263,7 @@ analysisObject_        = 实际被 run() 调用的顶层驱动对象，可能是
 
 接着看：
 
-- [N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C) 第 526 行附近
+- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C) 第 526 行附近
   `AnalysisManager::run()`
 
 这个函数本身并不直接实现 DC loop 或 transient loop。
@@ -296,7 +298,7 @@ runStatus = analysisObject_->run();
 
 看：
 
-- [N_ANP_DCSweep.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 第 276 行附近
+- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 第 276 行附近
   `DCSweep::doRun()`
 
 它很清楚：
@@ -311,7 +313,7 @@ doInit()
 
 再看：
 
-- [N_ANP_DCSweep.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 第 289 行附近
+- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 第 289 行附近
   `DCSweep::doInit()`
 
 这里最关键的动作有：
@@ -343,7 +345,7 @@ DC sweep 的本质是一系列 operating point 求解
 
 看：
 
-- [N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 739 行附近
+- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 739 行附近
   `Transient::doRun()`
 
 这里的总结构是：
@@ -368,7 +370,7 @@ doInit()
 
 再看：
 
-- [N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 839 行附近
+- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 839 行附近
   `Transient::doInit()`
 
 这里做的事情主要是：
@@ -381,14 +383,14 @@ doInit()
 
 然后：
 
-- [N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 1056 行附近
+- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 1056 行附近
   `Transient::doTranOP()`
 
 这里专门负责 transient 开始前的 DC operating point 计算。
 
 最后：
 
-- [N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 1178 行附近
+- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 第 1178 行附近
   `Transient::doLoopProcess()`
 
 这里才是真正的时间步进循环。
@@ -408,7 +410,7 @@ doInit()
 
 看：
 
-- [N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C) 第 408 行附近
+- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C) 第 408 行附近
   `initializeSolverSystem(...)`
 
 这个函数会重新创建几类核心对象：
@@ -420,7 +422,7 @@ doInit()
 
 再结合头文件里的成员：
 
-- [N_ANP_AnalysisManager.h](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h) 第 560 行附近
+- [N_ANP_AnalysisManager.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h) 第 560 行附近
 
 可以把共用基础设施先归纳成：
 

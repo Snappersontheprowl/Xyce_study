@@ -1,8 +1,10 @@
-# 2026-05-27 N_CIR_Xyce header
+# N_CIR_Xyce header
+
+记录日期：2026-05-27
 
 ## 这次读了哪些文件
 
-- [src/CircuitPKG/N_CIR_Xyce.h](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
+- [src/CircuitPKG/N_CIR_Xyce.h](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
 
 ## 这次带着什么问题去读
 
@@ -17,7 +19,7 @@
 
 当前最重要的结论是：
 
-- [N_CIR_Xyce.h](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 定义了 `Xyce::Circuit::Simulator`
+- [N_CIR_Xyce.h](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h) 定义了 `Xyce::Circuit::Simulator`
 - 这个类是 Xyce 的 top-level class
 - 这个头文件最适合拿来建立“顶层结构认识”，而不是一开始逐个读完所有成员函数
 
@@ -266,7 +268,7 @@ run / initialize
 
 最自然的下一步是去看：
 
-- [src/CircuitPKG/N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
 
 重点追这几个函数的实现：
 

@@ -1,23 +1,25 @@
-# 2026-06-03 matrix assembly and solver interface
+# matrix assembly and solver interface
+
+记录日期：2026-06-03
 
 ## 这次读了哪些文件
 
 这次按“从分析层进入装配层，再进入 nonlinear / linear solver”的顺序读了这些文件：
 
-- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
-- [src/AnalysisPKG/N_ANP_DCSweep.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
-- [src/AnalysisPKG/N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
-- [src/LinearAlgebraServicesPKG/N_LAS_System.h](../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
-- [src/LinearAlgebraServicesPKG/N_LAS_Problem.h](../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
-- [src/LinearAlgebraServicesPKG/N_LAS_Solver.h](../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
-- [src/LoaderServicesPKG/N_LOA_Loader.h](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
-- [src/LoaderServicesPKG/N_LOA_CktLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
-- [src/NonlinearSolverPKG/N_NLS_Manager.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
-- [src/NonlinearSolverPKG/N_NLS_Manager.C](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [src/AnalysisPKG/N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [src/AnalysisPKG/N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [src/LinearAlgebraServicesPKG/N_LAS_System.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
+- [src/LinearAlgebraServicesPKG/N_LAS_Problem.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
+- [src/LinearAlgebraServicesPKG/N_LAS_Solver.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
+- [src/LoaderServicesPKG/N_LOA_Loader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
+- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
+- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+- [src/LoaderServicesPKG/N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
+- [src/NonlinearSolverPKG/N_NLS_Manager.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
+- [src/NonlinearSolverPKG/N_NLS_Manager.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
+- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
+- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
 
 ## 这次带着什么问题去读
 
@@ -65,7 +67,7 @@ AnalysisManager::initializeSolverSystem()
 
 这一层最关键的函数还是：
 
-- [N_ANP_AnalysisManager.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
   中的 `AnalysisManager::initializeSolverSystem(...)`
 
 这个函数做了四件和第六阶段直接相关的事：
@@ -95,7 +97,7 @@ solver 不是直接拿 device 去算，
 
 这一层先看：
 
-- [N_LAS_System.h](../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
+- [N_LAS_System.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
 
 `Linear::System` 可以先理解成：
 
@@ -121,7 +123,7 @@ solver 不是直接拿 device 去算，
 
 继续看：
 
-- [N_LAS_Problem.h](../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
+- [N_LAS_Problem.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
 
 `Linear::Problem` 更像是：
 
@@ -154,7 +156,7 @@ A x = b
 
 但在 Xyce 里，中间有一层很明确的隔离：
 
-- [N_LOA_Loader.h](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
+- [N_LOA_Loader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
 
 这个头文件的注释其实已经把设计意图说得很直白了：
 
@@ -177,8 +179,8 @@ NonlinearSolver
 
 接着看：
 
-- [N_LOA_NonlinearEquationLoader.h](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
-- [N_LOA_NonlinearEquationLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+- [N_LOA_NonlinearEquationLoader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
+- [N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
 
 这个类不是直接去遍历所有器件做物理计算，它更像：
 
@@ -253,7 +255,7 @@ time integration 写最终 residual / Jacobian 组合规则
 
 既然 `NonlinearEquationLoader` 调的是 `loader_.loadDAEVectors()` 和 `loader_.loadDAEMatrices()`，下一步自然就应该看：
 
-- [N_LOA_CktLoader.C](../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
+- [N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
 
 这里最重要的两个函数是：
 
@@ -339,7 +341,7 @@ time integration 写最终 residual / Jacobian 组合规则
 
 在：
 
-- [N_ANP_DCSweep.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
 
 的 `takeStep_()` 里，可以直接看到：
 
@@ -347,7 +349,7 @@ time integration 写最终 residual / Jacobian 组合规则
 
 在：
 
-- [N_ANP_Transient.C](../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
 
 里也能看到同样的调用：
 
@@ -369,8 +371,8 @@ time integration 写最终 residual / Jacobian 组合规则
 
 继续看：
 
-- [N_NLS_Manager.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
-- [N_NLS_Manager.C](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
+- [N_NLS_Manager.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
+- [N_NLS_Manager.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
 
 `Manager` 的头文件注释已经说得很清楚：
 
@@ -411,8 +413,8 @@ nonlinear solver 的管理和分发层
 
 接着看：
 
-- [N_NLS_NonLinearSolver.h](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
-- [N_NLS_NonLinearSolver.C](../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [N_NLS_NonLinearSolver.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
+- [N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
 
 这个类是所有 nonlinear solver 算法共享的抽象基类。
 
@@ -483,7 +485,7 @@ NonLinearSolver::newton_()
 
 最后再看：
 
-- [N_LAS_Solver.h](../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
+- [N_LAS_Solver.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
 
 这里的抽象非常干净：
 

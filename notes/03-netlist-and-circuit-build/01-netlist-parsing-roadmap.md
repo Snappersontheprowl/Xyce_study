@@ -1,16 +1,18 @@
-# 2026-05-27 netlist parsing roadmap
+# netlist parsing roadmap
+
+记录日期：2026-05-27
 
 ## 这次读了哪些文件
 
-- [src/CircuitPKG/N_CIR_Xyce.C](../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
-- [src/IOInterfacePKG/N_IO_NetlistImportTool.h](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.h)
-- [src/IOInterfacePKG/N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C)
-- [src/IOInterfacePKG/N_IO_CircuitBlock.h](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.h)
-- [src/IOInterfacePKG/N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C)
-- [src/IOInterfacePKG/N_IO_DeviceBlock.h](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.h)
-- [src/IOInterfacePKG/N_IO_ParameterBlock.h](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_ParameterBlock.h)
-- [src/IOInterfacePKG/N_IO_OptionBlock.h](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_OptionBlock.h)
-- [src/DeviceModelPKG/Core/N_DEV_DeviceMgr.h](../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.h)
+- [src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [src/IOInterfacePKG/N_IO_NetlistImportTool.h](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.h)
+- [src/IOInterfacePKG/N_IO_NetlistImportTool.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C)
+- [src/IOInterfacePKG/N_IO_CircuitBlock.h](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.h)
+- [src/IOInterfacePKG/N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C)
+- [src/IOInterfacePKG/N_IO_DeviceBlock.h](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_DeviceBlock.h)
+- [src/IOInterfacePKG/N_IO_ParameterBlock.h](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_ParameterBlock.h)
+- [src/IOInterfacePKG/N_IO_OptionBlock.h](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_OptionBlock.h)
+- [src/DeviceModelPKG/Core/N_DEV_DeviceMgr.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/Core/N_DEV_DeviceMgr.h)
 
 ## 这次带着什么问题去读
 
@@ -49,9 +51,9 @@ netlist 文本
 
 真正进入 netlist 导入主线的关键函数是：
 
-- [N_IO_NetlistImportTool.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C) 里的 `NetlistImportTool::constructCircuitFromNetlist(...)`
+- [N_IO_NetlistImportTool.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.C) 里的 `NetlistImportTool::constructCircuitFromNetlist(...)`
 
-从 [N_IO_NetlistImportTool.h](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.h) 的注释可以直接看出，它承担三件事：
+从 [N_IO_NetlistImportTool.h](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_NetlistImportTool.h) 的注释可以直接看出，它承担三件事：
 
 1. 读并解析 netlist
 2. 把解析结果存进合适的数据结构
@@ -63,7 +65,7 @@ netlist 文本
 
 这一点最关键的函数是：
 
-- [N_IO_CircuitBlock.C](../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 里的 `CircuitBlock::handleLinePass1(...)`
+- [N_IO_CircuitBlock.C](../../vendor/Xyce-7.10.0/src/IOInterfacePKG/N_IO_CircuitBlock.C) 里的 `CircuitBlock::handleLinePass1(...)`
 
 当前可以先抓住最粗粒度的分类规则：
 
