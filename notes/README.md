@@ -9,7 +9,9 @@
 - `03-netlist-and-circuit-build/`：`netlist` 解析与电路构建
 - `04-device-trace/`：普通器件到实例化、装配的纵向追踪
 - `05-analysis-flow/`：`.OP`、`.DC`、`.TRAN` 等分析流程
-- `06-solver-and-assembly/`：矩阵装配与 solver 接口
+- `06-solver-and-assembly/`：分成两条主线
+  - `01-dae-assembly-pipeline.md`：电路 DAE 的建立与装配
+  - `02-dae-math-solving.md`：DAE 建好后的数学求解与代码对照
 - `07-cpp-structures/`：阅读 Xyce 真正需要的 C++ 结构
 
 命名约定：
