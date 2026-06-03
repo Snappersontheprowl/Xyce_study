@@ -2,455 +2,197 @@
 
 记录日期：2026-06-04
 
-## 这次读了哪些文件
+## 这篇的定位
 
-这次只盯“DAE 已经装好之后，数学上怎么求解”，按从分析触发到 Newton / linear solve 的顺序读了这些文件：
+这篇不负责把所有细节一次讲完，而是作为“DAE 建好之后数学上怎么解”的总览入口。
 
-- [src/AnalysisPKG/N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
-- [src/AnalysisPKG/N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
-- [src/NonlinearSolverPKG/N_NLS_Manager.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
-- [src/NonlinearSolverPKG/N_NLS_Manager.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
-- [src/LinearAlgebraServicesPKG/N_LAS_System.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
-- [src/LinearAlgebraServicesPKG/N_LAS_Problem.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
-- [src/LinearAlgebraServicesPKG/N_LAS_Solver.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+前一篇 [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md) 已经回答了：
 
-## 这次带着什么问题去读
+- device 先写出哪些 DAE 组成部分
+- `DeviceMgr`、`CktLoader`、`NonlinearEquationLoader` 分别如何把这些量汇总起来
 
-这一篇专门回答：
+这一篇往前走一步，先抓住最本质的问题：
 
-- DAE 量已经齐备之后，数学上要解的方程到底是什么？
-- residual 和 Jacobian 是哪一层真正组合出来的？
-- 分析流程在哪一步发起 nonlinear solve？
-- Newton 迭代里，谁负责 residual load、Jacobian load、linear solve？
-- 这些数学步骤在代码里分别对应哪些函数？
+```text
+DC 仿真到底在解什么方程？
+TR 仿真每一个时间步到底在解什么方程？
+Newton 和 linear solve 在代码里落在哪？
+```
 
 ## 当前结论先写在前面
 
-这一篇最重要的主线是：
+对当前阶段，最核心的数学对象可以先压缩成下面两组。
+
+### 1. DC operating point
+
+稳态下没有时间导数，所以目标方程退化成：
+
+$$
+F(x) - B = 0
+$$
+
+或者写成更标准的 nonlinear equation：
+
+$$
+f(x) = F(x) - B = 0
+$$
+
+Newton 线性化后，每一步要解的是：
+
+$$
+J(x_k)\,\Delta x_k = -f(x_k)
+$$
+
+其中：
+
+$$
+J(x_k) = \frac{\partial F}{\partial x}(x_k)
+$$
+
+在 Xyce 里，这条主线最适合专门看：
+
+- [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
+
+### 2. Transient
+
+瞬态下要解的原始 DAE 是：
+
+$$
+\frac{dQ(x)}{dt} + F(x) - B(t) = 0
+$$
+
+这不是一个“直接一次解完”的代数方程，而是：
+
+1. 先选一个 time integration method
+2. 把 $$\frac{dQ}{dt}$$ 离散成代数形式
+3. 在每一个时间步上，形成一个新的 nonlinear equation
+4. 再对这个 nonlinear equation 做 Newton
+
+所以 transient 的本质是：
 
 ```text
-分析流程
--> nonlinearManager_.solve()
--> NonLinearSolver::rhs_()
-   -> NonlinearEquationLoader::loadRHS()
-   -> obtainResidual()
--> NonLinearSolver::jacobian_()
-   -> NonlinearEquationLoader::loadJacobian()
-   -> obtainJacobian()
--> NonLinearSolver::newton_()
-   -> Linear::Solver::solve()
+时间推进
++
+每个时间步上的 nonlinear solve
 ```
 
-如果只抓数学本质，可以先记成：
+在 Xyce 里，这条主线最适合专门看：
 
-```text
-目标方程：f(x) = dQ/dt + F(x) - B(t) = 0
-Jacobian：J = d(dQ/dt)/dx + dF/dx
-Newton 步：J * Δx = -f(x)
-```
+- [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
 
-代码里这三步分别由：
+## 从代码层看，总的求解骨架是什么
 
-- `loadRHS()`
-- `loadJacobian()`
-- `newton_()`
+无论是 DC 还是 transient，真正触发 nonlinear solve 的外层入口都很像：
 
-对应起来。
+- `.DC` / `.OP` 一类会在 [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 里调用 `nonlinearManager_.solve()`
+- `.TRAN` 会在 [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 里调用 `nonlinearManager_.solve()`
 
-## 先把数学对象和代码对象对上
+而一旦进入 nonlinear solver 这层，公共骨架都会回到：
 
-这是这一篇最关键的第一步。
-
-前一篇已经知道，device 层先写出：
-
-- `Q`
-- `F`
-- `B`
-- `dQdx`
-- `dFdx`
-
-接下来数学上真正要解的不是这些量本身，而是：
-
-```text
-f(x) = dQ/dt + F - B = 0
-```
-
-以及它的 Jacobian：
-
-```text
-J = d(dQ/dt)/dx + dF/dx
-```
-
-这在代码里并不是由 device 直接完成，而是由：
-
-- [N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
-
-里的：
-
-- `loadRHS()`
-- `loadJacobian()`
-
-再加上 `WorkingIntegrationMethod` 去做最终组合。
-
-### 代码对照：residual
-
-数学上：
-
-```text
-f(x) = dQ/dt + F - B
-```
-
-代码上：
-
-1. `NonlinearEquationLoader::loadRHS()` 先让下层装出 `daeQ`、`daeF`、`daeB`
-2. `wim_.obtainResidual()` 再把它们组合成 nonlinear solver 真正看到的 residual
-
-### 代码对照：Jacobian
-
-数学上：
-
-```text
-J = d(dQ/dt)/dx + dF/dx
-```
-
-代码上：
-
-1. `NonlinearEquationLoader::loadJacobian()` 先让下层装出 `dQdx`、`dFdx`
-2. `wim_.obtainJacobian()` 再根据积分方法把最终 Jacobian 组合出来
-
-所以这一篇的第一个核心认知是：
-
-```text
-NonlinearEquationLoader + WorkingIntegrationMethod
-共同把 DAE 组成部分变成数学求解对象
-```
-
-## 数学求解是在哪一步被触发的
-
-接下来要回答：
-
-```text
-谁决定“现在该解一次 f(x)=0 了”
-```
-
-这一层先回到分析代码。
-
-### 在 `.DC` 里
-
-看：
-
-- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
-
-在 `takeStep_()` 里有：
-
-- `analysisManager_.getStepErrorControl().newtonConvergenceStatus = nonlinearManager_.solve();`
-
-这说明 `.DC` 分析并不自己展开 Newton 细节，它只是：
-
-```text
-在一个需要求解 operating point 的时刻，
-调用 nonlinearManager_.solve()
-```
-
-### 在 `.TRAN` 里
-
-看：
-
-- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
-
-里面也能看到同样的调用：
-
-- `nonlinearManager_.solve()`
-
-这说明：
-
-- `.TRAN` 控制“什么时候要解”
-- `Nonlinear::Manager` 决定“把这个解交给哪种 nonlinear solver”
-- 具体 residual / Jacobian / Newton 步的数学细节，不在分析类里展开
-
-## `Nonlinear::Manager` 在数学求解专题里是什么角色
-
-接着看：
-
-- [N_NLS_Manager.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.h)
-- [N_NLS_Manager.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
-
-在这个专题里，它最重要的身份不是“数学算法实现”，而是：
-
-```text
-nonlinear solver 的统一入口
-```
-
-它做的几件关键事情是：
-
-1. 持有一个具体 `nonlinearSolver_`
-2. 给它注册：
-   - `Linear::System`
-   - `NonlinearEquationLoader`
-   - `DataStore`
-   - `AnalysisManager`
-3. 在外部调用 `solve()` 时直接转发：
-   - `return nonlinearSolver_->solve();`
-
-所以如果从“数学求解接口”角度看，`Manager` 更像：
-
-```text
-分析层 -> 数学求解层 的门面
-```
-
-## 真正展开 Newton 主线的是 `NonLinearSolver`
-
-接下来才是真正的数学主角：
-
-- [N_NLS_NonLinearSolver.h](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.h)
 - [N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
 
-这个类虽然是抽象基类，但已经把“通用数学骨架”搭好了。
+里的三个关键动作：
 
-这里最值得抓的四个 helper 是：
+1. `rhs_()`  
+   生成当前点的 residual
+2. `jacobian_()`  
+   生成当前点的 Jacobian
+3. `newton_()`  
+   调用 linear solver，求 Newton 更新方向
 
-- `setX0_()`
-- `rhs_()`
-- `jacobian_()`
-- `newton_()`
+所以总骨架可以先记成：
 
-### `setX0_()`
+$$
+\text{Analysis}
+\rightarrow \text{nonlinearManager.solve()}
+\rightarrow \text{rhs}
+\rightarrow \text{jacobian}
+\rightarrow \text{linear solve}
+$$
 
-这一步先不用想复杂，它做的是：
+## 为什么要把 DC 和 TR 分开
 
-```text
-准备本轮 Newton 迭代使用的当前解向量
-```
+它们的“求解器骨架”很像，但“方程来源”不一样。
 
-也就是把当前解相关信息同步到 solver 看见的工作向量里。
+### DC
 
-### `rhs_()`
+DC 里本质上是在解：
 
-这一步对应的是：
+$$
+F(x) - B = 0
+$$
 
-```text
-计算当前 x 下的 residual
-```
+这更像一个纯稳态 nonlinear algebraic problem。
 
-代码上最关键的一句是：
+### TR
 
-- `nonlinearEquationLoader_->loadRHS();`
+TR 里每个时间步解的是：
 
-所以：
+$$
+\Phi_n(x_n) = 0
+$$
 
-```text
-NonLinearSolver::rhs_()
--> 不是自己算 residual
--> 而是回到 DAE 组合链去拿 residual
-```
+其中 $$\Phi_n$$ 不是单纯的 $$F(x)-B$$，而是把时间离散也并进去了。
 
-### `jacobian_()`
+例如最朴素地理解 backward Euler 时，可以把它想成：
 
-这一步对应的是：
+$$
+\Phi_n(x_n)
+=
+\frac{Q(x_n)-Q(x_{n-1})}{\Delta t}
+ + F(x_n) - B(t_n)
+= 0
+$$
 
-```text
-计算当前 x 下的 Jacobian
-```
-
-代码上最关键的一句是：
-
-- `nonlinearEquationLoader_->loadJacobian();`
-
-所以：
-
-```text
-NonLinearSolver::jacobian_()
--> 不是自己逐项微分 device
--> 而是回到 DAE 组合链去拿 Jacobian
-```
-
-### `newton_()`
-
-这一步就是数学求解专题里最关键的那一下：
+所以 transient 和 DC 最大的区别，不在“有没有 Newton”，而在：
 
 ```text
-解线性化方程，得到 Newton 更新方向
+每一步 nonlinear solve 所对应的方程本身不同
 ```
 
-代码里最关键的是：
+## 这一小专题现在拆成哪几篇
 
-- `lasSolverRCPtr_->setNewtonIter(...)`
-- `lasSolverRCPtr_->solve(false)`
+建议按下面顺序读：
 
-把它和数学表达式对起来看，就是：
+1. [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)  
+   先弄清 DAE 量是怎么被装出来的
 
-```text
-J * Δx = -f(x)
-```
+2. [02-dae-math-solving.md](02-dae-math-solving.md)  
+   先建立 DC / TR 数学问题的总览
 
-所以如果要回答“linear solver 真正在哪一层被调用”，这里就是最直接的答案：
+3. [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)  
+   细看稳态 operating point 的方程、Newton 和代码
 
-```text
-NonLinearSolver::newton_()
-```
+4. [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)  
+   细看 time discretization、每一步 nonlinear solve 和代码
 
-## `Linear::System`、`Problem`、`Solver` 在数学求解里分别代表什么
+## 这一篇只想让你先记住的 3 句话
 
-这一层最好直接跟数学对象对照。
+1. DC 在本质上是在解：
 
-### `Linear::System`
+$$
+F(x)-B=0
+$$
 
-看：
+2. transient 在本质上是在解：
 
-- [N_LAS_System.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
+$$
+\frac{dQ(x)}{dt}+F(x)-B(t)=0
+$$
 
-它提供：
+但它会先被离散成“每一个时间步上的 nonlinear algebraic equation”。
 
-- Jacobian matrix
-- RHS vector
-- Newton vector
-- `Problem`
+3. 不管是 DC 还是 TR，一旦进入 Newton 主线，最终都会走到：
 
-可以先理解成：
+- residual load
+- Jacobian load
+- linear solve
 
-```text
-求解所需矩阵/向量的宿主
-```
-
-### `Linear::Problem`
-
-看：
-
-- [N_LAS_Problem.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
-
-它把：
-
-- `A`
-- `x`
-- `b`
-
-打包到一起。
-
-所以数学上，它最接近：
-
-```text
-A x = b
-```
-
-这一整个线性问题对象。
-
-### `Linear::Solver`
-
-看：
-
-- [N_LAS_Solver.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
-
-它对外暴露的核心就是：
-
-- `solve(bool reuse_factors = false)`
-
-所以从数学角度看，这一层的职责非常纯粹：
-
-```text
-给你一个线性问题
-把它解出来
-```
-
-前面的电路、器件、DAE，都不会直接泄漏到这个接口里。
-
-## 把数学主线和代码主线对齐
-
-这一篇最有用的部分，我建议就记下面这张对照表。
-
-### 1. 目标方程
-
-数学：
-
-```text
-f(x) = dQ/dt + F - B = 0
-```
-
-代码：
-
-- `NonlinearEquationLoader::loadRHS()`
-- `WorkingIntegrationMethod::obtainResidual()`
-
-### 2. Jacobian
-
-数学：
-
-```text
-J = d(dQ/dt)/dx + dF/dx
-```
-
-代码：
-
-- `NonlinearEquationLoader::loadJacobian()`
-- `WorkingIntegrationMethod::obtainJacobian()`
-
-### 3. Newton 线性化
-
-数学：
-
-```text
-J * Δx = -f(x)
-```
-
-代码：
-
-- `NonLinearSolver::newton_()`
-- `Linear::Solver::solve()`
-
-### 4. 外层触发点
-
-数学语义：
-
-```text
-在当前分析步骤，需要做一次 nonlinear solve
-```
-
-代码：
-
-- `.DC` / `.TRAN` 里的 `nonlinearManager_.solve()`
-
-## 这篇最重要的路径图
-
-这一篇建议记下面这张“数学求解图”：
-
-```text
-.DC / .TRAN
--> nonlinearManager_.solve()
--> NonLinearSolver::setX0_()
--> NonLinearSolver::rhs_()
-   -> loadRHS()
-   -> obtainResidual()
--> NonLinearSolver::jacobian_()
-   -> loadJacobian()
-   -> obtainJacobian()
--> NonLinearSolver::newton_()
-   -> Linear::Solver::solve()
-```
-
-如果再压缩一句话：
-
-```text
-分析层决定何时求解，NonLinearSolver 展开 Newton 骨架，Linear::Solver 负责解每一步线性化方程
-```
-
-## 这一篇先不展开什么
-
-为了让这个专题保持“数学求解”聚焦，这里先不继续深挖：
-
-- `DampedNewton::solve()` 的全部迭代细节
-- `NOX` 分支和 pseudo-transient 细节
-- 线性 solver 背后具体是哪个 Trilinos 算法
-- 收敛判据和步长控制的全部策略
-
-这些都属于下一层纵深阅读。
+只是它们对应的方程本体不同。
 
 ## 现在可以做的自检
 
-你可以试着回答这四个问题：
+你可以先试着回答这两个问题：
 
-1. 数学上真正要求解的方程为什么不是单独的 `F(x)=0`，而是 `dQ/dt + F - B = 0`？
-2. `NonlinearEquationLoader::loadRHS()` 和 `WorkingIntegrationMethod::obtainResidual()` 分别负责哪一半工作？
-3. `nonlinearManager_.solve()` 是在分析层、装配层，还是数学求解层被触发的？
-4. 为什么 `Linear::Solver::solve()` 应该放在 `NonLinearSolver::newton_()` 这一层，而不是 `CktLoader`？
+1. 为什么说 transient 不是“一个大方程一次解完”，而是“时间推进 + 每步 nonlinear solve”？
+2. 如果只从数学本质上看，DC 和 transient 最大的区别是“求解器不同”，还是“每一步要求解的方程不同”？

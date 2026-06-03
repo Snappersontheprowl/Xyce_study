@@ -1,13 +1,17 @@
 # solver and assembly
 
-这个专题现在拆成两条主线，目的是把“电路方程怎么装出来”和“方程装好之后数学上怎么解”分开。
+这个专题现在拆成两条大主线，并在“数学求解”下面继续细分出 DC 和 transient 两个子专题，目的是把“电路方程怎么装出来”和“方程装好之后数学上怎么解”彻底分开。
 
 ## 目录说明
 
 - [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)
   关注 `Q`、`F`、`B`、`dQdx`、`dFdx` 这些 DAE 组成部分是如何从 device 层一路汇总到 loader 层的。
 - [02-dae-math-solving.md](02-dae-math-solving.md)
-  关注 DAE 量已经齐备之后，Xyce 如何把它们组合成 residual / Jacobian，并在数学上展开 Newton 和 linear solve。
+  作为总览，先回答 DC 和 transient 在数学上各自到底在解什么。
+- [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
+  专门看 DC operating point：$$F(x)-B=0$$、Newton、Jacobian 和代码对应。
+- [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
+  专门看 transient：$$\frac{dQ}{dt}+F-B=0$$ 如何离散成每个时间步上的 nonlinear equation，并在代码里展开求解。
 
 ## 为什么要这样拆
 
@@ -33,5 +37,8 @@
 
 1. 先读 [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)
 2. 再读 [02-dae-math-solving.md](02-dae-math-solving.md)
+3. 然后按需要深入：
+   - 想弄清 DC，就读 [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
+   - 想弄清 transient，就读 [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
 
 这样读的时候，第二篇里的数学对象就不会显得凭空出现。
