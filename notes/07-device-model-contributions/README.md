@@ -34,10 +34,10 @@ device model
 4. 再读 [04-from-device-equations-to-stamp.md](04-from-device-equations-to-stamp.md)
 5. 再读 [05-mosfet-b4-roadmap.md](05-mosfet-b4-roadmap.md)
 6. 再读 [06-mosfet-b4-unknowns-and-stamp.md](06-mosfet-b4-unknowns-and-stamp.md)
-7. 后面再按器件类型逐步细分：
-   - 先看 capacitor，重点理解 `Q/dQdx`
-   - 再看 diode，重点理解 nonlinear `F/dFdx`
-   - 最后再进入 MOS 一类复杂 compact model
+7. 再读 [07-mosfet-b4-f-and-dfdx.md](07-mosfet-b4-f-and-dfdx.md)
+8. 后面再继续：
+   - 把 `MOSFET_B4` 的 `Q/dQdx` 单独拆出来看
+   - 再回头总结复杂 compact model 如何同时贡献 `F/Q/dFdx/dQdx`
 
 ## 这一专题最想回答的 4 个问题
 
