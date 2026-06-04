@@ -1,6 +1,32 @@
 # solver and assembly
 
-这个专题现在拆成两条大主线，并在“数学求解”下面继续细分出 DC 和 transient 两个子专题，目的是把“电路方程怎么装出来”和“方程装好之后数学上怎么解”彻底分开。
+记录日期：2026-06-04
+
+这个专题只回答一个问题：
+
+```text
+当分析层已经决定“跑 DC 还是 transient”之后，
+Xyce 到底在装配什么方程，又是怎样把这些方程解出来的？
+```
+
+所以 `06-solver-and-assembly` 的关键词是：
+
+- `Q / F / B / dQdx / dFdx`
+- residual / Jacobian
+- time discretization
+- Newton
+- linear solve
+
+## 这一专题不负责什么
+
+这一专题**不再展开**下面这些问题：
+
+- `Simulator::runSimulation()` 怎样进入分析层
+- 分析类型在哪里注册
+- `.OP / .DC / .TRAN` 在分析对象选择上是什么关系
+- `DCSweep` / `Transient` 的生命周期是谁在调度
+
+这些内容统一放在 [05-analysis-flow](../05-analysis-flow/README.md)。
 
 ## 目录说明
 
@@ -33,6 +59,11 @@
 - 先搞清“电路方程是怎么被建立出来的”
 - 再搞清“方程建立好以后，数学上怎么解”
 
+同时，也和 [05-analysis-flow](../05-analysis-flow/README.md) 保持明确边界：
+
+- `05` 只讲“谁决定跑什么分析、什么时候创建公共对象”
+- `06` 只讲“这些对象怎样形成方程并进入求解”
+
 ## 推荐阅读顺序
 
 1. 先读 [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)
@@ -42,3 +73,36 @@
    - 想弄清 transient，就读 [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
 
 这样读的时候，第二篇里的数学对象就不会显得凭空出现。
+
+## 当前已经形成的主线
+
+当前这组笔记，先只把最基本、最通用的两类分析讲透：
+
+- `DC operating point`
+- `transient`
+
+暂时不继续扩展：
+
+- `AC`
+- `NOISE`
+- `HB`
+- `MPDE`
+
+因为这一专题的主轴不是“列出更多分析类型”，而是先把最核心的：
+
+```text
+装配
++ 
+DC / TR 求解骨架
+```
+
+讲清楚。
+
+## 下一轮深化更适合补什么
+
+如果后面继续补 `06`，更合理的方向不是加新的 analysis type，而是补清这几类细节：
+
+1. residual / Jacobian 的符号约定和对象关系
+2. transient 的步长控制与失败重试
+3. nonlinear solver 的收敛控制
+4. linear solver 后端栈

@@ -8,8 +8,8 @@
 - `02-startup/`：程序启动流程与顶层 `Simulator`
 - `03-netlist-and-circuit-build/`：`netlist` 解析与电路构建
 - `04-device-trace/`：普通器件到实例化、装配的纵向追踪
-- `05-analysis-flow/`：`.OP`、`.DC`、`.TRAN` 等分析流程
-- `06-solver-and-assembly/`：分成两条主线
+- `05-analysis-flow/`：只讲分析调度、分析对象选择、生命周期和共用基础设施初始化
+- `06-solver-and-assembly/`：只讲方程装配、`DC / transient` 的数学求解骨架
   - `01-dae-assembly-pipeline.md`：电路 DAE 的建立与装配
   - `02-dae-math-solving.md`：DAE 建好后的数学求解与代码对照
 - `07-device-model-contributions/`：从求解器继续下钻，研究器件如何贡献 `Q/F/B/dQdx/dFdx`
