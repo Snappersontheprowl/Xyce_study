@@ -137,7 +137,28 @@
 - 一张从 device load 函数到 solver 调用的路径图
 - 一份关键装配接口和求解接口列表
 
-## 第七阶段：补齐真正需要的 C++ 结构
+## 第七阶段：从求解器继续下钻到器件模型
+
+目标：
+
+- 搞清楚求解器里的 `Q/F/B/dQdx/dFdx` 到底是谁写出来的
+- 理解器件如何把自己的方程贡献到总 DAE
+
+需要回答的问题：
+
+- 一个器件是只贡献 `F`，还是也贡献 `Q`？
+- `Model`、`Master`、`Instance` 各自负责什么？
+- 器件的电流 / 电荷公式是怎么变成 residual / Jacobian 贡献的？
+- 数值收敛需求为什么会反过来影响器件模型代码写法？
+
+建议产出：
+
+- 一份“器件如何贡献总方程”的路线笔记
+- 至少两条具体器件主线：
+  - `capacitor`：重点理解 `Q/dQdx`
+  - `diode`：重点理解 nonlinear `F/dFdx`
+
+## 第八阶段：补齐真正需要的 C++ 结构
 
 目标：
 
@@ -156,7 +177,7 @@
 - 一份把重要 C++ 模式映射到 Xyce 真实代码示例的短笔记
 - 一组维护在 `docs/cpp/` 下的语法学习文档，按主题持续增补
 
-## 第八阶段：建立安全的构建、测试和修改流程
+## 第九阶段：建立安全的构建、测试和修改流程
 
 目标：
 
@@ -183,8 +204,9 @@
 4. 电阻器件的端到端追踪
 5. `.DC` 和 `.TRAN` 的分析流程
 6. 矩阵装配与求解器接口
-7. 在前面阅读中遇到的 C++ 结构
-8. 构建、测试和受控实验
+7. 器件如何贡献 `Q/F/B/dQdx/dFdx`
+8. 在前面阅读中遇到的 C++ 结构
+9. 构建、测试和受控实验
 
 ## 每读一个文件时的检查清单
 
@@ -214,6 +236,7 @@
 - `notes/03-netlist-and-circuit-build/01-netlist-parsing-roadmap.md`
 - `notes/04-device-trace/03-resistor-end-to-end.md`
 - `notes/05-analysis-flow/01-analysis-flow.md`
+- `notes/07-device-model-contributions/01-device-model-roadmap.md`
 
 每份笔记尽量围绕这几项展开：
 

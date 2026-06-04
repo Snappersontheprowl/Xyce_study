@@ -12,7 +12,11 @@
 - `06-solver-and-assembly/`：分成两条主线
   - `01-dae-assembly-pipeline.md`：电路 DAE 的建立与装配
   - `02-dae-math-solving.md`：DAE 建好后的数学求解与代码对照
-- `07-cpp-structures/`：阅读 Xyce 真正需要的 C++ 结构
+- `07-device-model-contributions/`：从求解器继续下钻，研究器件如何贡献 `Q/F/B/dQdx/dFdx`
+
+其中需要单独沉淀但不属于主线顺序的横向内容，放到 `docs/` 下维护：
+
+- `docs/cpp/`：阅读 Xyce 时真正会遇到的 C++ 结构和语法补充
 
 命名约定：
 
