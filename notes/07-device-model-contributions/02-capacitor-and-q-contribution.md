@@ -63,7 +63,7 @@ $$
 自己直接算最终的 dQ/dt 电流项
 ```
 
-这和你前面在 [04-transient-time-discretization-and-solving.md](../06-solver-and-assembly/04-transient-time-discretization-and-solving.md) 里学到的：
+这和你前面在 [04-transient-time-discretization-and-solving.md](../06-solver-and-assembly/01-basic/04-transient-time-discretization-and-solving.md) 里学到的：
 
 $$
 \frac{dQ(x)}{dt} + F(x) - B(t) = 0

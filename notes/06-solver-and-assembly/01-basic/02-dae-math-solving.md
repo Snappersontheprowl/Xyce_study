@@ -84,12 +84,12 @@ $$
 
 无论是 DC 还是 transient，真正触发 nonlinear solve 的外层入口都很像：
 
-- `.DC` / `.OP` 一类会在 [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 里调用 `nonlinearManager_.solve()`
-- `.TRAN` 会在 [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 里调用 `nonlinearManager_.solve()`
+- `.DC` / `.OP` 一类会在 [N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C) 里调用 `nonlinearManager_.solve()`
+- `.TRAN` 会在 [N_ANP_Transient.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C) 里调用 `nonlinearManager_.solve()`
 
 而一旦进入 nonlinear solver 这层，公共骨架都会回到：
 
-- [N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [N_NLS_NonLinearSolver.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
 
 里的三个关键动作：
 

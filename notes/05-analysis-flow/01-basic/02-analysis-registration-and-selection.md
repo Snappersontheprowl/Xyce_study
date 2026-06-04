@@ -14,11 +14,11 @@
 
 ## 这次读了哪些文件
 
-- [src/AnalysisPKG/N_ANP_RegisterAnalysis.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
-- [src/AnalysisPKG/N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
-- [src/AnalysisPKG/N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [src/AnalysisPKG/N_ANP_RegisterAnalysis.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.h](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [src/AnalysisPKG/N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [src/AnalysisPKG/N_ANP_Transient.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
 
 ## 当前结论先写在前面
 
@@ -42,7 +42,7 @@ registerAnalysisFactory(...)
 
 先看：
 
-- [N_ANP_RegisterAnalysis.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
+- [N_ANP_RegisterAnalysis.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_RegisterAnalysis.C)
 
 这个文件里会统一注册各种 analysis factory，比如：
 
@@ -72,7 +72,7 @@ AnalysisManager 手写 if/else 直接 new 某个分析类
 
 看：
 
-- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
   里的 `registerDCSweepFactory(...)`
 
 这里会把：
@@ -90,7 +90,7 @@ AnalysisManager 手写 if/else 直接 new 某个分析类
 
 看：
 
-- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [N_ANP_Transient.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
   里的 `registerTransientFactory(...)`
 
 这里会把：
@@ -112,7 +112,7 @@ AnalysisManager 手写 if/else 直接 new 某个分析类
 
 继续看：
 
-- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [N_ANP_AnalysisManager.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
   里的 `allocateAnalysisObject(...)`
 
 这是分析层最关键的选择函数之一。
@@ -182,7 +182,7 @@ analysisObject_        = 最终被 run() 调用的顶层对象，可能是包装
 - `DC` 在数学上解什么
 - `transient` 每步在解什么
 
-这些则属于 [06-solver-and-assembly](../06-solver-and-assembly/README.md)。
+这些则属于 [06-solver-and-assembly](../../06-solver-and-assembly/README.md)。
 
 ## 现在可以做的自检
 

@@ -6,13 +6,13 @@
 
 这次只盯 transient 的数学本质与代码对应，按“原始 DAE -> 时间离散 -> 每步 nonlinear solve”的顺序读了这些文件：
 
-- [src/AnalysisPKG/N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
-- [src/TimeIntegrationPKG/N_TIA_WorkingIntegrationMethod.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_WorkingIntegrationMethod.C)
-- [src/TimeIntegrationPKG/N_TIA_OneStep.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_OneStep.C)
-- [src/TimeIntegrationPKG/N_TIA_Gear12.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_Gear12.C)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
-- [src/NonlinearSolverPKG/N_NLS_DampedNewton.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_DampedNewton.C)
+- [src/AnalysisPKG/N_ANP_Transient.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+- [src/TimeIntegrationPKG/N_TIA_WorkingIntegrationMethod.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_WorkingIntegrationMethod.C)
+- [src/TimeIntegrationPKG/N_TIA_OneStep.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_OneStep.C)
+- [src/TimeIntegrationPKG/N_TIA_Gear12.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_Gear12.C)
+- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [src/NonlinearSolverPKG/N_NLS_DampedNewton.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_DampedNewton.C)
 
 ## 这次带着什么问题去读
 
@@ -97,7 +97,7 @@ $$
 
 这一层先看：
 
-- [N_TIA_WorkingIntegrationMethod.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_WorkingIntegrationMethod.C)
+- [N_TIA_WorkingIntegrationMethod.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_WorkingIntegrationMethod.C)
 
 它的角色不是直接装 device，而是把真正的 time integration method 包起来。
 
@@ -117,7 +117,7 @@ time integration 层再决定“如何用这些量构造当前时间步的方程
 
 先看：
 
-- [N_TIA_OneStep.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_OneStep.C)
+- [N_TIA_OneStep.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_OneStep.C)
 
 在 `OneStep::obtainResidual()` 里，你可以看出它先做：
 
@@ -170,7 +170,7 @@ $$
 
 再看：
 
-- [N_TIA_Gear12.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_Gear12.C)
+- [N_TIA_Gear12.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_Gear12.C)
 
 在 `Gear12::obtainResidual()` 里可以看到，它不是只用一个历史点，而是会用：
 
@@ -244,7 +244,7 @@ $$
 
 接着回到分析层：
 
-- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [N_ANP_Transient.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
 
 这一层的几个阶段，从数学上正好可以这样理解。
 

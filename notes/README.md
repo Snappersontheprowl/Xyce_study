@@ -8,10 +8,12 @@
 - `02-startup/`：程序启动流程与顶层 `Simulator`
 - `03-netlist-and-circuit-build/`：`netlist` 解析与电路构建
 - `04-device-trace/`：普通器件到实例化、装配的纵向追踪
-- `05-analysis-flow/`：只讲分析调度、分析对象选择、生命周期和共用基础设施初始化
-- `06-solver-and-assembly/`：只讲方程装配、`DC / transient` 的数学求解骨架
-  - `01-dae-assembly-pipeline.md`：电路 DAE 的建立与装配
-  - `02-dae-math-solving.md`：DAE 建好后的数学求解与代码对照
+- `05-analysis-flow/`：按“基础 / 进阶”两层组织分析调度专题
+  - `01-basic/`：`.OP / .DC / .TRAN` 的入口、注册、生命周期、基础设施初始化
+  - `02-advanced/`：`AC / NOISE / HB / MPDE` 的调度地图
+- `06-solver-and-assembly/`：按“基础 / 进阶”两层组织方程与求解专题
+  - `01-basic/`：电路 DAE 的建立与 `DC / transient` 求解骨架
+  - `02-advanced/`：`AC / NOISE / HB / MPDE` 的进阶求解路线
 - `07-device-model-contributions/`：从求解器继续下钻，研究器件如何贡献 `Q/F/B/dQdx/dFdx`
   - 其中 `05-mosfet-b4/` 是 `B4` 的独立子专题
   - 其中 `device/` 是器件家族地图和 `ADMS` 接入方式的扩展阅读

@@ -29,12 +29,18 @@ Xyce 在完成初始化之后，
 
 这些内容统一放到 [06-solver-and-assembly](../06-solver-and-assembly/README.md)。
 
+## 目录结构
+
+- [01-basic/README.md](01-basic/README.md)
+  - 基础分析调度：`.OP / .DC / .TRAN`
+- [02-advanced/README.md](02-advanced/README.md)
+  - 进阶分析地图：`AC / NOISE / HB / MPDE`
+
 ## 推荐阅读顺序
 
-1. 先读 [01-simulation-entry-to-analysis-manager.md](01-simulation-entry-to-analysis-manager.md)
-2. 再读 [02-analysis-registration-and-selection.md](02-analysis-registration-and-selection.md)
-3. 再读 [03-analysis-lifecycle-dc-and-tran.md](03-analysis-lifecycle-dc-and-tran.md)
-4. 最后读 [04-analysis-manager-common-infrastructure.md](04-analysis-manager-common-infrastructure.md)
+1. 先读 [01-basic/README.md](01-basic/README.md)
+2. 再顺着基础主线读 `01-basic/` 下面四篇
+3. 基础主线稳定后，再读 [02-advanced/README.md](02-advanced/README.md)
 
 ## 这一专题最想回答的 4 个问题
 

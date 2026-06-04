@@ -15,9 +15,9 @@ Xyce 是怎样从 Simulator 进入分析层的？
 
 ## 这次读了哪些文件
 
-- [src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
-- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [src/CircuitPKG/N_CIR_Xyce.C](../../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.h](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
 
 ## 当前结论先写在前面
 
@@ -39,7 +39,7 @@ Simulator::runSimulation()
 
 在：
 
-- [N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [N_CIR_Xyce.C](../../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
 
 里，初始化完成之后会进入：
 
@@ -51,7 +51,7 @@ Simulator::runSimulation()
 
 所以从学习顺序上，分析专题真正的第一个核心文件不是 `Transient.C`，而是：
 
-- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [N_ANP_AnalysisManager.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
 
 ## 为什么要先看 AnalysisManager
 
@@ -61,7 +61,7 @@ Simulator::runSimulation()
 
 从头文件：
 
-- [N_ANP_AnalysisManager.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
+- [N_ANP_AnalysisManager.h](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.h)
 
 先看这些成员和接口就够了：
 
@@ -88,7 +88,7 @@ AnalysisManager 不是某一种 analysis 的实现类，
 
 继续看：
 
-- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [N_ANP_AnalysisManager.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
   里的 `AnalysisManager::run()`
 
 它本身并不直接实现：
@@ -128,7 +128,7 @@ analysisObject_->run();
 - `NO_TIME_INTEGRATION`
 - `dQ/dt + F - B = 0`
 
-这些都属于 [06-solver-and-assembly](../06-solver-and-assembly/README.md)。
+这些都属于 [06-solver-and-assembly](../../06-solver-and-assembly/README.md)。
 
 ## 现在可以做的自检
 

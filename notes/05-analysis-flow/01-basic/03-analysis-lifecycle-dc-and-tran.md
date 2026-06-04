@@ -14,10 +14,10 @@ DCSweep 和 Transient 在控制流程上分别怎么跑起来？
 
 ## 这次读了哪些文件
 
-- [src/AnalysisPKG/N_ANP_DCSweep.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.h)
-- [src/AnalysisPKG/N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
-- [src/AnalysisPKG/N_ANP_Transient.h](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.h)
-- [src/AnalysisPKG/N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [src/AnalysisPKG/N_ANP_DCSweep.h](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.h)
+- [src/AnalysisPKG/N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [src/AnalysisPKG/N_ANP_Transient.h](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.h)
+- [src/AnalysisPKG/N_ANP_Transient.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
 
 ## 当前结论先写在前面
 
@@ -46,7 +46,7 @@ doTranOP()
 
 看：
 
-- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
   里的 `DCSweep::doRun()`
 
 它很清楚地组织成：
@@ -91,7 +91,7 @@ doInit()
 
 看：
 
-- [N_ANP_Transient.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
+- [N_ANP_Transient.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_Transient.C)
   里的 `Transient::doRun()`
 
 它的结构是：
@@ -140,7 +140,7 @@ Transient 通常不会直接进入时间步进，
 - 检查是否接受当前步
 - 推进输出和时间状态
 
-但这一篇先不深入“每一步具体在解什么方程”，因为那已经是 [06-solver-and-assembly](../06-solver-and-assembly/README.md) 的主题。
+但这一篇先不深入“每一步具体在解什么方程”，因为那已经是 [06-solver-and-assembly](../../06-solver-and-assembly/README.md) 的主题。
 
 ## 这一篇最想让你先吃下来的本质
 

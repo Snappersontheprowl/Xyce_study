@@ -6,12 +6,12 @@
 
 这次只盯 DC operating point 的数学求解与代码对应，按“分析触发 -> time integration 退化 -> Newton -> linear solve”的顺序读了这些文件：
 
-- [src/AnalysisPKG/N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
-- [src/TimeIntegrationPKG/N_TIA_NoTimeIntegration.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_NoTimeIntegration.C)
-- [src/NonlinearSolverPKG/N_NLS_Manager.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
-- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
-- [src/NonlinearSolverPKG/N_NLS_DampedNewton.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_DampedNewton.C)
-- [src/LinearAlgebraServicesPKG/N_LAS_Solver.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
+- [src/AnalysisPKG/N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [src/TimeIntegrationPKG/N_TIA_NoTimeIntegration.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_NoTimeIntegration.C)
+- [src/NonlinearSolverPKG/N_NLS_Manager.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_Manager.C)
+- [src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [src/NonlinearSolverPKG/N_NLS_DampedNewton.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_DampedNewton.C)
+- [src/LinearAlgebraServicesPKG/N_LAS_Solver.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
 
 ## 这次带着什么问题去读
 
@@ -53,7 +53,7 @@ $$
 
 先看：
 
-- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
 
 在 `DCSweep::doRun()` 的注释里，已经直接说了：
 
@@ -88,7 +88,7 @@ time integration 仍然参与，
 
 这一层看：
 
-- [N_TIA_NoTimeIntegration.C](../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_NoTimeIntegration.C)
+- [N_TIA_NoTimeIntegration.C](../../../vendor/Xyce-7.10.0/src/TimeIntegrationPKG/N_TIA_NoTimeIntegration.C)
 
 关键函数是：
 
@@ -181,7 +181,7 @@ $$
 
 在：
 
-- [N_ANP_DCSweep.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
+- [N_ANP_DCSweep.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_DCSweep.C)
 
 里，`takeStep_()` 做的事情非常直接：
 
@@ -205,7 +205,7 @@ $$
 
 这里最值得看的文件是：
 
-- [N_NLS_DampedNewton.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_DampedNewton.C)
+- [N_NLS_DampedNewton.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_DampedNewton.C)
 
 `DampedNewton::solve()` 的主循环，非常适合直接拿来对应 Newton 数学步骤。
 
@@ -253,7 +253,7 @@ $$
 
 最终真正发生 linear solve 的地方在：
 
-- [N_NLS_NonLinearSolver.C](../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
+- [N_NLS_NonLinearSolver.C](../../../vendor/Xyce-7.10.0/src/NonlinearSolverPKG/N_NLS_NonLinearSolver.C)
   中的 `NonLinearSolver::newton_()`
 
 那里调用：
@@ -296,7 +296,7 @@ Newton 方向
 
 再看：
 
-- [N_LAS_Solver.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
+- [N_LAS_Solver.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Solver.h)
 
 它对外最核心的接口就是：
 

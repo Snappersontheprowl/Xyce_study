@@ -28,16 +28,12 @@ Xyce 到底在装配什么方程，又是怎样把这些方程解出来的？
 
 这些内容统一放在 [05-analysis-flow](../05-analysis-flow/README.md)。
 
-## 目录说明
+## 目录结构
 
-- [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)
-  关注 `Q`、`F`、`B`、`dQdx`、`dFdx` 这些 DAE 组成部分是如何从 device 层一路汇总到 loader 层的。
-- [02-dae-math-solving.md](02-dae-math-solving.md)
-  作为总览，先回答 DC 和 transient 在数学上各自到底在解什么。
-- [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
-  专门看 DC operating point：$$F(x)-B=0$$、Newton、Jacobian 和代码对应。
-- [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
-  专门看 transient：$$\frac{dQ}{dt}+F-B=0$$ 如何离散成每个时间步上的 nonlinear equation，并在代码里展开求解。
+- [01-basic/README.md](01-basic/README.md)
+  - 基础仿真：`DC`、`transient`
+- [02-advanced/README.md](02-advanced/README.md)
+  - 进阶仿真：`AC`、`NOISE`、`HB`、`MPDE`
 
 ## 为什么要这样拆
 
@@ -66,11 +62,9 @@ Xyce 到底在装配什么方程，又是怎样把这些方程解出来的？
 
 ## 推荐阅读顺序
 
-1. 先读 [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)
-2. 再读 [02-dae-math-solving.md](02-dae-math-solving.md)
-3. 然后按需要深入：
-   - 想弄清 DC，就读 [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
-   - 想弄清 transient，就读 [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
+1. 先读 [01-basic/README.md](01-basic/README.md)
+2. 再顺着基础主线读 `01-basic/` 下面四篇
+3. 基础主线稳定后，再读 [02-advanced/README.md](02-advanced/README.md)
 
 这样读的时候，第二篇里的数学对象就不会显得凭空出现。
 
@@ -98,6 +92,11 @@ DC / TR 求解骨架
 
 讲清楚。
 
+接下来会把这条主线进一步分层成：
+
+- 基础仿真：`DC`、`transient`
+- 进阶仿真：`AC`、`NOISE`、`HB`、`MPDE`
+
 ## 下一轮深化更适合补什么
 
 如果后面继续补 `06`，更合理的方向不是加新的 analysis type，而是补清这几类细节：
@@ -106,3 +105,5 @@ DC / TR 求解骨架
 2. transient 的步长控制与失败重试
 3. nonlinear solver 的收敛控制
 4. linear solver 后端栈
+
+同时，在进阶仿真这一支上，最自然的下一步是先从 `AC` 开始。

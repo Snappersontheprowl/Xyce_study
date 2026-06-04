@@ -6,13 +6,13 @@
 
 这次只盯“DAE 是怎么被装出来的”，按从上到下的装配顺序读了这些文件：
 
-- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
-- [src/LinearAlgebraServicesPKG/N_LAS_System.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
-- [src/LinearAlgebraServicesPKG/N_LAS_Problem.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
-- [src/LoaderServicesPKG/N_LOA_Loader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
-- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
-- [src/LoaderServicesPKG/N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
+- [src/AnalysisPKG/N_ANP_AnalysisManager.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [src/LinearAlgebraServicesPKG/N_LAS_System.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
+- [src/LinearAlgebraServicesPKG/N_LAS_Problem.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
+- [src/LoaderServicesPKG/N_LOA_Loader.h](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
+- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
+- [src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+- [src/LoaderServicesPKG/N_LOA_CktLoader.C](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
 
 ## 这次带着什么问题去读
 
@@ -57,7 +57,7 @@ device 写 DAE 组成部分
 
 这一步最关键的函数还是：
 
-- [N_ANP_AnalysisManager.C](../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
+- [N_ANP_AnalysisManager.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C)
   中的 `AnalysisManager::initializeSolverSystem(...)`
 
 这里和装配最直接相关的对象有：
@@ -81,7 +81,7 @@ device 写 DAE 组成部分
 
 继续看：
 
-- [N_LAS_System.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
+- [N_LAS_System.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_System.h)
 
 `Linear::System` 可以先当成：
 
@@ -100,7 +100,7 @@ device 写 DAE 组成部分
 
 而：
 
-- [N_LAS_Problem.h](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
+- [N_LAS_Problem.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_Problem.h)
 
 把 `A`、`x`、`b` 打包成一个求解问题对象。
 
@@ -114,7 +114,7 @@ device 写 DAE 组成部分
 
 要理解装配专题，最好先看：
 
-- [N_LOA_Loader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
+- [N_LOA_Loader.h](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_Loader.h)
 
 这个头文件的注释已经把架构目的写得很清楚：
 
@@ -143,8 +143,8 @@ NonlinearSolver
 
 接着看：
 
-- [N_LOA_NonlinearEquationLoader.h](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
-- [N_LOA_NonlinearEquationLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
+- [N_LOA_NonlinearEquationLoader.h](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.h)
+- [N_LOA_NonlinearEquationLoader.C](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_NonlinearEquationLoader.C)
 
 在这个专题里，它最重要的作用不是“求解”，而是：
 
@@ -189,7 +189,7 @@ NonlinearSolver
 
 这一层最关键的文件是：
 
-- [N_LOA_CktLoader.C](../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
+- [N_LOA_CktLoader.C](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_CktLoader.C)
 
 它最重要的两个接口是：
 
