@@ -36,6 +36,7 @@ device model
 6. 后面再继续：
    - 再换一个器件做横向对比
    - 或回到 solver 视角看 `B4` 的贡献如何进入时间积分和 Newton
+7. 如果想补“器件家族地图”和“ADMS 接入方式”这些背景，再读 [device/README.md](device/README.md)
 
 ## 这一专题最想回答的 4 个问题
 

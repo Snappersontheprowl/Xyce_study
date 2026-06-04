@@ -13,6 +13,8 @@
   - `01-dae-assembly-pipeline.md`：电路 DAE 的建立与装配
   - `02-dae-math-solving.md`：DAE 建好后的数学求解与代码对照
 - `07-device-model-contributions/`：从求解器继续下钻，研究器件如何贡献 `Q/F/B/dQdx/dFdx`
+  - 其中 `05-mosfet-b4/` 是 `B4` 的独立子专题
+  - 其中 `device/` 是器件家族地图和 `ADMS` 接入方式的扩展阅读
   - `05-mosfet-b4/`：把 `MOSFET_B4` 单独拆成一条复杂 compact model 学习支线
 
 其中需要单独沉淀但不属于主线顺序的横向内容，放到 `docs/` 下维护：
