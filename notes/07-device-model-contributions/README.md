@@ -36,8 +36,10 @@ device model
 6. 再读 [06-mosfet-b4-unknowns-and-stamp.md](06-mosfet-b4-unknowns-and-stamp.md)
 7. 再读 [07-mosfet-b4-f-and-dfdx.md](07-mosfet-b4-f-and-dfdx.md)
 8. 再读 [08-mosfet-b4-q-and-dqdx.md](08-mosfet-b4-q-and-dqdx.md)
-9. 后面再继续：
-   - 再回头总结复杂 compact model 如何同时贡献 `F/Q/dFdx/dQdx`
+9. 再读 [09-mosfet-b4-merge-summary.md](09-mosfet-b4-merge-summary.md)
+10. 后面再继续：
+   - 再换一个器件做横向对比
+   - 或回到 solver 视角看 `B4` 的贡献如何进入时间积分和 Newton
 
 ## 这一专题最想回答的 4 个问题
 
