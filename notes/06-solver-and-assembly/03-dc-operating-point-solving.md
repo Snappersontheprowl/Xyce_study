@@ -25,10 +25,10 @@
 
 ## 当前结论先写在前面
 
-DC operating point 的本质是求一个稳态解 $$x^\*$$，使得：
+DC operating point 的本质是求一个稳态解 $x^*$，使得：
 
 $$
-F(x^\*) - B = 0
+F(x^*) - B = 0
 $$
 
 也就是：
@@ -114,11 +114,7 @@ $$
 
 ### 代码上
 
-Xyce 的 nonlinear solver 约定，`RHSVectorPtr` 存的不是 $$f(x)$$，而是：
-
-$$
--f(x)
-$$
+Xyce 的 nonlinear solver 约定，`RHSVectorPtr` 存的不是 $f(x)$，而是：$-f(x)$
 
 所以这里实际构造的是：
 
