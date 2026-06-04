@@ -35,8 +35,8 @@ device model
 5. 再读 [05-mosfet-b4-roadmap.md](05-mosfet-b4-roadmap.md)
 6. 再读 [06-mosfet-b4-unknowns-and-stamp.md](06-mosfet-b4-unknowns-and-stamp.md)
 7. 再读 [07-mosfet-b4-f-and-dfdx.md](07-mosfet-b4-f-and-dfdx.md)
-8. 后面再继续：
-   - 把 `MOSFET_B4` 的 `Q/dQdx` 单独拆出来看
+8. 再读 [08-mosfet-b4-q-and-dqdx.md](08-mosfet-b4-q-and-dqdx.md)
+9. 后面再继续：
    - 再回头总结复杂 compact model 如何同时贡献 `F/Q/dFdx/dQdx`
 
 ## 这一专题最想回答的 4 个问题
