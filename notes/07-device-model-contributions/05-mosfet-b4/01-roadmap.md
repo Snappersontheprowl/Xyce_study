@@ -36,8 +36,8 @@
 
 这次只做路线图，不进深公式，按“注册入口 -> 结构层次 -> 节点与 stamp -> 状态更新 -> 向量/矩阵装配”这条顺序看了这些位置：
 
-- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h)
-- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h)
+- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 重点扫过的函数位置包括：
 
@@ -83,8 +83,8 @@ $$
 
 先看：
 
-- [N_DEV_MOSFET_B4.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h)
-- [N_DEV_MOSFET_B4.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [N_DEV_MOSFET_B4.h](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h)
+- [N_DEV_MOSFET_B4.C](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 最先要抓的是 `Traits` 和 `registerDevice(...)`。
 
@@ -161,7 +161,7 @@ $$
 
 在：
 
-- [N_DEV_MOSFET_B4.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [N_DEV_MOSFET_B4.C](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
   里的 `registerLIDs(...)`
 
 你会看到它根据选项和模型结构，可能还会出现：
@@ -259,7 +259,7 @@ B4 不是“四端器件就只有四个未知量”，
 
 基于这次路线图，后面最适合按下面顺序继续拆：
 
-### 1. `06-mosfet-b4-unknowns-and-stamp.md`
+### 1. `02-unknowns-and-stamp.md`
 
 只看：
 
@@ -274,7 +274,7 @@ B4 不是“四端器件就只有四个未知量”，
 先搞清这个器件在总方程里占了多大一块位置
 ```
 
-### 2. `07-mosfet-b4-f-and-dfdx.md`
+### 2. `03-f-and-dfdx.md`
 
 只看：
 
@@ -287,7 +287,7 @@ B4 不是“四端器件就只有四个未知量”，
 先把导通电流和局部线性化这一半读通
 ```
 
-### 3. `08-mosfet-b4-q-and-dqdx.md`
+### 3. `04-q-and-dqdx.md`
 
 只看：
 

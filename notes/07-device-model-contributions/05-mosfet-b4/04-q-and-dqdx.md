@@ -11,7 +11,7 @@ MOSFET_B4 的电荷侧贡献，
 是怎样从内部 charge 量一路变成 Q 和 dQdx 的？
 ```
 
-和上一篇 `07-mosfet-b4-f-and-dfdx.md` 对应，这一篇只盯：
+和上一篇 `03-f-and-dfdx.md` 对应，这一篇只盯：
 
 $$
 Q(x), \qquad \frac{\partial Q}{\partial x}
@@ -23,7 +23,7 @@ $$
 
 这次继续读：
 
-- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 重点看了这些函数：
 
@@ -84,7 +84,7 @@ time integration 再把它变成 dQ/dt
 
 继续顺着代码看：
 
-- [updatePrimaryState()](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [updatePrimaryState()](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 这里会把内部 charge 写进 state vector，例如：
 
@@ -114,7 +114,7 @@ time integration 再把它变成 dQ/dt
 
 接下来最关键的函数是：
 
-- [setupCapacitors_newDAE()](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [setupCapacitors_newDAE()](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 这一步的角色，和上一节的 `setupFVectorVars()` 很像。  
 它做的事情不是直接装配，而是把更原始的电荷/电容信息整理成一组适合写 `dQdx` 的系数：
@@ -168,7 +168,7 @@ Q/dQdx 的结构不是固定的“几个电容”，
 
 然后再看：
 
-- [auxChargeCalculations()](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [auxChargeCalculations()](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 这一层最重要的不是再去算新的物理 charge，而是把已有电荷量整理成：
 
@@ -196,7 +196,7 @@ Q/dQdx 的结构不是固定的“几个电容”，
 
 等前面的 charge 量和修正量准备好以后，才轮到：
 
-- [Master::loadDAEVectors(...)](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [Master::loadDAEVectors(...)](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 这里最值得抓的是，它先把内部 charge 统一命名成：
 
@@ -250,13 +250,13 @@ charge 不只是一个“附带电容效果”，
 它甚至可以提升成显式内部未知量和方程块
 ```
 
-这也是为什么前面 `06-mosfet-b4-unknowns-and-stamp.md` 里要先把 `li_Charge` 单独记下来。
+这也是为什么前面 `02-unknowns-and-stamp.md` 里要先把 `li_Charge` 单独记下来。
 
 ## 第八步：`Master::loadDAEMatrices()` 才是真正写 `dQdx`
 
 最后再看：
 
-- [Master::loadDAEMatrices(...)](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [Master::loadDAEMatrices(...)](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 在 `Q` 侧，这里最重要的事就是：
 
@@ -355,8 +355,8 @@ charge state
 
 现在 `MOSFET_B4` 的两半已经分别站稳：
 
-- `07-mosfet-b4-f-and-dfdx.md`
-- `08-mosfet-b4-q-and-dqdx.md`
+- `03-f-and-dfdx.md`
+- `04-q-and-dqdx.md`
 
 下一步最自然的是再做一篇很短的合流总结，例如：
 

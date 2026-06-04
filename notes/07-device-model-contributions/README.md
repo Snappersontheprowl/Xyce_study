@@ -32,12 +32,8 @@ device model
 2. 再读 [02-capacitor-and-q-contribution.md](02-capacitor-and-q-contribution.md)
 3. 再读 [03-diode-and-nonlinear-f.md](03-diode-and-nonlinear-f.md)
 4. 再读 [04-from-device-equations-to-stamp.md](04-from-device-equations-to-stamp.md)
-5. 再读 [05-mosfet-b4-roadmap.md](05-mosfet-b4-roadmap.md)
-6. 再读 [06-mosfet-b4-unknowns-and-stamp.md](06-mosfet-b4-unknowns-and-stamp.md)
-7. 再读 [07-mosfet-b4-f-and-dfdx.md](07-mosfet-b4-f-and-dfdx.md)
-8. 再读 [08-mosfet-b4-q-and-dqdx.md](08-mosfet-b4-q-and-dqdx.md)
-9. 再读 [09-mosfet-b4-merge-summary.md](09-mosfet-b4-merge-summary.md)
-10. 后面再继续：
+5. 再进入 [05-mosfet-b4/README.md](05-mosfet-b4/README.md)
+6. 后面再继续：
    - 再换一个器件做横向对比
    - 或回到 solver 视角看 `B4` 的贡献如何进入时间积分和 Newton
 

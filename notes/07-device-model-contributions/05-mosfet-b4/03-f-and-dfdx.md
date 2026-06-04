@@ -28,7 +28,7 @@ $$
 
 这次主要继续读：
 
-- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 重点看了这些函数：
 
@@ -95,7 +95,7 @@ MOS 的导数信息是在矩阵装配那一刻才第一次出现
 
 接下来最关键的函数是：
 
-- [setupFVectorVars()](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [setupFVectorVars()](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 这一步非常重要，因为它不是直接往矩阵写，而是在做一层中间翻译。
 
@@ -277,7 +277,7 @@ voltage limiter / predictor 修正需要的“工作点差分项”
 
 等 `setupFVectorVars()` 把中间块准备好之后，才轮到：
 
-- [Master::loadDAEVectors(...)](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [Master::loadDAEVectors(...)](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 这里最值得看的不是每一行公式，而是它的组织方式。
 
@@ -360,7 +360,7 @@ B4 的 F 装配不是“一个主公式”，
 
 再往下看：
 
-- [Master::loadDAEMatrices(...)](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [Master::loadDAEMatrices(...)](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 这里做的事就更明确了：
 
@@ -399,7 +399,7 @@ B4 的 F 装配不是“一个主公式”，
 - `*mi.f_SPgpPtr += ...`
 - `*mi.f_GPbpPtr += ...`
 
-这正是前一篇 `06-mosfet-b4-unknowns-and-stamp.md` 的意义所在。  
+这正是前一篇 `02-unknowns-and-stamp.md` 的意义所在。  
 如果前面没有先建立：
 
 - `registerLIDs`
@@ -488,7 +488,7 @@ $$
 
 现在电流侧已经单独看过了，下一步最自然就是：
 
-- `08-mosfet-b4-q-and-dqdx.md`
+- `04-q-and-dqdx.md`
 
 也就是继续看：
 

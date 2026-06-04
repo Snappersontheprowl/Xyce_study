@@ -26,8 +26,8 @@ MOSFET_B4 这个器件，在总方程里到底占了多大一块位置？
 
 这次主要读了：
 
-- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h)
-- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.h)
+- [src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
 
 重点看了这些位置：
 
@@ -77,7 +77,7 @@ static int numNodes() {return 4;}
 
 继续看：
 
-- [N_DEV_MOSFET_B4.C](../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
+- [N_DEV_MOSFET_B4.C](../../../vendor/Xyce-7.10.0/src/DeviceModelPKG/OpenModels/N_DEV_MOSFET_B4.C)
   里的 `registerLIDs(...)`
 
 这里最值得先抓住的事情是：
@@ -387,7 +387,7 @@ registerLIDs / registerJacLIDs / setupPointers
 
 现在这层结构地图已经有了，下一步最自然的是：
 
-- `07-mosfet-b4-f-and-dfdx.md`
+- `03-f-and-dfdx.md`
 
 也就是先只看：
 

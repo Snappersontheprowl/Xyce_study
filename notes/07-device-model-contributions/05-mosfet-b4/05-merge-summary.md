@@ -32,11 +32,11 @@ $$
 
 现在可以把 `B4` 的主线重新写成：
 
-1. [06-mosfet-b4-unknowns-and-stamp.md](06-mosfet-b4-unknowns-and-stamp.md)
+1. [02-unknowns-and-stamp.md](02-unknowns-and-stamp.md)
    - 先建立 unknown / stamp / offset / pointer 地图
-2. [07-mosfet-b4-f-and-dfdx.md](07-mosfet-b4-f-and-dfdx.md)
+2. [03-f-and-dfdx.md](03-f-and-dfdx.md)
    - 再看工作点量如何变成 `F/dFdx`
-3. [08-mosfet-b4-q-and-dqdx.md](08-mosfet-b4-q-and-dqdx.md)
+3. [04-q-and-dqdx.md](04-q-and-dqdx.md)
    - 再看 charge 如何变成 `Q/dQdx`
 
 合在一起就是：
