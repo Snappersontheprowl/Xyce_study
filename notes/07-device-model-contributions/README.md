@@ -29,9 +29,9 @@ device model
 ## 推荐阅读顺序
 
 1. 先读 [01-device-model-roadmap.md](01-device-model-roadmap.md)
-2. 后面再按器件类型逐步细分：
-   - 先回顾 resistor
-   - 再看 capacitor，重点理解 `Q/dQdx`
+2. 再读 [02-capacitor-and-q-contribution.md](02-capacitor-and-q-contribution.md)
+3. 后面再按器件类型逐步细分：
+   - 先看 capacitor，重点理解 `Q/dQdx`
    - 再看 diode，重点理解 nonlinear `F/dFdx`
    - 最后再进入 MOS 一类复杂 compact model
 
