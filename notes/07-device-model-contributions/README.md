@@ -31,7 +31,8 @@ device model
 1. 先读 [01-device-model-roadmap.md](01-device-model-roadmap.md)
 2. 再读 [02-capacitor-and-q-contribution.md](02-capacitor-and-q-contribution.md)
 3. 再读 [03-diode-and-nonlinear-f.md](03-diode-and-nonlinear-f.md)
-4. 后面再按器件类型逐步细分：
+4. 再读 [04-from-device-equations-to-stamp.md](04-from-device-equations-to-stamp.md)
+5. 后面再按器件类型逐步细分：
    - 先看 capacitor，重点理解 `Q/dQdx`
    - 再看 diode，重点理解 nonlinear `F/dFdx`
    - 最后再进入 MOS 一类复杂 compact model
