@@ -14,11 +14,12 @@
 ## 当前内容
 
 1. [01-advanced-analysis-type-map.md](01-advanced-analysis-type-map.md)
+2. [02-ac-lifecycle.md](02-ac-lifecycle.md)
 
 ## 后续建议展开
 
-- `02-ac-and-noise-lifecycle.md`
-- `03-hb-and-mpde-lifecycle.md`
+- `03-noise-lifecycle.md`
+- `04-hb-and-mpde-lifecycle.md`
 
 ## 这一组的边界
 

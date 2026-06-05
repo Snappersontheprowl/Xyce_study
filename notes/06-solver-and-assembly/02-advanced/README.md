@@ -15,10 +15,10 @@ Xyce 里其他分析类型在数学上到底在解什么，
 ## 当前内容
 
 1. [01-advanced-simulation-roadmap.md](01-advanced-simulation-roadmap.md)
+2. [02-ac-small-signal-solving.md](02-ac-small-signal-solving.md)
 
 ## 计划中的后续展开
 
-- `02-ac-small-signal-solving.md`
 - `03-noise-analysis-solving.md`
 - `04-hb-solving-roadmap.md`
 - `05-mpde-solving-roadmap.md`
