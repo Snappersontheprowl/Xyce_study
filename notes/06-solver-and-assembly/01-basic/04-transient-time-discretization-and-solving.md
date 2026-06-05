@@ -47,6 +47,28 @@ $$
 \text{nonlinear solve at each step}
 $$
 
+## 第零步：为什么 transient 研究的是“轨迹”，不是“一个点”
+
+如果 `DCOP` 研究的是：
+
+```text
+有没有一个平衡点 x*
+```
+
+那么 `transient` 研究的就是：
+
+```text
+在给定初始状态和随时间变化的激励下，
+整条 x(t) 轨迹怎样演化
+```
+
+所以 `transient` 从一开始就和 `DC` 不同：
+
+- `DC` 的未知对象更像一个静态点 $$x^\*$$
+- `transient` 的未知对象是一条时间函数 $$x(t)$$
+
+也正因为如此，`transient` 不可能像 `DC` 一样只解一个方程就结束。
+
 ## 第一步：原始方程是什么
 
 在电路 DAE 这一层，最原始的形式就是：
@@ -93,7 +115,190 @@ $$
 
 这里的 $$\Phi_n$$ 来自把 $$\frac{dQ}{dt}$$ 离散化之后得到的代数表达式。
 
-## 第三步：代码里哪一层在做“时间离散”
+## 第三步：时间离散在数学上到底做了什么
+
+`transient` 最关键的一步，不是“又做一次 Newton”，而是先把连续时间问题变成离散时间问题。
+
+原始上你面对的是：
+
+$$
+\frac{dQ(x)}{dt} + F(x) - B(t) = 0
+$$
+
+这里难点在于：
+
+- $$x(t)$$ 是一个连续时间函数
+- $$Q(x(t))$$ 的导数不是一个现成代数量
+
+时间积分方法做的事情，本质上就是：
+
+```text
+把 dQ/dt 用“当前步 + 历史步”的代数组合近似掉
+```
+
+一旦这一步完成，连续时间问题就会被改写成“当前时刻未知量 $$x_n$$ 满足的一条代数方程”。
+
+所以时间积分的本质不是“求解器技巧”，而是：
+
+```text
+把“轨迹问题”变成“一步一步的代数问题”
+```
+
+## 第四步：最朴素地看 backward Euler，当前步方程怎么来
+
+先用最简单的直觉来看。  
+假设当前时刻是 $$t_n$$，上一步是 $$t_{n-1}$$，时间步长是：
+
+$$
+\Delta t = t_n - t_{n-1}
+$$
+
+如果用最朴素的 backward Euler / BDF1 思路，那么：
+
+$$
+\frac{dQ}{dt}(t_n)
+\approx
+\frac{Q(x_n)-Q(x_{n-1})}{\Delta t}
+$$
+
+把它代回原始 DAE：
+
+$$
+\frac{Q(x_n)-Q(x_{n-1})}{\Delta t} + F(x_n) - B(t_n) = 0
+$$
+
+这就是当前时间步上的 nonlinear algebraic equation。
+
+这里最值得先抓住的点是：
+
+- $$x_n$$ 是当前步未知量
+- $$x_{n-1}$$ 是历史已知量
+
+所以当前步真正要解的是：
+
+$$
+\Phi_n(x_n)=0
+$$
+
+其中：
+
+$$
+\Phi_n(x_n)=
+\frac{Q(x_n)-Q(x_{n-1})}{\Delta t}+F(x_n)-B(t_n)
+$$
+
+这就是“为什么 transient 每一步最终还是要解一个 nonlinear equation”的最直接来源。
+
+## 第五步：为什么每一步仍然可能是非线性的
+
+虽然时间导数已经被离散成代数形式了，但当前步方程仍然可能是非线性的。  
+原因在于：
+
+- $$Q(x_n)$$ 可能非线性
+- $$F(x_n)$$ 也可能非线性
+
+所以把时间离散之后，事情并没有变成一个固定线性系统，而只是变成：
+
+```text
+当前步对 x_n 的 nonlinear algebraic equation
+```
+
+这就是为什么 transient 每个时间步里仍然需要：
+
+- residual
+- Jacobian
+- Newton
+
+## 第六步：当前步 Jacobian 为什么会多出 dQdx 项
+
+继续用 backward Euler 的最朴素形式：
+
+$$
+\Phi_n(x_n)=
+\frac{Q(x_n)-Q(x_{n-1})}{\Delta t}+F(x_n)-B(t_n)
+$$
+
+对 $$x_n$$ 求导：
+
+$$
+J_n =
+\frac{\partial \Phi_n}{\partial x_n}
+=
+\frac{1}{\Delta t}\frac{\partial Q}{\partial x}(x_n)
++
+\frac{\partial F}{\partial x}(x_n)
+$$
+
+这一步非常关键，因为它正好解释了：
+
+```text
+为什么 transient 的 Jacobian 和 DC 不一样
+```
+
+在 `DC` 里，主角是：
+
+$$
+\frac{\partial F}{\partial x}
+$$
+
+在 `transient` 里，还会多出一块由时间离散带来的：
+
+$$
+\frac{1}{\Delta t}\frac{\partial Q}{\partial x}
+$$
+
+这就是 transient Jacobian 里“电容型项”的根源。
+
+## 第七步：高阶 Gear / BDF 只是把“一个历史点”推广成“多个历史点”
+
+上面用的是最简单的 BDF1 直觉。  
+而在更高阶的 Gear / BDF 里，区别只是：
+
+$$
+\frac{dQ}{dt}(t_n)
+\approx
+\frac{1}{\Delta t}
+\left(
+\alpha_0 Q(x_n)
++
+\alpha_1 Q(x_{n-1})
++
+\alpha_2 Q(x_{n-2})
+\cdots
+\right)
+$$
+
+所以当前步方程会变成：
+
+$$
+\Phi_n(x_n)=
+\frac{1}{\Delta t}
+\left(
+\alpha_0 Q(x_n)
++
+\alpha_1 Q(x_{n-1})
++
+\alpha_2 Q(x_{n-2})
+\cdots
+\right)
++
+F(x_n)-B(t_n)=0
+$$
+
+这里最重要的不是每个系数的细节，而是要吃住这件事：
+
+```text
+不管是一阶还是二阶，
+当前步未知量仍然只出现在 x_n 上，
+历史项都已经变成已知量。
+```
+
+所以更高阶的 Gear / BDF 不会改变 transient 的本质，只会改变：
+
+- 当前步方程里历史项怎样加权
+- Jacobian 里 `dQdx` 前面的系数
+
+## 第八步：代码里哪一层在做“时间离散”
 
 这一层先看：
 
@@ -113,7 +318,7 @@ device / loader 层先把 Q, F, B, dQdx, dFdx 装出来
 time integration 层再决定“如何用这些量构造当前时间步的方程”
 ```
 
-## 第四步：最朴素地看 OneStep / backward-Euler 风格会发生什么
+## 第九步：OneStep / backward-Euler 在代码里怎么对应
 
 先看：
 
@@ -166,7 +371,7 @@ $$
 
 具体符号和系数由积分方法决定。
 
-## 第五步：Gear/BDF 视角下要怎么理解
+## 第十步：Gear/BDF 视角下要怎么理解
 
 再看：
 
@@ -240,7 +445,7 @@ $$
 - `qscalar(sec.alpha_[0]/sec.currentTimeStep);`
 - `Jac.linearCombo( qscalar, dQdx, fscalar, dFdx );`
 
-## 第六步：Transient 分析流程在做什么
+## 第十一步：Transient 分析流程在做什么
 
 接着回到分析层：
 
@@ -300,7 +505,7 @@ $$
 4. 接受 / 更新当前步结果
 5. 做误差估计，决定步长和阶数是否调整
 
-## 第七步：每个时间步里的 nonlinear solve 和 DC 有什么关系
+## 第十二步：每个时间步里的 nonlinear solve 和 DC 有什么关系
 
 一旦进入：
 
