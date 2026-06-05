@@ -76,14 +76,13 @@ $$
 
 ## 第一步：为什么 AC 必须先有 DC operating point
 
-先把稳态工作点记成 $$x^\*$$。  
-在这个工作点上，直流方程满足：
+先把稳态工作点记成 $x^*$，在这个工作点上，直流方程满足：
 
 $$
-F(x^\*) - B_0 = 0
+F(x^*) - B_0 = 0
 $$
 
-这里 $$B_0$$ 是直流偏置源形成的常值激励。
+这里 $B_0$ 是直流偏置源形成的常值激励。
 
 这一点非常关键，因为 `AC` 研究的不是“任意状态附近的响应”，而是：
 
@@ -93,10 +92,10 @@ $$
 系统怎么响应
 ```
 
-如果没有先求出 $$x^\*$$，你后面做线性化时会一直残留一个“常值失配项”，也就是：
+如果没有先求出 $x^*$，你后面做线性化时会一直残留一个“常值失配项”，也就是：
 
 $$
-F(x^\*) - B_0 \neq 0
+F(x^*) - B_0 \neq 0
 $$
 
 那后面的方程就不是纯粹的小信号响应方程，而会混进“工作点本身还没平衡”的误差。  
@@ -118,12 +117,12 @@ AC 不是从零开始求一个新解，
 现在把真实变量拆成：
 
 $$
-x(t) = x^\* + \hat{x}(t)
+x(t) = x^* + \hat{x}(t)
 $$
 
 其中：
 
-- $$x^\*$$ 是 DC 工作点
+- $$x^*$$ 是 DC 工作点
 - $$\hat{x}(t)$$ 是围绕工作点的微小扰动
 
 同样，把激励也拆成：
@@ -140,30 +139,30 @@ $$
 然后把它们代回原始 DAE：
 
 $$
-\frac{dQ(x^\*+\hat{x})}{dt} + F(x^\*+\hat{x}) - \left(B_0+\hat{b}(t)\right)=0
+\frac{dQ(x^*+\hat{x})}{dt} + F(x^*+\hat{x}) - \left(B_0+\hat{b}(t)\right)=0
 $$
 
 这时才做真正的小信号线性化。  
-对 $$Q$$ 和 $$F$$ 在 $$x^\*$$ 附近做一阶 Taylor 展开：
+对 $Q$ 和 $F$ 在 $x^*$ 附近做一阶 Taylor 展开：
 
 $$
-Q(x^\*+\hat{x}) \approx Q(x^\*) + \left.\frac{\partial Q}{\partial x}\right|_{x^\*}\hat{x}
+Q(x^*+\hat{x}) \approx Q(x^*) + \left.\frac{\partial Q}{\partial x}\right|_{x^*}\hat{x}
 $$
 
 $$
-F(x^\*+\hat{x}) \approx F(x^\*) + \left.\frac{\partial F}{\partial x}\right|_{x^\*}\hat{x}
+F(x^*+\hat{x}) \approx F(x^*) + \left.\frac{\partial F}{\partial x}\right|_{x^*}\hat{x}
 $$
 
 把它们代回去：
 
 $$
 \frac{d}{dt}\left[
-Q(x^\*) + \left.\frac{\partial Q}{\partial x}\right|_{x^\*}\hat{x}
+Q(x^*) + \left.\frac{\partial Q}{\partial x}\right|_{x^*}\hat{x}
 \right]
 +
-F(x^\*)
+F(x^*)
 +
-\left.\frac{\partial F}{\partial x}\right|_{x^\*}\hat{x}
+\left.\frac{\partial F}{\partial x}\right|_{x^*}\hat{x}
 -
 B_0
 -
@@ -174,21 +173,21 @@ $$
 现在用到工作点条件：
 
 $$
-F(x^\*) - B_0 = 0
+F(x^*) - B_0 = 0
 $$
 
-并且因为 $$x^\*$$ 是常值工作点，所以：
+并且因为 $$x^*$$ 是常值工作点，所以：
 
 $$
-\frac{dQ(x^\*)}{dt}=0
+\frac{dQ(x^*)}{dt}=0
 $$
 
 于是整条式子就退化成：
 
 $$
-\left.\frac{\partial Q}{\partial x}\right|_{x^\*}\frac{d\hat{x}}{dt}
+\left.\frac{\partial Q}{\partial x}\right|_{x^*}\frac{d\hat{x}}{dt}
 +
-\left.\frac{\partial F}{\partial x}\right|_{x^\*}\hat{x}
+\left.\frac{\partial F}{\partial x}\right|_{x^*}\hat{x}
 =
 \hat{b}(t)
 $$
@@ -196,8 +195,8 @@ $$
 如果记：
 
 $$
-C = \left.\frac{\partial Q}{\partial x}\right|_{x^\*}, \qquad
-G = \left.\frac{\partial F}{\partial x}\right|_{x^\*}
+C = \left.\frac{\partial Q}{\partial x}\right|_{x^*}, \qquad
+G = \left.\frac{\partial F}{\partial x}\right|_{x^*}
 $$
 
 那么就得到：
@@ -227,8 +226,8 @@ $$
 这已经和原始 `transient` 很不一样了。  
 原始 `transient` 是非线性、随状态变化的；而这里我们已经得到一个在工作点附近的**线性时不变系统**：
 
-- `C` 是在 $$x^\*$$ 处固定下来的矩阵
-- `G` 也是在 $$x^\*$$ 处固定下来的矩阵
+- `C` 是在 $x^*$ 处固定下来的矩阵
+- `G` 也是在 $x^*$ 处固定下来的矩阵
 
 只要我们讨论的是“小信号、固定频率”的响应，就可以设：
 
@@ -252,7 +251,7 @@ $$
 C\,(j\omega X e^{j\omega t}) + G\,(X e^{j\omega t}) = B e^{j\omega t}
 $$
 
-把公共因子 $$e^{j\omega t}$$ 消掉，就得到：
+把公共因子 $e^{j\omega t}$ 消掉，就得到：
 
 $$
 \left(G + j\omega C\right)X(\omega) = B(\omega)
@@ -461,5 +460,5 @@ AC 的起点不是“频域技巧”，
 
 你可以先试着回答这两个问题：
 
-1. 为什么 `AC` 必须先有一个满足 $$F(x^\*)-B_0=0$$ 的工作点，后面的线性化才真正成立？
+1. 为什么 `AC` 必须先有一个满足 $$F(x^*)-B_0=0$$ 的工作点，后面的线性化才真正成立？
 2. 为什么 `AC` 里把时域方程变成 $$\left(G+j\omega C\right)X=B$$ 的前提，不是“直接做频域变换”，而是“先得到一个围绕 DCOP 的线性时不变小信号系统”？
