@@ -107,7 +107,7 @@ $$
 也就是说，`AC` 本质上依赖：
 
 $$
-x(t)=x^\*+\hat{x}(t), \qquad \hat{x}(t)\ \text{很小}
+x(t)=x^*+\hat{x}(t), \qquad \hat{x}(t)\ \text{很小}
 $$
 
 于是才有：
