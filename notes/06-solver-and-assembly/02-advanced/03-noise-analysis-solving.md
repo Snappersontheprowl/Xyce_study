@@ -72,10 +72,10 @@ $$
 
 ## 第一步：为什么 NOISE 也必须先有 DCOP
 
-先记工作点 $x^\*$ 满足：
+先记工作点 $x^*$ 满足：
 
 $$
-F(x^\*) - B_0 = 0
+F(x^*) - B_0 = 0
 $$
 
 这里 $B_0$ 是直流偏置。
@@ -92,7 +92,7 @@ $$
 器件内部噪声如何经过小信号网络传播到输出端
 ```
 
-所以和 `AC` 一样，如果没有先求出 $x^\*$，后面的小信号网络本身就不成立。  
+所以和 `AC` 一样，如果没有先求出 $x^*$，后面的小信号网络本身就不成立。  
 这就是为什么 `NOISE::doInit()` 里同样先调用：
 
 - `nonlinearManager_.solve();`
@@ -104,7 +104,7 @@ $$
 在工作点附近，把变量写成：
 
 $$
-x(t) = x^\* + \hat{x}(t)
+x(t) = x^* + \hat{x}(t)
 $$
 
 然后对原始 DAE 做一阶 Taylor 线性化，就和 `AC` 一样得到：
@@ -116,8 +116,8 @@ $$
 其中：
 
 $$
-C = \left.\frac{\partial Q}{\partial x}\right|_{x^\*}, \qquad
-G = \left.\frac{\partial F}{\partial x}\right|_{x^\*}
+C = \left.\frac{\partial Q}{\partial x}\right|_{x^*}, \qquad
+G = \left.\frac{\partial F}{\partial x}\right|_{x^*}
 $$
 
 接着在频域里，就得到：
