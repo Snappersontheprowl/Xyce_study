@@ -17,10 +17,11 @@
 2. [02-ac-lifecycle.md](02-ac-lifecycle.md)
 3. [03-noise-lifecycle.md](03-noise-lifecycle.md)
 4. [04-noise-adjoint-lifecycle-hook.md](04-noise-adjoint-lifecycle-hook.md)
+5. [05-hb-lifecycle.md](05-hb-lifecycle.md)
 
 ## 后续建议展开
 
-- `05-hb-and-mpde-lifecycle.md`
+- `06-mpde-lifecycle.md`
 
 ## 这一组的边界
 
