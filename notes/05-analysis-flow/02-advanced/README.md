@@ -18,10 +18,11 @@
 3. [03-noise-lifecycle.md](03-noise-lifecycle.md)
 4. [04-noise-adjoint-lifecycle-hook.md](04-noise-adjoint-lifecycle-hook.md)
 5. [05-hb-lifecycle.md](05-hb-lifecycle.md)
+6. [06-hb-time-frequency-lifecycle-hook.md](06-hb-time-frequency-lifecycle-hook.md)
 
 ## 后续建议展开
 
-- `06-mpde-lifecycle.md`
+- `07-mpde-lifecycle.md`
 
 ## 这一组的边界
 
