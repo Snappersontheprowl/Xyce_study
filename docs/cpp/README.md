@@ -12,6 +12,7 @@
 
 - `syntax-basics.md`：声明、定义、头文件、匿名命名空间等基础语法
 - `xyce-reading-structures.md`：阅读 Xyce 真正需要的接口、Manager、工厂、模板和 ownership 结构
+- `career-learning-path.md`：围绕 SPICE / HPC / EDA 自动化的简要学习路线
 
 ## 后续建议补充
 
