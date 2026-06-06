@@ -8,223 +8,425 @@
 
 - [05-hb-solving-roadmap.md](05-hb-solving-roadmap.md)
 
-但不再只停留在“HB 是什么”的层面，而是进一步回答：
+这一篇要先回答数学上的核心问题，再去对代码：
 
 ```text
-HB 在代码里到底是怎样把“频域谐波系数上的 nonlinear 问题”
-和“普通器件更自然的时域装配”接起来的？
+为什么 HB 会同时出现“谐波系数”“fast-time 样本”“FFT/IFT”这三套对象？
+它们不是实现细节，而是 HB 数学形式本身的直接落地。
 ```
 
-这条桥的核心角色就是：
+如果只抓一句话，请先抓这个：
 
-- `HBLoader`
-- `HBBuilder`
-- `permutedIFT / permutedFFT`
+```text
+HB 不是在时域一步一步推进轨迹，
+而是在“周期稳态”假设下，
+直接把整条周期波形表示成有限个谐波系数，
+然后在这些系数上解一个 nonlinear algebraic system。
+```
 
 ## 这次读了哪些文件
 
+- [src/AnalysisPKG/N_ANP_HB.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_HB.C)
 - [src/LoaderServicesPKG/N_LOA_HBLoader.h](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_HBLoader.h)
 - [src/LoaderServicesPKG/N_LOA_HBLoader.C](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_HBLoader.C)
 - [src/LinearAlgebraServicesPKG/N_LAS_HBBuilder.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_HBBuilder.h)
-- [src/AnalysisPKG/N_ANP_HB.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_HB.C)
 
-## 当前结论先写在前面
+## 先从原始电路方程出发
 
-`HB` 在实现上的关键桥梁，可以先压成下面这条主线：
-
-```text
-频域谐波系数向量 Xf
--> HBLoader::permutedIFT(...)
--> 一组 fast-time 时域样本块
--> 普通 appLoader 在每个 fast-time 样本上做器件装配
--> 得到时域 Q/F/B 和 time-domain Jacobian
--> HBLoader::permutedFFT(...)
--> 回到频域残差和频域 Jacobian 贡献
-```
-
-如果只抓一句话，我希望你先抓住：
-
-```text
-HB 不是要求器件自己直接写出封闭频域公式，
-而是大量复用“普通时域器件装配”，
-再靠时频变换把它包装成谐波系数上的 nonlinear 系统。
-```
-
-## 第一步：HB 的未知量在代码里到底是什么形状
-
-在 `HB` 主线里，真正送进 nonlinear solve 的未知量，已经不是单个时刻的：
+`HB` 也不是从空中冒出来的。它和 `DC`、`transient` 一样，起点仍然是同一条电路 DAE：
 
 $$
-x(t_n)
+\frac{dQ(x)}{dt} + F(x) - B(t) = 0
 $$
 
-而是一组谐波系数。
+这里：
 
-在代码里，这一层先由：
+- $$x(t)$$ 是整套电路未知量
+- $$Q(x)$$ 是电荷/磁链类动态项
+- $$F(x)$$ 是静态导通与 KCL/KVL 项
+- $$B(t)$$ 是外部激励
+
+`transient` 的思路是：
+
+- 保留 $$x(t)$$ 这条轨迹
+- 再用时间离散把它变成一步一步的 nonlinear equation
+
+而 `HB` 的思路完全不同：
+
+- 先假设最终要找的是一个 **周期稳态解**
+- 不再一步步追踪整个起始到终点的时间演化
+- 而是直接在“一个周期上的周期函数空间”里解方程
+
+## 第一步：周期稳态假设
+
+`HB` 的第一条数学假设是：
+
+$$
+x(t + T) = x(t)
+$$
+
+也就是说，我们关心的是周期为 $$T$$ 的稳态响应。
+
+这一步和 `transient` 的根本差别就在这里：
+
+- `transient` 允许波形随着时间继续向前演化
+- `HB` 只关心“最终那个已经稳定下来的周期波形”
+
+一旦这个假设成立，就意味着我们可以不再把未知对象看成“任意轨迹”，而把它看成“周期函数”。
+
+## 第二步：有限谐波展开
+
+对于周期函数，最自然的表示方法就是 Fourier 展开。
+
+对单基波场景，可以先写成：
+
+$$
+x(t) \approx x_0 + \sum_{k=1}^{K}
+\Big(
+a_k \cos(k\omega_0 t) + b_k \sin(k\omega_0 t)
+\Big)
+$$
+
+其中：
+
+- $$\omega_0 = \frac{2\pi}{T}$$
+- $$K$$ 是保留的最高谐波阶数
+- $$x_0, a_k, b_k$$ 都是待求系数
+
+如果把这些系数统一堆成一个大向量：
+
+$$
+\hat{x}
+=
+\begin{bmatrix}
+x_0 & a_1 & b_1 & a_2 & b_2 & \cdots & a_K & b_K
+\end{bmatrix}^T
+$$
+
+那么 `HB` 真正要求解的未知量，其实就不再是时域轨迹 $$x(t)$$，而是这组谐波系数 $$\hat{x}$$。
+
+这一点非常重要：
+
+```text
+HB 的 Newton 未知量不是“当前时刻的电压向量”，
+而是“整个周期波形的有限谐波系数”。
+```
+
+## 第三步：为什么 nonlinear 器件逼着我们回到时域样本
+
+如果电路是线性的，那么把所有东西都写成 Fourier 系数后，频域处理会很直接。
+
+但真实电路里，器件是非线性的。  
+比如某个器件电流可能是：
+
+$$
+i(t) = f(v(t))
+$$
+
+如果 $$v(t)$$ 已经写成一串谐波展开，那么：
+
+$$
+f(v(t))
+$$
+
+通常不会轻松地直接变成“简单的系数代数表达式”。  
+尤其对 `MOSFET_B4` 这类复杂 compact model，更不可能要求器件作者手工直接写出完整的谐波域公式。
+
+所以 `HB` 的实际思路不是：
+
+```text
+让每个器件直接给出完整频域 nonlinear 残差
+```
+
+而是：
+
+```text
+先把谐波系数还原成一个周期上的若干时域样本，
+在这些样本点上复用普通时域器件装配，
+再把结果投影回谐波系数空间。
+```
+
+这就是时频桥的数学理由。
+
+## 第四步：从谐波系数到 fast-time 样本
+
+为了复用普通时域装配，`HB` 会在一个周期内选择若干个采样点：
+
+$$
+t_1, t_2, \dots, t_M
+$$
+
+然后用当前谐波系数 $$\hat{x}$$ 计算这些采样点上的波形值：
+
+$$
+x(t_i) = \Phi(t_i)\hat{x}
+$$
+
+这里 $$\Phi(t_i)$$ 可以理解成由：
+
+- 常数基
+- $$\cos(k\omega_0 t_i)$$
+- $$\sin(k\omega_0 t_i)$$
+
+组成的一行基函数矩阵。
+
+把所有采样点堆起来，就得到：
+
+$$
+x_t = T_{\mathrm{IFT}} \hat{x}
+$$
+
+这就是“从频域系数到时域样本”的线性变换。  
+在代码里，它对应的正是 `IFT`。
+
+所以，`HB` 里的 `IFT` 不是附属技巧，而是这条数学关系的直接实现：
+
+$$
+\text{谐波系数} \longrightarrow \text{周期样本值}
+$$
+
+## 第五步：在样本点上写残差
+
+一旦得到了这些样本值 $$x(t_i)$$，我们就可以在每个样本点上评估原始 DAE：
+
+$$
+r(t_i;\hat{x}) =
+\frac{dQ(x(t_i))}{dt} + F(x(t_i)) - B(t_i)
+$$
+
+这里要注意：
+
+- 器件仍然只是在“某个时刻的状态”下算 $$Q$$、$$F$$、$$dQdx$$、$$dFdx$$
+- 它并不知道自己正在为 `HB` 服务
+- `HB` 只是在外层帮它把“当前谐波系数对应的波形样本”喂进去
+
+这就是为什么 `HB` 能大量复用普通器件装配代码。
+
+## 第六步：为什么还要把样本残差再变回频域
+
+`HB` 真正的未知量是谐波系数 $$\hat{x}$$，所以最终 residual 也必须表达在同一个空间里。
+
+也就是说，我们不能只在样本点上得到一堆：
+
+$$
+r(t_1), r(t_2), \dots, r(t_M)
+$$
+
+还必须把这些样本残差重新投影回有限谐波子空间：
+
+$$
+\hat{r} = T_{\mathrm{FFT}} r_t
+$$
+
+这样才能得到 `HB` 的 nonlinear solve 真正要看到的频域 residual：
+
+$$
+\hat{r}(\hat{x}) = 0
+$$
+
+因此，`FFT` 这一步也不是辅助动作，而是这条数学关系的直接实现：
+
+$$
+\text{时域样本残差} \longrightarrow \text{谐波系数残差}
+$$
+
+## 第七步：时间导数为什么会变成 $$j\omega$$
+
+这是 `HB` 数学里最核心的一步之一。
+
+对单个复指数基函数：
+
+$$
+e^{jk\omega_0 t}
+$$
+
+有：
+
+$$
+\frac{d}{dt} e^{jk\omega_0 t}
+=
+jk\omega_0 e^{jk\omega_0 t}
+$$
+
+所以在 Fourier 系数空间里，时间导数算子不再表现成“时间步长差分”，而直接变成“乘以谐波频率”：
+
+$$
+\frac{d}{dt}
+\quad \Longleftrightarrow \quad
+jk\omega_0
+$$
+
+这就是为什么：
+
+- `transient` 里导数项靠 $$\Delta t$$ 离散
+- `HB` 里导数项靠 $$j\omega$$ 作用
+
+对实数形式的 `cos/sin` 基底来说，$$j\omega$$ 不会直接以复数标量出现，而是变成实数块之间的耦合。  
+这正是你在代码里看到的：
+
+```text
+±ω 的交叉项
+```
+
+所以本质上：
+
+```text
+HB 里的时间导数没有消失，
+只是从“时间差分”变成了“谐波域中的频率乘子”。
+```
+
+## 第八步：Jacobain 为什么也要走同样的时频桥
+
+`HB` 最终要做 Newton，所以还需要：
+
+$$
+\frac{\partial \hat{r}}{\partial \hat{x}}
+$$
+
+这个 Jacobian 不适合被理解成“器件直接给出一张巨大频域矩阵”。  
+更自然的理解是：
+
+1. 当前谐波系数 $$\hat{x}$$ 先通过 `IFT` 变成样本值
+2. 每个样本点上，普通器件照常给出：
+   - $$\frac{\partial Q}{\partial x}$$
+   - $$\frac{\partial F}{\partial x}$$
+3. 再通过 `FFT/IFT` 和导数算子的组合，把它们拼成谐波系数空间里的 Jacobian 作用
+
+所以在 `HB` 里：
+
+```text
+Jacobian 的难点不是“它是个大矩阵”，
+而是“它是时域局部导数，经由时频变换，投影成谐波系数空间中的大块结构”。
+```
+
+## 到这里先收一句最本质的话
+
+如果只抓一句数学本质，我希望你先抓住：
+
+```text
+HB = 周期稳态假设
+   + 有限谐波展开
+   + 在 fast-time 样本点上评估 nonlinear 器件
+   + 再把样本残差/导数投影回谐波系数空间
+```
+
+这就是 `HB` 里同时出现：
+
+- 谐波系数
+- fast-time 样本
+- FFT / IFT
+
+的根本原因。
+
+## 下面再把这条数学主线对上代码
+
+到这一步，再去看代码，逻辑就会顺很多。
+
+### 1. 先定 fast-time 采样点和变换矩阵
+
+在：
+
+- [N_ANP_HB.C](../../../vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_HB.C)
+
+里，先看：
+
+- `HB::setTimePoints_()`
+- `HB::createFT_()`
+
+这里的作用分别可以先理解成：
+
+- `setTimePoints_()`：决定一个周期内选哪些采样点
+- `createFT_()`：构造时频变换矩阵，也就是这里说的 $$T_{\mathrm{IFT}}$$ 和 $$T_{\mathrm{FFT}}$$ 的实现基础
+
+你会在 `createFT_()` 里直接看到：
+
+- `cos(...)`
+- `sin(...)`
+- 以及 DFT/IDFT 矩阵的建立
+
+所以这一层不是实现细节，而是前面“有限谐波展开 + 样本投影”的数学定义在代码里的落地。
+
+### 2. 再由 HBBuilder 决定两套 block 结构
+
+然后看：
 
 - [N_LAS_HBBuilder.h](../../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_HBBuilder.h)
 
-负责组织。
-
-从这个头文件里最值得先记住的是两类 block vector：
-
-### 1. time-domain block vector
-
-例如：
+这里最值得先记的是两类向量构造：
 
 - `createTimeDomainBlockVector()`
-- `createTimeDomainStateBlockVector()`
-
-它对应的直觉是：
-
-```text
-block(i) = 第 i 个 fast-time 采样点上的整套电路未知量
-```
-
-### 2. expanded real form transpose block vector
-
-例如：
-
 - `createExpandedRealFormTransposeBlockVector()`
 
-它对应的直觉是：
+它们分别对应：
 
-```text
-block(n) = 第 n 个电路未知量在所有谐波上的 real/imag 系数
-```
+- 时域采样块
+- 频域谐波系数块
 
-所以在 `HB` 里，最先要切开的一个概念就是：
+也就是说，`HBBuilder` 做的是“线性代数对象形状”的准备工作，让后面的：
 
-```text
-时域样本块
-vs
-频域谐波系数块
-```
+- `IFT`
+- 时域装配
+- `FFT`
 
-这两个 block 结构都不是“装饰性数据结构”，而是整个 HB 桥接的核心。
+都能落在正确的 block 结构上。
 
-## 第二步：为什么要先从频域向量回到时域样本
+### 3. HBLoader::permutedIFT(...) 对应“系数 -> 样本”
 
-现在看：
+再看：
 
 - [N_LOA_HBLoader.C](../../../vendor/Xyce-7.10.0/src/LoaderServicesPKG/N_LOA_HBLoader.C)
   里的 `HBLoader::loadDAEVectors(...)`
 
-这个函数一开始最关键的动作之一就是：
+一开始最关键的动作之一就是：
 
 ```cpp
-Linear::BlockVector & bXf = *dynamic_cast<Linear::BlockVector*>(Xf);
 permutedIFT(bXf, &*bXtPtr_);
 ```
 
-也就是说：
+现在它就不再显得突兀了。  
+它对应的正是前面的数学关系：
 
-```text
-当前 nonlinear solver 送进来的频域未知量 Xf，
-先被逆变换成时域样本块 bXtPtr_
-```
-
-为什么要先这么做？
-
-因为普通器件更自然的装配接口，仍然是围绕：
-
-- 某个时刻下的节点电压/状态
-- 某个时刻下的 `Q/F/B`
-- 某个时刻下的 `dQdx/dFdx`
-
-而不是直接围绕“一组 Fourier 系数”。
-
-所以从数学和实现的连接点看，`HB` 在这里做的事情非常朴素：
-
-```text
-先把谐波系数还原成一组时域采样点，
-这样普通器件代码就还能继续在它熟悉的世界里工作。
-```
-
-## 第三步：在每个 fast-time 样本上，普通装配是怎么复用的
-
-继续看 `HBLoader::loadDAEVectors(...)` 的主循环。
-
-这里你会看到：
-
-```cpp
-for( int i = 0; i < BlockCount; ++i )
-```
+$$
+x_t = T_{\mathrm{IFT}} \hat{x}
+$$
 
 也就是：
 
 ```text
-对每一个 fast-time 样本块，逐个处理
+当前 Newton 未知量是谐波系数
+-> 先把它还原成一个周期上的时域样本块
 ```
 
-在每个样本块上，最关键的动作是：
+### 4. 样本循环里复用普通时域器件装配
 
-1. `deviceManager_.setFastTime(times_[i] / fScalar);`
-2. `appLoaderPtr_->updateSources();`
-3. `appLoaderPtr_->updateState(..., Xyce::Device::NONLINEAR_FREQ);`
-4. `appLoaderPtr_->loadDAEVectors(..., Xyce::Device::NONLINEAR_FREQ);`
-5. `appLoaderPtr_->loadDAEMatrices(..., Xyce::Device::LINEAR_FREQ / NONLINEAR_FREQ);`
+接着在同一个 `loadDAEVectors(...)` 里，会看到对 `BlockCount` 的循环。
 
-这一段最值得先抓住的本质是：
+在每个样本点上，核心动作是：
+
+1. `deviceManager_.setFastTime(...)`
+2. `appLoaderPtr_->updateSources()`
+3. `appLoaderPtr_->updateState(..., Device::NONLINEAR_FREQ)`
+4. `appLoaderPtr_->loadDAEVectors(...)`
+5. `appLoaderPtr_->loadDAEMatrices(...)`
+
+这正对应前面的数学步骤：
+
+$$
+r(t_i;\hat{x})
+=
+\frac{dQ(x(t_i))}{dt} + F(x(t_i)) - B(t_i)
+$$
+
+也就是说：
 
 ```text
-HB 并没有发明一套完全不同的器件装配 API，
-而是把普通 appLoader 在“某个时域样本点”上的工作，
-一块一块地复用起来。
+HB 并没有要求普通器件直接进入“谐波域思维”，
+而是让它们继续在“当前样本点”的时域世界里工作。
 ```
 
-也就是说，在每个 fast-time 样本点上，器件仍然是在做你已经熟悉的事情：
+### 5. permutedFFT2(...) 对应“样本残差 -> 系数残差”
 
-- 写时域的 `Q`
-- 写时域的 `F`
-- 写时域的 `B`
-- 写时域的 `dQdx`
-- 写时域的 `dFdx`
-
-只是现在这些东西不再只对应一个时间步，而是对应：
-
-```text
-一个周期内若干个采样点
-```
-
-## 第四步：为什么 HBLoader 要分别处理 linear 和 nonlinear Jacobian
-
-在这个循环里，你会看到：
-
-- 线性部分：
-  - `Xyce::Device::LINEAR_FREQ`
-- 非线性部分：
-  - `Xyce::Device::NONLINEAR_FREQ`
-
-而且：
-
-- 线性部分会被放进 `linAppdQdxPtr_ / linAppdFdxPtr_`
-- 非线性部分会按每个时间块存进：
-  - `vecNLAppdQdxPtr_[i]`
-  - `vecNLAppdFdxPtr_[i]`
-
-这一步从实现角度先不用一下子吃透所有细节，但最重要的理解是：
-
-```text
-HBLoader 不只是把时域向量搬来搬去，
-它还在为“频域上的 Jacobian 作用”提前把线性和非线性部分分开存好。
-```
-
-后面 matrix-free 应用时，才有可能：
-
-- 对线性频域部分直接在频域上处理
-- 对非线性部分先回时域再作用
-
-这也解释了为什么你会在 `applyDAEMatrices(...)` 里看到：
-
-- `permutedIFT(...)`
-- 时域 matvec
-- `permutedFFT(...)`
-- 再加上线性频域矩阵作用
-
-## 第五步：Q/F/B 是怎样从时域再回到频域的
-
-在 `HBLoader::loadDAEVectors(...)` 后半段，你会看到：
+在 `loadDAEVectors(...)` 后半段，你会看到：
 
 ```cpp
 permutedFFT2(*bBt, bB);
@@ -232,141 +434,86 @@ permutedFFT2(*bQt, bQ);
 permutedFFT2(*bFt, bF);
 ```
 
-这三句非常关键。
+这对应的正是：
 
-它们说明：
+$$
+\hat{r} = T_{\mathrm{FFT}} r_t
+$$
+
+它的含义是：
 
 ```text
-前面在每个时域采样点上装出来的 B/Q/F，
-最后又被变换回频域 block 结构，
-从而形成 HB nonlinear solve 真正要看到的频域残差对象。
+前面在时域样本点上得到的 Q/F/B，
+要重新回到谐波系数空间，
+这样 HB 的 residual 才能跟当前未知量 Xf 属于同一个空间。
 ```
 
-也就是说：
+### 6. applyDAEMatrices(...) 对应 Jacobian 的时频桥
 
-- 时域样本块只是中间工作空间
-- 最终交给 HB nonlinear solve 的，仍然是频域系数意义下的向量
+最后看：
 
-这是 `HB` 这条桥里最核心的闭环之一：
+- `HBLoader::applyDAEMatrices(...)`
+
+这一层最适合理解成：
 
 ```text
-频域未知量
--> 时域样本装配
--> 频域残差
+把“谐波系数空间中的一个扰动向量”
+送过 HB Jacobian
+得到“谐波系数空间中的 Jacobian-vector 结果”
 ```
 
-## 第六步：时间导数项在 HB 里怎么体现
+它的大体逻辑是：
 
-这一点很容易混。
+1. 对输入扰动向量做 `IFT`
+2. 在样本点上用存好的时域 Jacobian 做局部作用
+3. 再做 `FFT`
+4. 最后把导数项对应的 $$j\omega$$ 结构补进去
 
-在 `transient` 里，我们熟悉的是：
+这就是为什么你在这里会看到：
+
+- 时域 matvec
+- `permutedFFT / permutedIFT`
+- 以及 `±ω` 交叉项
+
+现在这几步的数学含义都能对上了。
+
+## 当前结论
+
+`HB` 的时频桥，最本质地可以压成下面这条链：
 
 $$
-\frac{dQ}{dt}
+\hat{x}
+\xrightarrow{\mathrm{IFT}}
+x(t_i)
+\xrightarrow{\text{device/load}}
+r(t_i)
+\xrightarrow{\mathrm{FFT}}
+\hat{r}
 $$
 
-通过时间离散变成：
+而 Jacobian 则是这条链在线性化后的对应版本：
 
 $$
-\frac{1}{\Delta t}\frac{\partial Q}{\partial x}
+\delta \hat{x}
+\xrightarrow{\mathrm{IFT}}
+\delta x(t_i)
+\xrightarrow{\text{sample Jacobian}}
+\delta r(t_i)
+\xrightarrow{\mathrm{FFT}}
+\delta \hat{r}
 $$
 
-那在 `HB` 里，时间导数并不是靠时间步长离散出来，而是通过频域关系体现。
-
-在 `applyDAEMatrices(...)` 那段代码里，你会看到它对 `bdQdxV` 做类似：
-
-```text
-乘以 ±ω
-```
-
-这正对应频域里：
+再叠加时间导数在谐波域里的：
 
 $$
 \frac{d}{dt} \leftrightarrow j\omega
 $$
 
-所以从本质上说：
-
-```text
-HB 里 dQ/dt 这一项没有消失，
-只是它不再通过时间步长离散，
-而是通过谐波频率上的 ±jω 作用体现在频域残差/Jacobian 里。
-```
-
-这正是 `HB` 与 `transient` 在“处理导数”上的根本不同。
-
-## 第七步：为什么还会有 frequency-domain devices
-
-在 `HBLoader::loadDAEVectors(...)` 里，除了时域样本循环，你还会看到：
-
-- `updateFDIntermediateVars(...)`
-- `loadFreqDAEVectors(...)`
-- `loadFreqDAEMatrices(...)`
-
-这说明 `HB` 不是百分之百都靠“先回时域再回来”。
-
-某些器件/贡献可以更自然地直接按频域形式加载。  
-所以 `HBLoader` 实际上在做两件事：
-
-1. 大量复用时域装配
-2. 同时允许某些 frequency-domain contribution 直接进入系统
-
-所以更准确地说：
-
-```text
-HBLoader 是“时域样本装配 + 频域专用贡献”的混合桥梁
-```
-
-而不是单纯的 FFT 外壳。
-
-## 第八步：applyDAEMatrices() 为什么值得单独记住
-
-如果 `loadDAEVectors()` 主要是在建立：
-
-```text
-Q / F / B 的频域残差对象
-```
-
-那么：
-
-- `applyDAEMatrices(...)`
-
-更值得先理解成：
-
-```text
-频域 Jacobian 对某个向量 V 的作用，怎样被高效实现
-```
-
-它的大致逻辑是：
-
-1. 先把频域向量 `Vf` 逆变换到时域块
-2. 在时域上用存好的 nonlinear Jacobian 做 matvec
-3. 再 FFT 回频域
-4. 再叠加线性频域部分
-5. 再把 `dQdx` 对应的导数项通过频率因子并入 `dFdx` 那一边
-
-这一步的意义在于：
-
-```text
-HB 的 nonlinear solve 虽然是“频域系数上的 solve”，
-但 Jacobian 的作用并不是通过一张朴素大矩阵硬乘出来的，
-而是通过时频桥接和分块存储高效实现的。
-```
-
-## 这一篇最想让你先吃下来的本质
-
-如果只抓一句话，我希望你先抓住：
-
-```text
-HB 在实现上的关键，不是先写出一张巨大的频域方程，
-而是用 HBLoader 把“频域谐波系数上的 nonlinear 问题”
-反复翻译成“时域采样点上的普通器件装配”，
-再把结果送回频域残差和 Jacobian 作用。
-```
+这就形成了 `HB` 最终送进 Newton 的 nonlinear algebraic system。
 
 ## 现在可以做的自检
 
 你可以先试着回答这两个问题：
 
-1. 为什么 `HBLoader::loadDAEVectors()` 一开始最关键的动作之一是 `permutedIFT(...)`，而不是直接在频域里调用普通器件装配？
-2. 为什么 `HB` 里时间导数项的处理，更接近“频域中的 ±jω 作用”，而不是 `transient` 里的时间步长离散？
+1. 为什么 `HB` 里必须同时保留“谐波系数空间”和“fast-time 样本空间”，而不能只在其中一个空间把所有事情做完？
+2. 为什么 `HB` 中的 `IFT/FFT` 不只是实现技巧，而是“有限谐波展开 + 样本点评估 + 投影回谐波空间”这条数学链本身的直接实现？
