@@ -16,10 +16,11 @@
 1. [01-advanced-analysis-type-map.md](01-advanced-analysis-type-map.md)
 2. [02-ac-lifecycle.md](02-ac-lifecycle.md)
 3. [03-noise-lifecycle.md](03-noise-lifecycle.md)
+4. [04-noise-adjoint-lifecycle-hook.md](04-noise-adjoint-lifecycle-hook.md)
 
 ## 后续建议展开
 
-- `04-hb-and-mpde-lifecycle.md`
+- `05-hb-and-mpde-lifecycle.md`
 
 ## 这一组的边界
 
