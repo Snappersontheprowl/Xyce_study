@@ -20,6 +20,7 @@
 5. [05-hb-lifecycle.md](05-hb-lifecycle.md)
 6. [06-hb-time-frequency-lifecycle-hook.md](06-hb-time-frequency-lifecycle-hook.md)
 7. [07-mpde-lifecycle.md](07-mpde-lifecycle.md)
+8. [08-sensitivity-lifecycle.md](08-sensitivity-lifecycle.md)
 
 ## 横向收束
 

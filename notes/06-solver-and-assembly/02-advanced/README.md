@@ -22,6 +22,7 @@ Xyce 里其他分析类型在数学上到底在解什么，
 6. [06-hb-time-frequency-bridge.md](06-hb-time-frequency-bridge.md)
 7. [07-mpde-solving-roadmap.md](07-mpde-solving-roadmap.md)
 8. [08-advanced-analysis-comparison.md](08-advanced-analysis-comparison.md)
+9. [09-sensitivity-analysis-solving.md](09-sensitivity-analysis-solving.md)
 
 ## 这一组的边界
 
