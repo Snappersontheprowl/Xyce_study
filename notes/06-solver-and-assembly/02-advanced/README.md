@@ -20,10 +20,7 @@ Xyce 里其他分析类型在数学上到底在解什么，
 4. [04-adjoint-for-noise.md](04-adjoint-for-noise.md)
 5. [05-hb-solving-roadmap.md](05-hb-solving-roadmap.md)
 6. [06-hb-time-frequency-bridge.md](06-hb-time-frequency-bridge.md)
-
-## 计划中的后续展开
-
-- `07-mpde-solving-roadmap.md`
+7. [07-mpde-solving-roadmap.md](07-mpde-solving-roadmap.md)
 
 ## 这一组的边界
 
