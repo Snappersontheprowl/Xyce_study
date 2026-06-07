@@ -20,7 +20,12 @@
 5. [05-hb-lifecycle.md](05-hb-lifecycle.md)
 6. [06-hb-time-frequency-lifecycle-hook.md](06-hb-time-frequency-lifecycle-hook.md)
 7. [07-mpde-lifecycle.md](07-mpde-lifecycle.md)
-8. [08-sensitivity-lifecycle.md](08-sensitivity-lifecycle.md)
+
+## 灵敏度已单独拆出
+
+灵敏度分析已经单独整理到同级目录：
+
+- [../03-sensitivity/README.md](../03-sensitivity/README.md)
 
 ## 横向收束
 

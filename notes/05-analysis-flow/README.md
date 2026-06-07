@@ -35,12 +35,15 @@ Xyce 在完成初始化之后，
   - 基础分析调度：`.OP / .DC / .TRAN`
 - [02-advanced/README.md](02-advanced/README.md)
   - 进阶分析地图：`AC / NOISE / HB / MPDE`
+- [03-sensitivity/README.md](03-sensitivity/README.md)
+  - 灵敏度作为附着在主分析上的能力层：`.SENS`、`SENSITIVITY`
 
 ## 推荐阅读顺序
 
 1. 先读 [01-basic/README.md](01-basic/README.md)
 2. 再顺着基础主线读 `01-basic/` 下面四篇
 3. 基础主线稳定后，再读 [02-advanced/README.md](02-advanced/README.md)
+4. 需要系统学习灵敏度时，再读 [03-sensitivity/README.md](03-sensitivity/README.md)
 
 ## 这一专题最想回答的 4 个问题
 

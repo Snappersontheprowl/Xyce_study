@@ -11,9 +11,11 @@
 - `05-analysis-flow/`：按“基础 / 进阶”两层组织分析调度专题
   - `01-basic/`：`.OP / .DC / .TRAN` 的入口、注册、生命周期、基础设施初始化
   - `02-advanced/`：`AC / NOISE / HB / MPDE` 的调度地图
+  - `03-sensitivity/`：灵敏度作为附着在主分析上的能力层，其调度与生命周期
 - `06-solver-and-assembly/`：按“基础 / 进阶”两层组织方程与求解专题
   - `01-basic/`：电路 DAE 的建立与 `DC / transient` 求解骨架
   - `02-advanced/`：`AC / NOISE / HB / MPDE` 的进阶求解路线
+  - `03-sensitivity/`：解敏感度、输出敏感度、direct / adjoint 的数学与求解
 - `07-device-model-contributions/`：从求解器继续下钻，研究器件如何贡献 `Q/F/B/dQdx/dFdx`
   - 其中 `05-mosfet-b4/` 是 `B4` 的独立子专题
   - 其中 `device/` 是器件家族地图和 `ADMS` 接入方式的扩展阅读

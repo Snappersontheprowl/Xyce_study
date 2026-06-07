@@ -34,6 +34,8 @@ Xyce 到底在装配什么方程，又是怎样把这些方程解出来的？
   - 基础仿真：`DC`、`transient`
 - [02-advanced/README.md](02-advanced/README.md)
   - 进阶仿真：`AC`、`NOISE`、`HB`、`MPDE`
+- [03-sensitivity/README.md](03-sensitivity/README.md)
+  - 灵敏度分析：解敏感度、输出敏感度、direct / adjoint
 
 ## 为什么要这样拆
 
@@ -65,6 +67,7 @@ Xyce 到底在装配什么方程，又是怎样把这些方程解出来的？
 1. 先读 [01-basic/README.md](01-basic/README.md)
 2. 再顺着基础主线读 `01-basic/` 下面四篇
 3. 基础主线稳定后，再读 [02-advanced/README.md](02-advanced/README.md)
+4. 需要系统学习灵敏度时，再读 [03-sensitivity/README.md](03-sensitivity/README.md)
 
 这样读的时候，第二篇里的数学对象就不会显得凭空出现。
 
