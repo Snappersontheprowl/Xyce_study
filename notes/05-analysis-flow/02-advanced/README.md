@@ -21,6 +21,19 @@
 6. [06-hb-time-frequency-lifecycle-hook.md](06-hb-time-frequency-lifecycle-hook.md)
 7. [07-mpde-lifecycle.md](07-mpde-lifecycle.md)
 
+## 横向收束
+
+如果你已经走完这一组的生命周期地图，想把：
+
+- `AC`
+- `NOISE`
+- `HB`
+- `MPDE`
+
+在“数学目标 / 未知量 / 方程形态 / 求解骨架”上横向对齐，建议直接看：
+
+- [../../06-solver-and-assembly/02-advanced/08-advanced-analysis-comparison.md](../../06-solver-and-assembly/02-advanced/08-advanced-analysis-comparison.md)
+
 ## 这一组的边界
 
 这一组仍然属于 `05-analysis-flow`，所以只讲“调度”和“生命周期地图”。
