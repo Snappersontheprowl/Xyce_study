@@ -13,7 +13,7 @@
 而这个 `device/` 目录更偏“器件家族地图”和“模型接入方式”：
 
 - `DeviceModelPKG` 里到底有哪些器件家族
-- 哪些属于常规 `OpenModels`
+- 哪些属于常规 `OpenModels`，比如最熟悉的模型 BSIM 就属于这里。
 - 哪些是混合信号、神经元、TCAD、IBIS、外部耦合这类专门方向
 - `ADMS` 到底是什么，它和手工写 `OpenModels` 的差别是什么
 
