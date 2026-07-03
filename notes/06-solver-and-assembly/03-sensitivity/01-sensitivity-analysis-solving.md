@@ -49,11 +49,7 @@ $$
 - $x$ 是整套仿真未知量
 - $p$ 是某个参数
 
-那么：
-
-### 解对参数的敏感度
-
-是：
+==那么**解对参数的敏感度**是：==
 
 $$
 \frac{\partial x}{\partial p}
@@ -64,16 +60,14 @@ $$
 ```text
 参数 p 变一点，整个状态向量 x 会怎样变
 ```
-
-### 某个输出对参数的敏感度
-
 如果输出写成：
 
 $$
 y = g(x,p)
 $$
+> 模拟电路中观测量基本上就是只依赖于状态解和参数，或者再加一个时间维度
 
-那么输出敏感度是：
+==那么**输出敏感度**是：==
 
 $$
 \frac{\partial y}{\partial p}
@@ -104,9 +98,7 @@ $$
 - 如果先有 $\partial x / \partial p$
 - 再有输出映射 $g$
 
-就能得到 $\partial y / \partial p$
-
-所以更准确地说：
+就能得到 $\partial y / \partial p$，所以更准确地说：
 
 ```text
 输出敏感度通常是“解敏感度经过输出映射后的结果”
@@ -121,6 +113,7 @@ f(x,p)=0
 $$
 
 对参数 $p$ 求导：
+[(详细矩阵展开)](notes/06-solver-and-assembly/03-sensitivity/detail_matrix.md)
 
 $$
 \frac{\partial f}{\partial x}\frac{\partial x}{\partial p}
@@ -157,7 +150,7 @@ $$
 $$
 J\frac{\partial x}{\partial p_i} = -\frac{\partial f}{\partial p_i}
 $$
-
+[具体求解过程](notes/06-solver-and-assembly/03-sensitivity/detail_solver_process.md)
 所以如果参数有很多个，就意味着：
 
 - 左端矩阵都是同一个 $J$
