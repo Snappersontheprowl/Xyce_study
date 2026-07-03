@@ -1,53 +1,60 @@
 # analysis flow
 
-记录日期：2026-06-04
+记录日期：2026-07-03
 
-这个专题只回答一个问题：
+这个专题现在明确站在 **工程代码实现** 的角度来组织。
+
+它主要回答的不是“方程在数学上怎么来”，而是：
 
 ```text
 Xyce 在完成初始化之后，
 是谁决定“跑哪种分析”，
-以及这些分析对象是怎样被组织和启动的？
+这些分析对象在代码里怎样被组织，
+以及控制流是怎样一步步往下走的？
 ```
 
-所以 `05-analysis-flow` 的关键词是：
+所以 `05-analysis-flow` 的关键词应该理解成：
 
-- 分析入口
-- 分析注册
-- 分析对象选择
-- 分析生命周期
-- 共用基础设施初始化
+- 代码入口
+- 对象关系
+- 模块职责
+- 生命周期与控制流
+- 注册、选择、初始化、切换
+- “谁持有谁”“谁调用谁”“什么时候切换到下一层”
 
 ## 这一专题不负责什么
 
-这一专题**不展开**下面这些内容：
+这一专题**不负责系统展开底层数学原理**，例如：
 
-- `Q / F / B / dQdx / dFdx` 如何装配
-- residual / Jacobian 数学形式
-- `DC` operating point 的 Newton 细节
-- `transient` 每个时间步上的离散方程
+- 原始电路 DAE 如何写成方程
+- `DC` 方程怎样从稳态条件推出来
+- `AC` 为什么能从时域转到频域
+- `HB` 的有限谐波展开为什么成立
+- `MPDE` 为什么会变成多时间尺度 PDE
+- direct / adjoint sensitivity 的数学推导
 
 这些内容统一放到 [06-solver-and-assembly](../06-solver-and-assembly/README.md)。
 
 ## 目录结构
 
 - [01-basic/README.md](01-basic/README.md)
-  - 基础分析调度：`.OP / .DC / .TRAN`
+  - 基础分析的工程实现主线：`.OP / .DC / .TRAN`
 - [02-advanced/README.md](02-advanced/README.md)
-  - 进阶分析地图：`AC / NOISE / HB / MPDE`
+  - 进阶分析的工程实现主线：`AC / NOISE / HB / MPDE`
 - [03-sensitivity/README.md](03-sensitivity/README.md)
-  - 灵敏度作为附着在主分析上的能力层：`.SENS`、`SENSITIVITY`
+  - 灵敏度作为附着能力层，在工程代码里怎样挂到主分析上
 
 ## 推荐阅读顺序
 
 1. 先读 [01-basic/README.md](01-basic/README.md)
-2. 再顺着基础主线读 `01-basic/` 下面四篇
-3. 基础主线稳定后，再读 [02-advanced/README.md](02-advanced/README.md)
-4. 需要系统学习灵敏度时，再读 [03-sensitivity/README.md](03-sensitivity/README.md)
+2. 再顺着基础实现主线读 `01-basic/` 下面几篇
+3. 基础实现主线稳定后，再读 [02-advanced/README.md](02-advanced/README.md)
+4. 最后再看 [03-sensitivity/README.md](03-sensitivity/README.md)，理解灵敏度怎样附着到现有分析对象上
 
-## 这一专题最想回答的 4 个问题
+## 这一专题最想回答的几个工程问题
 
 1. `Simulator::runSimulation()` 之后，是谁接管了分析流程？
-2. `.OP`、`.DC`、`.TRAN` 在分析层面分别是怎样被注册和选出来的？
-3. `DCSweep` 和 `Transient` 的生命周期结构分别是什么？
+2. `.OP`、`.DC`、`.TRAN`、`AC`、`NOISE`、`HB`、`MPDE` 在代码里分别是怎样被注册和选出来的？
+3. `DCSweep`、`Transient`、`HB`、`MPDE` 的生命周期结构分别是什么？
 4. `AnalysisManager` 在什么时候创建 `workingIntgMethod`、`stepErrorControl`、`nonlinearEquationLoader`、`dataStore`？
+5. 为什么有些能力是独立主分析，有些能力只是附着层，比如 `SENS`？
