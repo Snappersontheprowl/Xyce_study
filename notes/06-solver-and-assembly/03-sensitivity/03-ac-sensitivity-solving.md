@@ -88,6 +88,7 @@ $$
 (G+j\omega C)\hat{x}=\hat{b}
 $$
 
+*细节参考：*[02-ac-small-signal-solving](notes/06-solver-and-assembly/02-advanced/02-ac-small-signal-solving.md)
 所以 `AC sensitivity` 的起点不是原始非线性残差，而是：
 
 ```text
@@ -178,8 +179,7 @@ $$
 是 `AC` 里最值得特别注意的一项，因为它编码了：
 
 ```text
-参数变化不仅推动输入，
-还会改变整个小信号网络本身。
+参数变化不仅推动输入，还会改变整个小信号网络本身。
 ```
 
 ## 第四步：为什么 Xyce 的 AC sensitivity 会先做一层 DC 预计算
@@ -203,7 +203,6 @@ AC 矩阵 G+jωC 并不是一个“凭空给定”的常量矩阵，
 必须先知道参数如何改变工作点。
 ```
 
-这也是为什么 `AC sensitivity` 比 `DC sensitivity` 更绕一层。
 
 ## 第五步：Xyce 为什么把复数系统改写成实数块矩阵
 
@@ -258,6 +257,7 @@ $$
 那么 direct 思路是：
 
 1. 对每个参数解
+
    $$
    J_{AC}\frac{\partial \hat{x}}{\partial p_k}
    =
@@ -270,6 +270,7 @@ $$
 adjoint 思路则是：
 
 1. 先解
+
    $$
    J_{AC}^{T}\lambda
    =
@@ -338,6 +339,7 @@ $$
 
 1. `AC sensitivity` 不是直接对原非线性电路做频域灵敏度，而是先建立 DC 工作点，再对小信号系统求导。
 2. 它的核心方程是
+
    $$
    J_{AC}\frac{\partial \hat{x}}{\partial p_k}
    =

@@ -177,7 +177,7 @@ $$
 \right)
 $$
 
-于是左边矩阵正好就是原始 `DC Newton` 问题用过的 Jacobian：
+于是左边矩阵正好就是[原始 *DC Newton* 问题](/home/eda/my_lab/projects/study/xyce_study/notes/06-solver-and-assembly/01-basic/03-dc-operating-point-solving.md)用过的 Jacobian：
 
 $$
 J_{DC}=\frac{\partial F}{\partial x}
@@ -186,8 +186,7 @@ $$
 这就是为什么 `DC direct sensitivity` 不是重新发明一套方程，而是复用：
 
 ```text
-原来的 Jacobian
-+ 新的参数扰动右端项
+原来的 Jacobian + 新的参数扰动右端项
 ```
 
 ## 第四步：从解灵敏度到输出灵敏度
@@ -323,6 +322,7 @@ DC sensitivity 在数学上是“工作点上的线性响应问题”，
 ## 当前这一篇学完后，应该记住什么
 
 1. `DC sensitivity` 的母方程是
+
    $$
    J_{DC}\frac{\partial x}{\partial p_k}
    =
