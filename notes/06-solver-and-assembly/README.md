@@ -38,6 +38,8 @@ Xyce 底层到底在解什么方程，
 
 ## 目录结构
 
+- [00-notation-conventions.md](00-notation-conventions.md)
+  - 本专题统一符号约定
 - [01-basic/README.md](01-basic/README.md)
   - 基础数学骨架：`DC`、`transient`
 - [02-advanced/README.md](02-advanced/README.md)
