@@ -113,7 +113,7 @@ f(x,p)=0
 $$
 
 对参数 $p$ 求导：
-[(详细矩阵展开)](notes/06-solver-and-assembly/03-sensitivity/detail_matrix.md)
+*细节参考：*[detail_matrix](notes/06-solver-and-assembly/03-sensitivity/detail_matrix.md)
 
 $$
 \frac{\partial f}{\partial x}\frac{\partial x}{\partial p}
@@ -150,7 +150,7 @@ $$
 $$
 J\frac{\partial x}{\partial p_i} = -\frac{\partial f}{\partial p_i}
 $$
-[具体求解过程](notes/06-solver-and-assembly/03-sensitivity/detail_solver_process.md)
+*细节参考：*[detail_solver_process](notes/06-solver-and-assembly/03-sensitivity/detail_solver_process.md)
 所以如果参数有很多个，就意味着：
 
 - 左端矩阵都是同一个 $J$
@@ -225,7 +225,7 @@ $$
 这一步就是 adjoint 方法的核心。
 
 ## 第六步：为什么 adjoint 能省计算
-
+*细节参考：*[detail_less_computation](notes/06-solver-and-assembly/03-sensitivity/detail_less_computation.md)
 现在可以直接看复杂度。
 
 ### direct 方法
@@ -378,38 +378,6 @@ AC adjoint 不是在求整个 dx/dp，
 
 这也是为什么 transient adjoint 在生命周期上会明显比 AC 的 adjoint 更重。
 
-## 第十步：从“解敏感度”和“输出敏感度”回头看 direct / adjoint
-
-现在再把这几件事连起来看，会更清楚：
-
-### 如果你关心的是解对参数的敏感度
-
-例如：
-
-$$
-\frac{\partial x}{\partial p}
-$$
-
-那么 direct 方法更自然，因为它就是直接解这个对象。
-
-### 如果你关心的是少数几个输出对参数的敏感度
-
-例如：
-
-$$
-\frac{\partial y}{\partial p}
-$$
-
-而参数个数很多，那么 adjoint 通常更合适，因为它直接围绕输出 $$y$$ 的导数映射来工作。
-
-所以：
-
-```text
-direct 更偏“状态敏感度”
-adjoint 更偏“输出敏感度”
-```
-
-虽然两者并不是绝对绑定，但这是最稳的第一层直觉。
 
 ## 当前这篇最想让你先吃下来的本质
 
