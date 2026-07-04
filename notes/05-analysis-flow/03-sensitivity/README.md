@@ -14,6 +14,9 @@
 ## 当前内容
 
 1. [01-sensitivity-lifecycle.md](01-sensitivity-lifecycle.md)
+2. [02-dc-sensitivity-lifecycle.md](02-dc-sensitivity-lifecycle.md)
+3. [03-ac-sensitivity-lifecycle.md](03-ac-sensitivity-lifecycle.md)
+4. [04-transient-sensitivity-lifecycle.md](04-transient-sensitivity-lifecycle.md)
 
 ## 这一组的边界
 

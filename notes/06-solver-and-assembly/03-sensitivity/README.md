@@ -14,6 +14,9 @@
 ## 当前内容
 
 1. [01-sensitivity-analysis-solving.md](01-sensitivity-analysis-solving.md)
+2. [02-dc-sensitivity-solving.md](02-dc-sensitivity-solving.md)
+3. [03-ac-sensitivity-solving.md](03-ac-sensitivity-solving.md)
+4. [04-transient-sensitivity-solving.md](04-transient-sensitivity-solving.md)
 
 ## 这一组的边界
 
