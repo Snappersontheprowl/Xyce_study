@@ -175,7 +175,7 @@ AC 里还要问“参数如何改变小信号矩阵本身”。
 ```
 
 ## 第三步：direct AC sensitivity 方程是怎么来的
-
+**关于频域下灵敏度的物理含义理解** *详见：* [detail_sens_under_freq](/home/eda/my_lab/projects/study/xyce_study/notes/06-solver-and-assembly/03-sensitivity/detail_sens_under_freq.md)
 从
 
 $$
