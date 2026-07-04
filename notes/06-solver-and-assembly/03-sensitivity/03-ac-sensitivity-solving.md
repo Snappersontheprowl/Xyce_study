@@ -51,6 +51,40 @@ $$
 
 这就是 `AC direct sensitivity` 最核心的方程。
 
+## 记号约定
+
+这一篇和 [02-ac-small-signal-solving.md](../02-advanced/02-ac-small-signal-solving.md) 保持同一套记号：
+
+- $x^*$：`DC operating point`
+- $\Delta x(t)$：时域小扰动
+- $\hat{x}$：单频小扰动的频域相量
+- $B_0$：直流偏置激励
+- $\Delta b(t)$：时域小信号激励
+- $\hat{b}$：频域相量形式的小信号激励
+- $J_{AC}(\omega)$：频域小信号系统矩阵
+
+因此这里默认有下面这组对应关系：
+
+$$
+x(t)=x^*+\Delta x(t)
+$$
+
+$$
+B(t)=B_0+\Delta b(t)
+$$
+
+$$
+\Delta x(t)=\Re\{\hat{x}e^{j\omega t}\},
+\qquad
+\Delta b(t)=\Re\{\hat{b}e^{j\omega t}\}
+$$
+
+所以：
+
+- 不带帽子的 $\Delta x(t)$、$\Delta b(t)$ 是时域量
+- 带帽子的 $\hat{x}$、$\hat{b}$ 是频域相量
+- 写成 $J_{AC}(\omega)\hat{x}=\hat{b}$ 时，已经是在频域层
+
 ## 第一步：为什么 AC 不是直接从原非线性方程开始
 
 `AC analysis` 不是直接把非线性电路拿到频域里解，而是分两步：
@@ -65,10 +99,10 @@ $$
 
 ### 2. 再在工作点附近做小信号线性化
 
-于是原始非线性系统在小扰动层面只保留一阶项，形成：
+于是原始非线性系统在小扰动层面只保留一阶项，形成时域小信号方程：
 
 $$
-G\,\Delta x + C\,\frac{d(\Delta x)}{dt} = \Delta b(t)
+C\,\frac{d(\Delta x)}{dt} + G\,\Delta x = \Delta b(t)
 $$
 
 这里：
@@ -76,10 +110,14 @@ $$
 - $G$ 来自工作点处的 $\partial F/\partial x$
 - $C$ 来自工作点处的 $\partial Q/\partial x$
 
-然后假设小信号是正弦稳态：
+然后再把这个时域小信号方程投到单频相量形式：
 
 $$
 \Delta x(t)=\Re\{\hat{x}e^{j\omega t}\}
+$$
+
+$$
+\Delta b(t)=\Re\{\hat{b}e^{j\omega t}\}
 $$
 
 就得到频域方程：
@@ -95,7 +133,7 @@ $$
 已经在线性化之后的频域小信号系统
 ```
 
-## 第二步：参数在 AC 里会影响哪些对象
+## 第二步：参数 $p$ 在 AC 里会影响哪些对象
 
 对 `AC` 来说，参数不只会影响右端输入，也会影响系统矩阵本身：
 
@@ -119,7 +157,7 @@ $$
 J_{AC}(\omega)=G+j\omega C
 $$
 
-而 $G$ 和 $C$ 都来自工作点及器件模型，所以参数变化会导致：
+而 $G$ 和 $C$ 都来自==工作点==及==器件模型==，所以参数变化会导致：
 
 $$
 \frac{\partial J_{AC}}{\partial p_k}
@@ -281,9 +319,7 @@ adjoint 思路则是：
 所以在 `AC` 里，adjoint 的节省点和通用情况一致：
 
 ```text
-输出少时，
-按输出解伴随方程
-会比按参数逐个解 direct 系统更便宜。
+输出少时，按输出解伴随方程会比按参数逐个解 direct 系统更便宜。
 ```
 
 ## 第七步：为什么 AC 输出会比 DC 输出多一层映射

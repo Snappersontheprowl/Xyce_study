@@ -36,7 +36,7 @@ AC analysis 在数学上到底解什么，
 如果把最核心的频域系统压成一行，可以先记成：
 
 $$
-\left(G + j \omega C\right) x(\omega) = b(\omega)
+\left(G + j \omega C\right)\hat{x} = \hat{b}
 $$
 
 这和 `DC`、`transient` 的区别非常大：
@@ -44,6 +44,29 @@ $$
 - `DC`：解 nonlinear algebraic equation
 - `transient`：解 time-discretized nonlinear equation
 - `AC`：解围绕 `DCOP` 线性化后的 frequency-domain linear system
+
+## 记号约定
+
+为了避免把时域量、频域量和工作点混在一起，这一篇统一用下面这套记号：
+
+- $x^*$：`DC operating point`，也就是直流平衡点
+- $\Delta x(t)$：围绕 $x^*$ 的**时域小扰动**，是实值时域量
+- $\hat{x}$：对应单频小扰动的**频域相量**，一般是复数向量
+- $B_0$：直流偏置激励
+- $\Delta b(t)$：时域小信号激励
+- $\hat{b}$：频域相量形式的小信号激励
+- $G=\left.\dfrac{\partial F}{\partial x}\right|_{x^*}$：工作点处的 conductance-like Jacobian
+- $C=\left.\dfrac{\partial Q}{\partial x}\right|_{x^*}$：工作点处的 capacitance-like Jacobian
+
+因此这一篇会严格区分三层：
+
+```text
+工作点层：x*
+时域小扰动层：Δx(t), Δb(t)
+频域相量层：x̂, b̂
+```
+
+后面只要看到帽子 `\hat{}`，就把它理解成“频域相量”，不要再把它当成时域函数。
 
 ## 第零步：原始电路方程是什么
 
@@ -117,56 +140,55 @@ AC 不是从零开始求一个新解，
 现在把真实变量拆成：
 
 $$
-x(t) = x^* + \hat{x}(t)
+x(t) = x^* + \Delta x(t)
 $$
 
 其中：
 
 - $x^*$ 是 DC 工作点
-- $\hat{x}(t)$ 是围绕工作点的微小扰动
+- $\Delta x(t)$ 是围绕工作点的时域微小扰动
 
 同样，把激励也拆成：
 
 $$
-B(t) = B_0 + \hat{b}(t)
+B(t) = B_0 + \Delta b(t)
 $$
 
 其中：
 
 - $B_0$ 是直流偏置部分
-- $\hat{b}(t)$ 是很小的交流激励
+- $\Delta b(t)$ 是时域小信号激励
 
 然后把它们代回原始 DAE：
 
 $$
-\frac{dQ(x^*+\hat{x})}{dt} + F(x^*+\hat{x}) - \left(B_0+\hat{b}(t)\right)=0
+\frac{dQ(x^*+\Delta x)}{dt} + F(x^*+\Delta x) - \left(B_0+\Delta b(t)\right)=0
 $$
 
 这时才做真正的小信号线性化。  
 对 $Q$ 和 $F$ 在 $x^*$ 附近做一阶 Taylor 展开：
 
 $$
-Q(x^*+\hat{x}) \approx Q(x^*) + \left.\frac{\partial Q}{\partial x}\right|_{x^*}\hat{x}
+Q(x^*+\Delta x) \approx Q(x^*) + \left.\frac{\partial Q}{\partial x}\right|_{x^*}\Delta x
 $$
 
 $$
-F(x^*+\hat{x}) \approx F(x^*) + \left.\frac{\partial F}{\partial x}\right|_{x^*}\hat{x}
+F(x^*+\Delta x) \approx F(x^*) + \left.\frac{\partial F}{\partial x}\right|_{x^*}\Delta x
 $$
 
 把它们代回去：
 
 $$
 \frac{d}{dt}\left[
-Q(x^*) + \left.\frac{\partial Q}{\partial x}\right|_{x^*}\hat{x}
+Q(x^*) + \left.\frac{\partial Q}{\partial x}\right|_{x^*}\Delta x
 \right]
 +
 F(x^*)
 +
-\left.\frac{\partial F}{\partial x}\right|_{x^*}\hat{x}
+\left.\frac{\partial F}{\partial x}\right|_{x^*}\Delta x
 -
 B_0
--
-\hat{b}(t)
+-\Delta b(t)
 =0
 $$
 
@@ -185,16 +207,16 @@ $$
 于是整条式子就退化成：
 
 $$
-\left.\frac{\partial Q}{\partial x}\right|_{x^*}\frac{d\hat{x}}{dt}
+\left.\frac{\partial Q}{\partial x}\right|_{x^*}\frac{d(\Delta x)}{dt}
 +
-\left.\frac{\partial F}{\partial x}\right|_{x^*}\hat{x}
+\left.\frac{\partial F}{\partial x}\right|_{x^*}\Delta x
 =
-\hat{b}(t)
+\Delta b(t)
 $$
 
 如果记：
 
-$$
+$$ 
 C = \left.\frac{\partial Q}{\partial x}\right|_{x^*}, \qquad
 G = \left.\frac{\partial F}{\partial x}\right|_{x^*}
 $$
@@ -202,7 +224,7 @@ $$
 那么就得到：
 
 $$
-C\,\frac{d\hat{x}}{dt} + G\,\hat{x} = \hat{b}(t)
+C\,\frac{d(\Delta x)}{dt} + G\,\Delta x = \Delta b(t)
 $$
 
 这就是 `AC` 的真正时域小信号方程。
@@ -212,8 +234,8 @@ $$
 
 上一步得到的是：
 
-$$
-C\,\frac{d\hat{x}}{dt} + G\,\hat{x} = \hat{b}(t)
+$$ 
+C\,\frac{d(\Delta x)}{dt} + G\,\Delta x = \Delta b(t)
 $$
 
 这已经和原始 `transient` 很不一样了。  
@@ -225,12 +247,19 @@ $$
 只要我们讨论的是“小信号、固定频率”的响应，就可以设：
 
 $$
-\hat{x}(t) = X(\omega)e^{j\omega t}
+\Delta x(t) = \Re\{\hat{x}e^{j\omega t}\}
 $$
 
 $$
-\hat{b}(t) = B(\omega)e^{j\omega t}
+\Delta b(t) = \Re\{\hat{b}e^{j\omega t}\}
 $$
+
+这里：
+
+- $\Delta x(t)$、$\Delta b(t)$ 是实值时域量
+- $\hat{x}$、$\hat{b}$ 是对应的复数相量
+
+为了推导方便，下面默认直接对复指数形式做计算。
 
 因为对指数函数有：
 
@@ -241,13 +270,13 @@ $$
 代回去：
 
 $$
-C\,(j\omega X e^{j\omega t}) + G\,(X e^{j\omega t}) = B e^{j\omega t}
+C\,(j\omega \hat{x} e^{j\omega t}) + G\,(\hat{x} e^{j\omega t}) = \hat{b} e^{j\omega t}
 $$
 
 把公共因子 $e^{j\omega t}$ 消掉，就得到：
 
 $$
-\left(G + j\omega C\right)X(\omega) = B(\omega)
+\left(G + j\omega C\right)\hat{x} = \hat{b}
 $$
 
 这就是 `AC` 真正的频域方程来源。
@@ -422,7 +451,7 @@ $$
 ### AC
 
 $$
-\left(G + j\omega C\right)x(\omega) = b(\omega)
+\left(G + j\omega C\right)\hat{x} = \hat{b}
 $$
 
 - 建立在 `DCOP` 上
@@ -454,4 +483,4 @@ AC 的起点不是“频域技巧”，
 你可以先试着回答这两个问题：
 
 1. 为什么 `AC` 必须先有一个满足 $$F(x^*)-B_0=0$$ 的工作点，后面的线性化才真正成立？
-2. 为什么 `AC` 里把时域方程变成 $$\left(G+j\omega C\right)X=B$$ 的前提，不是“直接做频域变换”，而是“先得到一个围绕 DCOP 的线性时不变小信号系统”？
+2. 为什么 `AC` 里把时域方程变成 $$\left(G+j\omega C\right)\hat{x}=\hat{b}$$ 的前提，不是“直接做频域变换”，而是“先得到一个围绕 DCOP 的线性时不变小信号系统”？
