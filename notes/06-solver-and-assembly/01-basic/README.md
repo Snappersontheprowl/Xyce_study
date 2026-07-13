@@ -14,7 +14,8 @@
 1. [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)
 2. [02-dae-math-solving.md](02-dae-math-solving.md)
 3. [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
-4. [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
+4. [03-dcop-convergence-analysis.md](03-dcop-convergence-analysis.md)
+5. [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
 
 ## 这一组的边界
 
