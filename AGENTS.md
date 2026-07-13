@@ -3,11 +3,20 @@
 本文件用于固化本项目的人机协作规则，确保后续会话可以快速恢复一致的工作方式。
 
 ## 项目目的
-学习 Xyce 仿真器，晶体管级仿真
+学习 Xyce 仿真器/晶体管级仿真底层原理及工程代码实现。
 
-学习笔记会引用很多代码，代码文件的出现顺序要有逻辑，不能突然毫无缘故的讲一个新的代码。
-至于具体的学习计划、方式、节奏等问题，请参考 `/home/eda/my_lab/projects/study/xyce_study/notes` 中给出的具体方案。
+至于具体的学习计划、约定、方式、节奏等问题，请参考 `/home/eda/my_lab/projects/study/xyce_study/notes/README.md` 。
 
+## 本级目录下：
+.
+├── AGENTS.md
+├── artifacts       // 历史遗留文件，主要是 Xyce 源码压缩包
+├── build           // 编译过程中的生成物
+├── docs            // 存放项目所有文档
+├── notes           // 存放源码学习笔记
+├── README.md
+├── scripts         // 存放有用的脚本
+└── vendor          // 存放实际源码
 
 ## 基本环境
 
