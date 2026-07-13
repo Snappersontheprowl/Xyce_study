@@ -8,7 +8,6 @@
 - `DC operating point` 在数学上解什么
 - `transient` 每个时间步在数学上解什么
 - residual / Jacobian、Newton、linear solve 在这两类分析里怎样协作
-- 上面四件事怎样压缩成一个稳定的总图
 
 ## 推荐阅读顺序
 
@@ -16,7 +15,6 @@
 2. [02-dae-math-solving.md](02-dae-math-solving.md)
 3. [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
 4. [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
-5. [05-dae-solving-checkpoint.md](05-dae-solving-checkpoint.md)
 
 ## 这一组的边界
 
