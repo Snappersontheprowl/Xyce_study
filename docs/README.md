@@ -9,6 +9,7 @@
 - `cpp/README.md`：C++ 语言学习模块入口与主题索引
 - `cpp/xyce-reading-structures.md`：阅读 Xyce 真正需要的 C++ 结构，作为横向补充材料维护
 - `architecture.md`：源码包结构和高层流程总结
+- `parallelism.md`：MPI 并行抽象、分布式数据结构与线程型 solver backend 的专题笔记
 - `parser.md`：netlist 解析与电路构建相关笔记
 - `devices.md`：器件模型追踪笔记
 - `solver.md`：矩阵装配与求解器接口笔记
