@@ -1,4 +1,4 @@
-# Xyce 并行与“多线程”学习笔记
+# Xyce 并行学习笔记
 
 记录日期：2026-07-19
 
@@ -309,3 +309,294 @@
 2. `Communicator` 抽象帮 Xyce 隐藏了哪些“串行 vs MPI”差异？
 3. 为什么 `ShyLU-Basker requires OpenMP` 这句话比单纯搜索 `#pragma omp` 更能说明 Xyce 的多线程落点？
 4. 如果你要研究“Xyce 自己的并行机制”，为什么应该优先读 `ParallelDistPKG` 而不是先读某个器件模型？
+
+## 面向“刚学完内存池与线程池”的学习建议
+
+### 当前起点怎么判断
+
+如果你刚学完：
+
+- 内存池
+- 线程池
+
+那你现在通常已经具备两种很有用的直觉：
+
+1. 你知道“频繁分配/释放”和“对象生命周期管理”会影响性能。
+2. 你知道“任务拆分、同步、队列、工作线程”是共享内存并发程序的常见组织方式。
+
+但在 Xyce 里，这两种直觉的价值并不完全对称：
+
+- 线程池直觉能帮助你意识到“并行不只是开线程，还要看任务划分和同步边界”
+- 内存池直觉能帮助你关注对象组织、数据局部性和分配开销
+- 不过，Xyce 当前最值得先学的并行主线，并不是线程池式任务调度，而是 `MPI` 分布式抽象和分布式数据结构
+
+所以，当前最有收益的策略不是“在 Xyce 里继续找线程池实现”，而是主动完成一次思维切换：
+
+> 从“共享内存线程并发”切到“分布式进程 + communicator + map + reduce”的并行模型。
+
+### 最值得先学的 5 个点
+
+下面这 5 个点，对你现在这个阶段最有收益。
+
+#### 1. 先学 `MPI` 生命周期，而不是先学线程技巧
+
+最值得先搞清的是：
+
+- Xyce 何时初始化并行环境
+- 串行 build 和 MPI build 如何切换
+- communicator 从哪里来，生命周期怎样结束
+
+为什么这最有用：
+
+- 它会重置你对“并行入口”的理解
+- 你会开始意识到，在 Xyce 里“并行”首先是进程间协作，不是线程池排任务
+
+对应文件：
+
+- [vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_EpetraMPIComm.C](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_EpetraMPIComm.C)
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_EpetraHelpers.C](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_EpetraHelpers.C)
+
+#### 2. 重点学 `Communicator` 抽象
+
+这一步非常适合你现在的基础。
+
+因为你学完线程池后，很容易把注意力放在：
+
+- 线程数量
+- 队列
+- 锁
+- 条件变量
+
+但 Xyce 的关键抽象不是这些，而是：
+
+- `procID()`
+- `numProc()`
+- `sumAll()`
+- `bcast()`
+- `send()/recv()`
+- `barrier()`
+
+这一层最有价值的学习收获是：
+
+- 你会看到一个大型工程如何把“并行后端差异”收敛成统一接口
+- 这比单独再学一个线程池实现更贴近 Xyce 的真实架构收益
+
+对应文件：
+
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_Comm.h](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_Comm.h)
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_EpetraSerialComm.h](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_EpetraSerialComm.h)
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_ParallelMachine.h](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_ParallelMachine.h)
+
+#### 3. 学分布式数据结构，比学线程池更有收益
+
+这是你当前最应该补的“新能力层”。
+
+Xyce 并行里一个很大的重点不是“线程怎么调度”，而是：
+
+- 数据怎样分布在不同 rank 上
+- 全局索引和本地索引怎样映射
+- overlap 数据怎样处理
+- 图和矩阵结构怎样跨进程组织
+
+这部分对应的思维和线程池不一样，它更接近：
+
+- 分布式所有权
+- halo / overlap
+- 跨进程规约
+- 全局到局部映射
+
+如果你把这层学明白，收益会非常高，因为这正是电路模拟器做大规模并行时的关键基础设施。
+
+对应文件：
+
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_Manager.h](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_Manager.h)
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_Manager.C](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_Manager.C)
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_ParMap.h](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_ParMap.h)
+- [vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_GlobalAccessor.h](../../vendor/Xyce-7.10.0/src/ParallelDistPKG/N_PDS_GlobalAccessor.h)
+
+#### 4. 学“并行服务如何注入主流程”
+
+这一点特别适合你建立工程感。
+
+与其问：
+
+- “Xyce 里哪里开了几个线程？”
+
+不如先问：
+
+- “并行能力是怎样进入 simulator、topology、linear system、device manager 的？”
+
+这一步最有价值的地方是：
+
+- 你会看到并行不是孤立子模块，而是被主流程整体消费的横向基础设施
+
+这会帮你从“并发代码片段视角”提升到“系统架构视角”。
+
+对应文件：
+
+- [vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.C)
+- [vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h](../../vendor/Xyce-7.10.0/src/CircuitPKG/N_CIR_Xyce.h)
+
+#### 5. 最后再学线程型 solver backend
+
+这一步很适合放在后面，而不是一开始。
+
+因为等你前面已经理解：
+
+- Xyce 上层主并行模型是 MPI
+- 并行抽象和分布式数据结构怎样组织
+
+再回来看：
+
+- `Basker`
+- `ShyLU-Basker`
+- `OpenMP`
+- `Kokkos`
+
+你就不会误以为“这就是 Xyce 的全部并行内容”。
+
+这一层更像：
+
+- 线程级并行在 solver backend 里的落点
+
+而不是：
+
+- Xyce 应用层主流程的并行组织方式
+
+对应文件：
+
+- [vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_IRSolver.C](../../vendor/Xyce-7.10.0/src/LinearAlgebraServicesPKG/N_LAS_IRSolver.C)
+- [vendor/Xyce-7.10.0/cmake/tps.cmake](../../vendor/Xyce-7.10.0/cmake/tps.cmake)
+- [vendor/Xyce-7.10.0/cmake/trilinos/trilinos-beta.cmake](../../vendor/Xyce-7.10.0/cmake/trilinos/trilinos-beta.cmake)
+- [vendor/Xyce-7.10.0/cmake/trilinos/trilinos-MPI-beta.cmake](../../vendor/Xyce-7.10.0/cmake/trilinos/trilinos-MPI-beta.cmake)
+
+### 哪些内容现在先不要优先学
+
+下面这些内容不是没价值，而是对你当前阶段“收益/投入比”不高：
+
+#### 1. 不要优先找 `std::thread` / 锁 / 条件变量
+
+原因很简单：
+
+- Xyce 主干并行不是围绕这些抽象展开的
+
+如果你现在专门去找：
+
+- 线程池实现
+- worker queue
+- lock-free queue
+- condition variable 协调
+
+很可能会偏离 Xyce 的主并行叙事。
+
+#### 2. 不要把内存池当成并行主线
+
+内存池知识当然有价值，但在 Xyce 的并行学习里，当前更值得先问的是：
+
+- 数据分布
+- 通信边界
+- 全局/局部映射
+
+而不是先问：
+
+- 有没有自定义 slab allocator
+- 有没有对象池复用某类节点
+
+内存组织是重要话题，但它不是你当前读 Xyce 并行最优先的突破口。
+
+#### 3. 不要一上来就钻 OpenMP 细枝末节
+
+例如：
+
+- `schedule(static)` 还是 `schedule(dynamic)`
+- 线程亲和性怎么配
+- 某个 backend 的微优化参数
+
+这些内容要等你先明白：
+
+- Xyce 为何把线程级并行下沉到 solver backend
+
+之后再学，才会更稳。
+
+### 一条最适合你的学习路线
+
+如果只给你一条最推荐路线，我建议按下面顺序：
+
+1. `CircuitPKG` 里并行初始化进入点  
+   目标：理解并行环境怎样在顶层启动。
+2. `ParallelDistPKG` 的 `Communicator + Manager + ParMap`  
+   目标：建立分布式并行的核心抽象。
+3. `parallelManager_` 如何被 topology / linear system / analysis 消费  
+   目标：理解并行如何变成主流程基础设施。
+4. `IRSolver + tps.cmake + Trilinos beta cmake`  
+   目标：理解线程级并行为什么主要落在 solver backend。
+
+### 为什么这条路线对你最有益
+
+因为它刚好能把你已有的两种基础“转化升级”：
+
+#### 线程池基础会升级成“并行模型辨识能力”
+
+你会逐步学会分清：
+
+- 共享内存任务并发
+- 分布式进程并发
+- 应用层并发
+- 求解器后端并发
+
+这比再写一个线程池更有工程价值。
+
+#### 内存池基础会升级成“数据组织敏感度”
+
+你会更容易注意到：
+
+- 本地/全局索引映射
+- overlap 数据结构
+- graph / matrix 的分布组织
+- 数据访问边界
+
+这类直觉对后面读求解器和装配层都很有帮助。
+
+### 当前掌握目标
+
+如果这一轮学得比较扎实，最理想的掌握结果不是“我看到了并行相关文件”，而是你能独立说清下面这 4 句话：
+
+1. Xyce 的主并行模型首先是 `MPI`，不是应用层线程池。
+2. `ParallelDistPKG` 负责把串行和 MPI 运行收敛成统一抽象。
+3. Xyce 上层主流程消费的是 communicator、map、graph、reduce 这些分布式基础设施。
+4. 线程级并行更多在 Trilinos / Basker / ShyLU-Basker 这类 solver backend 中体现。
+
+### 给你的微产出任务
+
+如果你想把这轮学习真正变成自己的能力，我建议做一个很小的产出：
+
+- 画一张两栏对照表
+
+左边写：
+
+- 线程池程序里你熟悉的关键词
+
+例如：
+
+- worker
+- task queue
+- mutex
+- condition variable
+- shared memory
+
+右边写：
+
+- Xyce 并行里更对应的关键词
+
+例如：
+
+- rank
+- communicator
+- allreduce
+- broadcast
+- par map
+- overlap
+- solver backend OpenMP
+
+只要这张表你能自己写出来，你对 Xyce 并行的理解就已经从“套用旧模型”跨到了“建立新模型”。
