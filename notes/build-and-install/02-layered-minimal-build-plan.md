@@ -81,6 +81,8 @@ xyce_build="$xyce_workspace/build/xyce-7.10-serial-release"
 xyce_install="$xyce_workspace/out/xyce-7.10-serial-release"
 xyce_tpl_source="$xyce_workspace/artifacts/source"
 xyce_tpl_build="$xyce_workspace/build/deps/xyce-7.10-serial-release"
+xyce_blas="/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so"
+xyce_lapack="/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so"
 ```
 
 目标布局为：
@@ -131,6 +133,7 @@ xyce_cxx="/opt/rh/gcc-toolset-15/root/usr/bin/g++"
 - 已记录所有工具的版本和绝对路径；
 - `xyce_cc`、`xyce_cxx` 指向同一发行版/工具链的合规编译器；
 - `xyce_cc`、`xyce_cxx` 分别等于 `/opt/rh/gcc-toolset-15/root/usr/bin/gcc` 和 `/opt/rh/gcc-toolset-15/root/usr/bin/g++`；
+- `xyce_blas`、`xyce_lapack` 指向同一 Cadence IC231 LAPACK 目录中的 BLAS/LAPACK 动态库；
 - 已确认此次是 `serial + Release + static + no-plugin + no-FFT + no-test`。
 
 ### 停止条件
@@ -200,10 +203,20 @@ cmake -S "$xyce_suitesparse_source" -B "$xyce_suitesparse_build" \
   -DCMAKE_C_COMPILER="$xyce_cc" \
   -DCMAKE_CXX_COMPILER="$xyce_cxx" \
   -DCMAKE_INSTALL_PREFIX="$xyce_deps_prefix" \
-  -DSUITESPARSE_ENABLE_PROJECTS="suitesparse_config;amd"
+  -DSUITESPARSE_ENABLE_PROJECTS="suitesparse_config;amd" \
+  -DSUITESPARSE_USE_FORTRAN=OFF \
+  -DSUITESPARSE_USE_OPENMP=OFF \
+  -DSUITESPARSE_DEMOS=OFF \
+  -DBUILD_TESTING=OFF \
+  -DBUILD_SHARED_LIBS=ON \
+  -DBUILD_STATIC_LIBS=ON \
+  -DBLAS_LIBRARIES="$xyce_blas" \
+  -DLAPACK_LIBRARIES="$xyce_lapack"
 ```
 
-先阅读 CMake 输出和 `CMakeCache.txt`，确认安装前缀、编译器和项目选择无误，再继续。
+先阅读 CMake 输出和 `CMakeCache.txt`，确认安装前缀、编译器、项目选择和 BLAS/LAPACK 路径无误，再继续。
+
+对当前最小子集而言，`suitesparse_config` 与 `amd` 实际链接阶段不直接链接 BLAS/LAPACK；若 CMake 报告 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 为 manually-specified but not used，同时已经出现 `Configuring done` 和 `Generating done`，可记录该 warning 后继续。真正需要统一 BLAS/LAPACK 的主要是阶段 3 Trilinos。
 
 ### 编译、安装与验收
 
@@ -249,10 +262,14 @@ cmake -S "$xyce_trilinos_source" -B "$xyce_trilinos_build" \
   -DTrilinos_ENABLE_Fortran=OFF \
   -DCMAKE_INSTALL_PREFIX="$xyce_deps_prefix" \
   -DAMD_LIBRARY_DIRS="$xyce_deps_prefix/lib64" \
-  -DAMD_INCLUDE_DIRS="$xyce_deps_prefix/include"
+  -DAMD_INCLUDE_DIRS="$xyce_deps_prefix/include" \
+  -DBLAS_LIBRARY_DIRS=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit \
+  -DLAPACK_LIBRARY_DIRS=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit \
+  -DBLAS_LIBRARY_NAMES=blas \
+  -DLAPACK_LIBRARY_NAMES=lapack
 ```
 
-这里显式关闭 Fortran 只是最小构建的取舍，不表示 Xyce 不允许或不受益于带 Fortran 的 Trilinos。若系统 BLAS/LAPACK 不在 CMake 默认搜索路径，先停止并补充实际的库目录；不要靠随意修改链接 flags 绕过探测。
+这里显式关闭 Fortran 只是最小构建的取舍，不表示 Xyce 不允许或不受益于带 Fortran 的 Trilinos。当前系统没有标准 BLAS/LAPACK 开发包，因此明确使用 Cadence IC231 自带的 `libblas.so` 与 `liblapack.so`。不要让 Trilinos 重新自动搜索到另一套数值库。
 
 配置后检查：
 

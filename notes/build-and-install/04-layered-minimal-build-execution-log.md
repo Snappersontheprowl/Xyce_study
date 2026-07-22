@@ -247,3 +247,67 @@ liblapack.so: dgeev_, dgesv_
 阶段 2B 未通过，需要带显式 BLAS/LAPACK 路径重新配置 SuiteSparse。
 
 当前推荐的临时路线是使用 Cadence IC231 自带 BLAS/LAPACK 作为本机可用数值库。后续 Trilinos 配置也应使用同一组 BLAS/LAPACK，避免 SuiteSparse 和 Trilinos 使用不同数值后端。
+
+## 2026-07-22：阶段 2B SuiteSparse 重新配置通过
+
+### 用户反馈的结果
+
+带显式 BLAS/LAPACK 路径重新配置后，SuiteSparse CMake 完成：
+
+```text
+-- Configuring done
+-- Generating done
+-- Build files have been written to:
+   /home/eda/my_lab/projects/study/xyce_study/build/deps/xyce-7.10-serial-release/suitesparse
+```
+
+CMake 同时报告：
+
+```text
+Manually-specified variables were not used by the project:
+  BLAS_LIBRARIES
+  LAPACK_LIBRARIES
+```
+
+### Cache 检查
+
+关键 cache 项正确：
+
+```cmake
+BLAS_LIBRARIES=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+LAPACK_LIBRARIES=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+BUILD_SHARED_LIBS=ON
+BUILD_STATIC_LIBS=ON
+BUILD_TESTING=OFF
+CMAKE_BUILD_TYPE=Release
+CMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/g++
+CMAKE_C_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/gcc
+CMAKE_INSTALL_PREFIX=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release
+SUITESPARSE_DEMOS=OFF
+SUITESPARSE_ENABLE_PROJECTS=suitesparse_config;amd
+SUITESPARSE_USE_FORTRAN=OFF
+SUITESPARSE_USE_OPENMP=OFF
+```
+
+生成目录包含预期子项目：
+
+```text
+build/deps/xyce-7.10-serial-release/suitesparse/AMD
+build/deps/xyce-7.10-serial-release/suitesparse/SuiteSparse_config
+```
+
+### Codex 只读检查
+
+生成的 link 文件显示当前最小子集实际不直接链接 BLAS/LAPACK：
+
+```text
+libsuitesparseconfig.so.7.8.3 links with -lm
+libamd.so.3.3.3 links with libsuitesparseconfig.so.7.8.3 and -lm
+libamd.a is archived from AMD object files
+```
+
+因此 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 的 unused warning 对当前 SuiteSparse 最小子集可接受。保留这两个变量的价值在于记录本轮统一数值库选择；后续 Trilinos 必须使用同一 Cadence IC231 BLAS/LAPACK。
+
+### 阶段判断
+
+阶段 2B 通过。可以进入阶段 2C：编译并安装 SuiteSparse。
