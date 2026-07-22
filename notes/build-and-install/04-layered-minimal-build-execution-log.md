@@ -2305,3 +2305,74 @@ Xyce build allowed:                     yes
 ```
 
 下一步可以重新执行 Xyce build。若再次出现 undefined reference，需要以新的 `xyce-build-openblas-j8.log` 为准重新定位；但当前已解决上一轮 `srotm_` / `drotm_` / `srotmg_` / `drotmg_` 缺失问题。
+
+## 2026-07-22：阶段 5B Xyce OpenBLAS 路线编译与 build-tree 运行检查通过
+
+### 用户反馈的运行结果
+
+build tree 中的 Xyce 可执行文件已经可以运行并输出帮助信息：
+
+```bash
+"$xyce_build/src/Xyce" -h | head -n 30
+```
+
+输出开头：
+
+```text
+Usage: Xyce [arguments] netlist
+
+Arguments:
+  -b                          batch mode flag for spice compatibility (ignored)
+  -h                          print usage and exit
+  -v                          print version info and exit
+  -capabilities               print compiled-in options and exit
+```
+
+### Codex 只读复核
+
+构建日志错误检索未发现常见失败模式：
+
+```bash
+rg -n "error:|fatal error|undefined reference|collect2|ld:|Error [0-9]|FAILED" \
+  build/logs/xyce-build-openblas-j8.log
+```
+
+build tree 中存在可执行文件：
+
+```text
+Xyce build binary exists
+```
+
+`ldd` 显示运行时已经绑定到 Mentor OpenBLAS：
+
+```text
+libopenblas.so.0 => /opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so.0
+libgcc_s.so.1 => /lib64/libgcc_s.so.1
+libgfortran.so.5 => /lib64/libgfortran.so.5
+libquadmath.so.0 => /lib64/libquadmath.so.0
+```
+
+版本输出：
+
+```text
+Xyce Release 7.10.0-opensource
+```
+
+### 判断
+
+阶段 5B 通过。
+
+当前状态：
+
+```text
+Xyce build completed:          yes
+Xyce executable linked:        yes
+Xyce build-tree binary runs:   yes
+Runtime BLAS/LAPACK provider:  Mentor OpenBLAS
+Xyce installed:                no
+Smoke simulation tested:       no
+```
+
+上一轮由 Cadence BLAS 缺失 `srotm_` / `drotm_` / `srotmg_` / `drotmg_` 导致的最终链接失败已经解决。
+
+下一步进入阶段 6：安装 Xyce，并对安装前缀中的 `bin/Xyce` 做版本、动态依赖与最小 netlist 冒烟测试。
