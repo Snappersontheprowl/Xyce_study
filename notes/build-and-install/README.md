@@ -10,6 +10,8 @@
   串行 Release 最小配置的可执行计划：前置审计、依赖复用/重建决策、逐层配置命令、验收点与停止条件。
 - [03-gcc-toolchain-check.md](./03-gcc-toolchain-check.md)
   记录系统现有 GCC/Clang、`gcc-toolset-15` 可用性，以及 Xyce 分层构建应采用的编译器更新策略。
+- [04-layered-minimal-build-execution-log.md](./04-layered-minimal-build-execution-log.md)
+  保存最小分层构建的实际执行证据、阶段判断、失败诊断和后续动作。
 
 ## 专题边界
 
