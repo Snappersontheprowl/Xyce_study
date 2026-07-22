@@ -2161,3 +2161,40 @@ drotmg_
 ```
 
 下一步可以进入 Trilinos TPL 重配置：清除旧 Cadence BLAS/LAPACK cache，显式指定 `libopenblas.so` 同时作为 BLAS 与 LAPACK。
+
+## 2026-07-22：阶段 3E Trilinos 已重新配置为 Mentor OpenBLAS
+
+### 用户反馈的 cache 检查
+
+重新配置 Trilinos 后，BLAS/LAPACK 相关 cache 已指向 Mentor OpenBLAS：
+
+```text
+BLAS_LIBRARY_DIRS=/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib
+BLAS_LIBRARY_NAMES=openblas
+LAPACK_LIBRARY_DIRS=/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib
+LAPACK_LIBRARY_NAMES=openblas
+TPL_BLAS_LIBRARIES=/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so
+TPL_ENABLE_BLAS=ON
+TPL_ENABLE_LAPACK=ON
+TPL_LAPACK_LIBRARIES=/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so
+```
+
+清理旧 Cadence 路径的检查通过：
+
+```text
+No Cadence BLAS/LAPACK remains in Trilinos cache
+```
+
+### 判断
+
+阶段 3E 的 Trilinos 重配置通过。
+
+`TPL_BLAS_LIBRARIES` 与 `TPL_LAPACK_LIBRARIES` 在 cache 中显示为 `UNINITIALIZED` 是因为命令行传入时没有显式指定 CMake cache 类型；值本身有效，不影响本轮判断。关键验收点是：
+
+- `BLAS_LIBRARY_DIRS` / `LAPACK_LIBRARY_DIRS` 指向 Mentor OpenBLAS 目录；
+- `BLAS_LIBRARY_NAMES` / `LAPACK_LIBRARY_NAMES` 均为 `openblas`；
+- `TPL_BLAS_LIBRARIES` / `TPL_LAPACK_LIBRARIES` 均指向同一个 `libopenblas.so`；
+- `TPL_ENABLE_BLAS=ON` 且 `TPL_ENABLE_LAPACK=ON`；
+- Trilinos cache 中已经没有 Cadence BLAS/LAPACK 旧路径。
+
+下一步进入阶段 3F：重新 build/install Trilinos，使安装前缀中的 `TrilinosConfig.cmake` 也导出 OpenBLAS，而不是 Cadence BLAS/LAPACK。
