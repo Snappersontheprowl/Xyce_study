@@ -2102,3 +2102,62 @@ ldd "$xyce_blas"
 ```
 
 验收通过后，重新配置 Trilinos 时清除旧的 BLAS/LAPACK cache，并显式指定 OpenBLAS。
+
+## 2026-07-22：阶段 2.5 修正路线 Mentor OpenBLAS 符号验收通过
+
+### 用户执行的检查
+
+固定 Mentor OpenBLAS 路径：
+
+```bash
+xyce_blas_lapack_libdir="/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib"
+xyce_blas="$xyce_blas_lapack_libdir/libopenblas.so"
+xyce_lapack="$xyce_blas_lapack_libdir/libopenblas.so"
+```
+
+库文件存在：
+
+```text
+OpenBLAS exists: /opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so
+```
+
+符号检查通过：
+
+```text
+00000000001ef740 T dgeev_
+00000000008154a0 T dgemm_
+0000000000838fc0 T dgesv_
+0000000000807780 T drotm_
+0000000000807a70 T drotmg_
+0000000000814660 T sgemm_
+0000000000806ff0 T srotm_
+00000000008072e0 T srotmg_
+0000000000808040 T sswap_
+```
+
+运行时依赖：
+
+```text
+libpthread.so.0 => /lib64/libpthread.so.0
+libgfortran.so.5 => /lib64/libgfortran.so.5
+libm.so.6 => /lib64/libm.so.6
+libgcc_s.so.1 => /lib64/libgcc_s.so.1
+libquadmath.so.0 => /lib64/libquadmath.so.0
+libc.so.6 => /lib64/libc.so.6
+libz.so.1 => /lib64/libz.so.1
+```
+
+### 判断
+
+Mentor OpenBLAS 作为当前 fallback 通过阶段 2.5 的修正验收。
+
+相对于已被证伪的 Cadence BLAS，这份 OpenBLAS 额外提供了 Xyce 最终链接失败所缺少的：
+
+```text
+srotm_
+drotm_
+srotmg_
+drotmg_
+```
+
+下一步可以进入 Trilinos TPL 重配置：清除旧 Cadence BLAS/LAPACK cache，显式指定 `libopenblas.so` 同时作为 BLAS 与 LAPACK。
