@@ -6,6 +6,8 @@
 
 - [01-build-and-install-architecture.md](./01-build-and-install-architecture.md)
   建立 Xyce 大型工程的构建全景：工具链、SuiteSparse/Trilinos 依赖栈、CMake 路线、构建目录隔离、功能开关和验收步骤。
+- [02-layered-minimal-build-plan.md](./02-layered-minimal-build-plan.md)
+  串行 Release 最小配置的可执行计划：前置审计、依赖复用/重建决策、逐层配置命令、验收点与停止条件。
 
 ## 专题边界
 
