@@ -1987,3 +1987,118 @@ rg -n "error:|fatal error|undefined reference|collect2|ld:|Error [0-9]|FAILED" b
 test -x "$xyce_build/src/Xyce" && echo "Xyce build binary exists"
 "$xyce_build/src/Xyce" -h | head -n 30
 ```
+
+## 2026-07-22：阶段 5 Xyce 编译到最终链接失败，Cadence BLAS 缺少 KokkosKernels 所需符号
+
+### 用户反馈的结果
+
+Xyce 编译阶段已经生成大部分目标，`libxyce.a` 也已完成；失败发生在最终可执行文件 `src/Xyce` 的链接阶段。
+
+错误检索输出：
+
+```text
+/opt/rh/gcc-toolset-15/root/usr/libexec/gcc/x86_64-redhat-linux/15/ld: /home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib/libkokkoskernels.a(KokkosBlas_Host_tpl.cpp.o): in function `KokkosBlas::Impl::HostBlas<float>::rotm(int, float*, int, float*, int, float const*)':
+KokkosBlas_Host_tpl.cpp:(.text+0x171): undefined reference to `srotm_'
+/opt/rh/gcc-toolset-15/root/usr/libexec/gcc/x86_64-redhat-linux/15/ld: /home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib/libkokkoskernels.a(KokkosBlas_Host_tpl.cpp.o): in function `KokkosBlas::Impl::HostBlas<double>::rotm(int, double*, int, double*, int, double const*)':
+KokkosBlas_Host_tpl.cpp:(.text+0x6b1): undefined reference to `drotm_'
+/opt/rh/gcc-toolset-15/root/usr/libexec/gcc/x86_64-redhat-linux/15/ld: /home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib/libkokkoskernels.a(KokkosBlas_Host_tpl.cpp.o): in function `KokkosBlas::Impl::HostBlas<float>::rotmg(float*, float*, float*, float const*, float*)':
+KokkosBlas_Host_tpl.cpp:(.text+0x181): undefined reference to `srotmg_'
+/opt/rh/gcc-toolset-15/root/usr/libexec/gcc/x86_64-redhat-linux/15/ld: /home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib/libkokkoskernels.a(KokkosBlas_Host_tpl.cpp.o): in function `KokkosBlas::Impl::HostBlas<double>::rotmg(double*, double*, double*, double const*, double*)':
+KokkosBlas_Host_tpl.cpp:(.text+0x6c1): undefined reference to `drotmg_'
+collect2: error: ld returned 1 exit status
+```
+
+### Codex 只读复核
+
+Xyce 的实际链接命令位于：
+
+```text
+build/xyce-7.10-serial-release/src/CMakeFiles/Xyce.dir/link.txt
+```
+
+该链接命令已经包含当前 Trilinos 导出的 Cadence BLAS/LAPACK：
+
+```text
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+```
+
+因此问题不是 BLAS/LAPACK 没有进入链接行，而是进入链接行的 Cadence `libblas.so` 缺少 KokkosKernels `HostBlas` 所需的 modified Givens routine。
+
+Cadence BLAS 抽样符号：
+
+```text
+dgemm_
+sgemm_
+sswap_
+```
+
+缺少本次链接报错需要的：
+
+```text
+srotm_
+drotm_
+srotmg_
+drotmg_
+```
+
+本机只读搜索发现 Mentor Calibre 安装树中存在 OpenBLAS 候选：
+
+```text
+/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so
+```
+
+该 OpenBLAS 导出本次所需符号及基础 BLAS/LAPACK 符号：
+
+```text
+srotm_
+srotmg_
+drotm_
+drotmg_
+sswap_
+sgemm_
+dgemm_
+dgeev_
+dgesv_
+```
+
+其运行时依赖指向系统运行库：
+
+```text
+libgfortran.so.5 => /lib64/libgfortran.so.5
+libquadmath.so.0 => /lib64/libquadmath.so.0
+libgcc_s.so.1 => /lib64/libgcc_s.so.1
+```
+
+### 判断
+
+阶段 5 未通过。
+
+当前状态：
+
+```text
+XyceLib built:              yes
+Xyce executable linked:     no
+Xyce installed:             no
+Cadence BLAS final verdict: rejected for this build
+```
+
+这次失败证实了早先 Cadence fallback 的风险：它足以通过 CMake 的基础 BLAS/LAPACK 探测，但不足以满足 Trilinos/KokkosKernels 静态库在最终 Xyce 链接时暴露出的完整符号需求。
+
+### 下一步
+
+不要手工修改 `src/CMakeFiles/Xyce.dir/link.txt`，也不要继续重复执行同一个 Xyce build。应回到 Trilinos TPL 配置层，把 BLAS/LAPACK 从 Cadence 切换到完整实现，然后重新安装 Trilinos 并重新配置 Xyce。
+
+当前推荐的务实路线是先使用本机已有 Mentor OpenBLAS：
+
+```bash
+xyce_blas_lapack_libdir="/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib"
+xyce_blas="$xyce_blas_lapack_libdir/libopenblas.so"
+xyce_lapack="$xyce_blas_lapack_libdir/libopenblas.so"
+
+test -f "$xyce_blas"
+nm -D "$xyce_blas" | rg ' (sgemm_|dgemm_|sswap_|srotm_|drotm_|srotmg_|drotmg_|dgesv_|dgeev_)$'
+ldd "$xyce_blas"
+```
+
+验收通过后，重新配置 Trilinos 时清除旧的 BLAS/LAPACK cache，并显式指定 OpenBLAS。

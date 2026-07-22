@@ -127,14 +127,14 @@ xyce_cc="/opt/rh/gcc-toolset-15/root/usr/bin/gcc"
 xyce_cxx="/opt/rh/gcc-toolset-15/root/usr/bin/g++"
 ```
 
-本计划仍在 Trilinos 中显式关闭 `Trilinos_ENABLE_Fortran`。当前系统没有可用的 `/opt/rh/gcc-toolset-15/root/usr/bin/gfortran`，且查询 `gcc-toolset-15` Fortran 包时被外部 `nodesource-nodejs` 仓库元数据错误阻断。本轮不再新增项目本地 OpenBLAS 层，而是接受 Cadence IC231 自带 BLAS/LAPACK 作为显式 fallback。
+本计划仍在 Trilinos 中显式关闭 `Trilinos_ENABLE_Fortran`。当前系统没有可用的 `/opt/rh/gcc-toolset-15/root/usr/bin/gfortran`，且查询 `gcc-toolset-15` Fortran 包时被外部 `nodesource-nodejs` 仓库元数据错误阻断。先前曾临时接受 Cadence IC231 自带 BLAS/LAPACK 作为 fallback；但 2026-07-22 的 Xyce 最终链接阶段已证实该 BLAS 缺少 KokkosKernels 需要的 `srotm_`、`drotm_`、`srotmg_`、`drotmg_` 符号。因此当前计划应切换到“完整 BLAS/LAPACK”路线。
 
 ### 成功判据
 
 - 已记录所有工具的版本和绝对路径；
 - `xyce_cc`、`xyce_cxx` 指向同一发行版/工具链的合规编译器；
 - `xyce_cc`、`xyce_cxx` 分别等于 `/opt/rh/gcc-toolset-15/root/usr/bin/gcc` 和 `/opt/rh/gcc-toolset-15/root/usr/bin/g++`；
-- `xyce_blas`、`xyce_lapack` 分别指向 Cadence IC231 的 `libblas.so` 和 `liblapack.so`；
+- `xyce_blas`、`xyce_lapack` 指向同一套完整 BLAS/LAPACK；不能再使用已被最终链接证伪的 Cadence IC231 `libblas.so`；
 - 已确认此次是 `serial + Release + static + no-plugin + no-FFT + no-test`。
 
 ### 停止条件
@@ -229,23 +229,36 @@ find "$xyce_deps_prefix" -maxdepth 3 -type f -name 'libamd.*'
 
 验收要求是安装前缀中同时出现 AMD 头文件和库；如果库位于 `lib64/`，阶段 3 必须显式传递该路径。安装失败时先保留 build tree 和 `CMakeFiles/CMakeError.log`，不覆盖重配。
 
-## 阶段 2.5：数值库策略确认（当前接受 Cadence fallback）
+## 阶段 2.5：数值库策略确认（Cadence fallback 已被最终链接证伪）
 
 ### 背景
 
-先前仅为让 SuiteSparse 配置通过，临时指定了 Cadence IC231 中的 `libblas.so`、`liblapack.so`。这些库本身可用，但它们的运行时依赖 Cadence 安装树中的 `libgfortran`、`libquadmath` 和 `libgcc_s`，并且不处在本项目依赖前缀中。这会把最终 Trilinos/Xyce 的可运行性隐式绑定到 Cadence 安装及其运行时环境。
+先前仅为让 SuiteSparse 配置通过，临时指定了 Cadence IC231 中的 `libblas.so`、`liblapack.so`。这些库可以通过早期的 `sgemm_`、`dgemm_`、`dgeev_`、`dgesv_` 抽样检查，也足以让 Trilinos CMake 通过 BLAS/LAPACK 探测；但它们不是一套对当前 Xyce/Trilinos/KokkosKernels 链接闭环足够完整的 BLAS。
 
-更干净的路线是系统 OpenBLAS/LAPACK 开发包，或在 `$xyce_deps_prefix` 中构建一份项目专用 OpenBLAS。但是当前机器没有标准 BLAS/LAPACK 开发包；conda base 也没有 `libblas.so`、`libopenblas.so` 或 `liblapack.so`；同时未发现 GCC Toolset 15 的 `gfortran`，查询可安装包又被 `nodesource-nodejs` 仓库元数据错误阻断。
+2026-07-22，Xyce 最终可执行文件链接失败，`libkokkoskernels.a(KokkosBlas_Host_tpl.cpp.o)` 引用以下 BLAS modified Givens routine：
 
-因此本轮最小构建接受 Cadence IC231 BLAS/LAPACK 作为 fallback，并把这个选择明确记录到执行日志。后续若系统仓库或 `gfortran` 条件恢复，可以回到项目专用 OpenBLAS 路线。
+```text
+srotm_
+drotm_
+srotmg_
+drotmg_
+```
+
+`src/CMakeFiles/Xyce.dir/link.txt` 已经包含 Cadence `liblapack.so` 与 `libblas.so`，因此这不是“BLAS 未上链接行”，而是“链接行上的 BLAS 缺少符号”。Cadence fallback 到此停止使用。
+
+更干净的路线仍然是系统 OpenBLAS/LAPACK 开发包，或在 `$xyce_deps_prefix` 中构建一份项目专用 OpenBLAS。但是当前机器没有标准 BLAS/LAPACK 开发包；conda base 也没有 `libblas.so`、`libopenblas.so` 或 `liblapack.so`；同时未发现 GCC Toolset 15 的 `gfortran`，查询可安装包又被 `nodesource-nodejs` 仓库元数据错误阻断。
+
+本机目前可作为务实 fallback 的完整候选是 Mentor Calibre 安装树中的 OpenBLAS：
 
 ### 当前固定路径
 
 ```sh
-xyce_blas_lapack_libdir="/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit"
-xyce_blas="$xyce_blas_lapack_libdir/libblas.so"
-xyce_lapack="$xyce_blas_lapack_libdir/liblapack.so"
+xyce_blas_lapack_libdir="/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib"
+xyce_blas="$xyce_blas_lapack_libdir/libopenblas.so"
+xyce_lapack="$xyce_blas_lapack_libdir/libopenblas.so"
 ```
+
+这里 BLAS 与 LAPACK 都由同一个 `libopenblas.so` 提供。
 
 ### 验收
 
@@ -254,13 +267,13 @@ xyce_lapack="$xyce_blas_lapack_libdir/liblapack.so"
 ```sh
 test -f "$xyce_blas"
 test -f "$xyce_lapack"
-nm -D "$xyce_blas" | rg ' (sgemm_|dgemm_)$'
+nm -D "$xyce_blas" | rg ' (sgemm_|dgemm_|sswap_|srotm_|drotm_|srotmg_|drotmg_)$'
 nm -D "$xyce_lapack" | rg ' (dgesv_|dgeev_)$'
 ldd "$xyce_blas"
 ldd "$xyce_lapack"
 ```
 
-验收要求：符号存在；`ldd` 中的 Cadence runtime 依赖被记录为本轮 fallback 的已知代价；后续 Trilinos 必须显式使用同一组 BLAS/LAPACK，不允许自动搜索到另一套库。
+验收要求：上述符号全部存在；运行时依赖被记录为本轮 fallback 的已知代价；后续 Trilinos 必须显式使用同一组 BLAS/LAPACK，不允许自动搜索到另一套库。
 
 ## 阶段 3：构建 Xyce 所需的串行 Trilinos 14.4（当前推荐执行）
 
@@ -297,11 +310,13 @@ cmake -S "$xyce_trilinos_source" -B "$xyce_trilinos_build" \
   -DAMD_INCLUDE_DIRS="$xyce_deps_prefix/include" \
   -DBLAS_LIBRARY_DIRS="$xyce_blas_lapack_libdir" \
   -DLAPACK_LIBRARY_DIRS="$xyce_blas_lapack_libdir" \
-  -DBLAS_LIBRARY_NAMES=blas \
-  -DLAPACK_LIBRARY_NAMES=lapack
+  -DBLAS_LIBRARY_NAMES=openblas \
+  -DLAPACK_LIBRARY_NAMES=openblas \
+  -DTPL_BLAS_LIBRARIES="$xyce_blas" \
+  -DTPL_LAPACK_LIBRARIES="$xyce_lapack"
 ```
 
-这里显式关闭 Fortran 只是最小 Trilinos 构建的取舍，不表示 Xyce 不允许或不受益于带 Fortran 的 Trilinos。当前 BLAS/LAPACK 采用 Cadence IC231 fallback；不要让 Trilinos 自动搜索到另一套库。
+这里显式关闭 Fortran 只是最小 Trilinos 构建的取舍，不表示 Xyce 不允许或不受益于带 Fortran 的 Trilinos。当前 BLAS/LAPACK 采用同一份 OpenBLAS fallback；不要让 Trilinos 自动搜索到另一套库。
 
 配置后检查：
 
@@ -461,7 +476,7 @@ R1 1 0 1k
 完成后在本专题新增一次执行记录，至少包含：
 
 - Xyce、SuiteSparse、Trilinos 的版本与来源/commit；
-- Cadence IC231 BLAS/LAPACK fallback 的路径、符号检查和运行时依赖；
+- 最终采用的完整 BLAS/LAPACK fallback 的路径、符号检查和运行时依赖；同时记录 Cadence IC231 BLAS 已被最终链接证伪的原因；
 - CMake、C/C++ 编译器、flex、bison 的版本和绝对路径；
 - 每层完整 configure/build/install 命令及其关键参数；
 - 每层 build/install 的开始与结束时间、并行度；
@@ -483,7 +498,7 @@ R1 1 0 1k
 ```text
 0. 固定 GCC Toolset 15 的 gcc/g++
 1. 审计现有 Trilinos 14.4 / AMD 前缀，记录其 GCC 8.5 来源
-2. SuiteSparse -> 2.5 确认 Cadence BLAS/LAPACK fallback -> 3. Trilinos -> 4. 配置 Xyce
+2. SuiteSparse -> 2.5 确认完整 BLAS/LAPACK fallback -> 3. Trilinos -> 4. 配置 Xyce
 5. 审核 Xyce 的 CMake cache
 6. 编译 Xyce -> 确认 build/src/Xyce
 7. 安装 -> 确认 out/.../bin/Xyce -> 帮助与电阻冒烟测试
@@ -492,4 +507,4 @@ R1 1 0 1k
 
 ## 下一步
 
-当前已完成阶段 0、阶段 1 与阶段 2B（SuiteSparse 配置），尚未执行编译或安装。下一步可先完成 SuiteSparse 的 build/install；在进入 Trilinos 前，复核并记录 Cadence IC231 BLAS/LAPACK fallback 的路径、符号和运行时依赖。完整的实际进度以 [04-layered-minimal-build-execution-log.md](./04-layered-minimal-build-execution-log.md) 为准。
+当前实际进度以 [04-layered-minimal-build-execution-log.md](./04-layered-minimal-build-execution-log.md) 为准。2026-07-22 的 Xyce 最终链接失败已证明 Cadence IC231 BLAS 不满足当前 Trilinos/KokkosKernels 链接需求；下一步应先把 Trilinos 的 BLAS/LAPACK TPL 切换到完整实现，再重新生成 Xyce 链接命令。
