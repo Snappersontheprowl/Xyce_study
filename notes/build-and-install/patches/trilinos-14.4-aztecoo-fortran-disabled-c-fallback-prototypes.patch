@@ -1,0 +1,14 @@
+diff --git a/packages/aztecoo/src/az_aztec.h b/packages/aztecoo/src/az_aztec.h
+index 0829e35..fe673dc 100644
+--- a/packages/aztecoo/src/az_aztec.h
++++ b/packages/aztecoo/src/az_aztec.h
+@@ -1502,6 +1502,9 @@ extern void MC64AD_F77(int *, int *, int *, int *, int *, double*,
+                     int *, int *);
+ 
+ extern void AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
++#else
++extern int AZ_FNROOT_F77(int *,int *,int *,int *, int *, int *, int *);
++extern int AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
+ #endif /* ndef FORTRAN_DISABLED */
+ 
+ /*****************************************************************************/

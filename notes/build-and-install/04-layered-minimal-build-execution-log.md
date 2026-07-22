@@ -1066,3 +1066,80 @@ extern int AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
 ```bash
 cmake --build "$xyce_trilinos_build" --parallel 2
 ```
+
+## 2026-07-22：阶段 3C Trilinos AztecOO 最小源码补丁已应用
+
+### 用户确认
+
+用户确认：
+
+```text
+允许应用 AztecOO 最小源码补丁
+```
+
+### 实际修改
+
+已修补当前 Trilinos 源码树：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h
+```
+
+在 AztecOO auxiliary routine 声明区，为 `FORTRAN_DISABLED` 分支补充 C fallback 函数声明：
+
+```c
+#else
+extern int AZ_FNROOT_F77(int *,int *,int *,int *, int *, int *, int *);
+extern int AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
+#endif /* ndef FORTRAN_DISABLED */
+```
+
+### 补丁理由
+
+当前构建关闭 Fortran：
+
+```cmake
+Trilinos_ENABLE_Fortran=OFF
+```
+
+因此 `AZ_FNROOT_F77` 和 `AZ_RCM_F77` 宏会分别映射到：
+
+```c
+az_fnroot_c
+az_rcm_c
+```
+
+这些 C fallback 函数定义存在于：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_reorder.c
+```
+
+且返回类型为 `int`。补丁只补充缺失的函数原型声明，不改变调用逻辑和算法实现。
+
+### 可复现补丁
+
+由于 `artifacts/source/*` 被 `.gitignore` 忽略，当前源码树中的改动不会自然进入 git 跟踪。
+
+为保证后续可复现，已保存补丁文件：
+
+```text
+notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+```
+
+如果将来重新解压 Trilinos 源码，可在源码根目录应用：
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+```
+
+### 下一步
+
+无需重新配置 Trilinos CMake。请继续执行：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
+
+若继续失败，仍然只回传第一处真实错误即可。
