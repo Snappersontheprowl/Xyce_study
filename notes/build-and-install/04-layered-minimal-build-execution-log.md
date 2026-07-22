@@ -1143,3 +1143,142 @@ cmake --build "$xyce_trilinos_build" --parallel 2
 ```
 
 若继续失败，仍然只回传第一处真实错误即可。
+
+## 2026-07-22：阶段 3C Trilinos 第三次编译失败，AztecOO 继续暴露 C fallback 声明缺失
+
+### 用户反馈的结果
+
+应用 AztecOO `az_fnroot_c` / `az_rcm_c` 原型补丁后，Trilinos 编译继续推进，但仍在 AztecOO 目标中失败。
+
+新的第一处真实错误：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h:631:24:
+error: implicit declaration of function ‘az_dlaic1_c’ [-Wimplicit-function-declaration]
+```
+
+触发编译单元：
+
+```text
+packages/aztecoo/src/CMakeFiles/aztecoo.dir/az_gmres.c.o
+```
+
+对应调用点：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_gmres.c:426
+```
+
+构建同时显示其他目标仍可继续推进，例如 `epetraext` 已完成：
+
+```text
+[45%] Built target epetraext
+```
+
+### Codex 只读复核
+
+在 `FORTRAN_DISABLED` 条件下，AztecOO 将 LAPACK auxiliary routine 宏映射到 C fallback 函数：
+
+```c
+#define AZ_DLASWP_F77  az_dlaswp_c
+#define AZ_DLAIC1_F77  az_dlaic1_c
+```
+
+但对应原型声明只在未禁用 Fortran 时启用：
+
+```c
+#ifndef FORTRAN_DISABLED
+void PREFIX AZ_DLASWP_F77(int *, double *, int *, int *, int *, int *, int *);
+
+void PREFIX AZ_DLAIC1_F77(int * , int *, double *, double *, double *, double *,
+                          double *, double *, double *);
+...
+#endif /* FORTRAN_DISABLED */
+```
+
+实际 C fallback 函数定义存在：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_util.c
+```
+
+对应函数：
+
+```c
+int az_dlaic1_c(integer *job, integer *j, doublereal *x,
+                doublereal *sest, doublereal *w, doublereal *gamma,
+                doublereal *sestpr, doublereal *s, doublereal *c__)
+
+int az_dlaswp_c(integer *n, doublereal *a, integer *lda,
+                integer *k1, integer *k2, integer *ipiv, integer *incx)
+```
+
+其中 `integer` 为 `int`，`doublereal` 为 `double`。
+
+### 判断
+
+阶段 3C 仍未通过，但这次失败与上一处 `az_fnroot_c` / `az_rcm_c` 属于同一类：
+
+- 当前构建关闭 Fortran；
+- AztecOO 使用 C fallback；
+- C fallback 函数存在；
+- 头文件没有在 `FORTRAN_DISABLED` 分支下暴露对应函数原型；
+- GCC 15 拒绝 implicit function declaration。
+
+这继续说明当前路线是正确的：不是依赖或链接错，而是 Trilinos 14.4 老 C/F2C 兼容层需要补齐声明。
+
+### 建议处置
+
+建议扩展 AztecOO 最小补丁，在 `az_aztec.h` 的 LAPACK auxiliary routine 声明块中，为 `FORTRAN_DISABLED` 分支补充 double-precision C fallback 原型。
+
+建议补丁位置：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h
+```
+
+建议把声明块从：
+
+```c
+#ifndef FORTRAN_DISABLED
+void PREFIX AZ_DLASWP_F77(int *, double *, int *, int *, int *, int *, int *);
+
+void PREFIX AZ_DLAIC1_F77(int * , int *, double *, double *, double *, double *,
+                          double *, double *, double *);
+void PREFIX AZ_SLASWP_F77(int *, float *, int *, int *, int *, int *, int *);
+
+void PREFIX AZ_SLAIC1_F77(int * , int *, float *, float *, float *, float *,
+                          float *, float *, float *);
+#endif /* FORTRAN_DISABLED */
+```
+
+调整为：
+
+```c
+#ifndef FORTRAN_DISABLED
+void PREFIX AZ_DLASWP_F77(int *, double *, int *, int *, int *, int *, int *);
+
+void PREFIX AZ_DLAIC1_F77(int * , int *, double *, double *, double *, double *,
+                          double *, double *, double *);
+void PREFIX AZ_SLASWP_F77(int *, float *, int *, int *, int *, int *, int *);
+
+void PREFIX AZ_SLAIC1_F77(int * , int *, float *, float *, float *, float *,
+                          float *, float *, float *);
+#else
+extern int AZ_DLASWP_F77(int *, double *, int *, int *, int *, int *, int *);
+extern int AZ_DLAIC1_F77(int *, int *, double *, double *, double *, double *,
+                         double *, double *, double *);
+#endif /* FORTRAN_DISABLED */
+```
+
+这里不补 `AZ_SLASWP_F77` / `AZ_SLAIC1_F77` 的 C fallback，因为在当前 `FORTRAN_DISABLED` 分支下没有定义对应宏，也没有发现对应 C fallback 函数定义；只补当前实际映射到 C fallback 的 double-precision 例程。
+
+### 下一步
+
+先暂停 Trilinos 编译。待确认是否允许扩展 AztecOO 最小补丁。
+
+若确认应用补丁，补丁后仍无需重新配置 CMake，直接继续：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
