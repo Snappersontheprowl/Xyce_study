@@ -2,6 +2,9 @@
 
 记录日期：2026-07-22
 
+最近更新：2026-07-22。已完成 GCC 工具链检查，详见
+[03-gcc-toolchain-check.md](./03-gcc-toolchain-check.md)。
+
 ## 目标与边界
 
 本计划的唯一交付物是一套可复现的 **Xyce 7.10 串行 Release 安装**：
@@ -46,16 +49,25 @@ SuiteSparse（只需 suitesparse_config + AMD）
 | Xyce 源码 | `vendor/Xyce-7.10.0/` | 目标源码固定，不再另行下载 |
 | CMake | 3.26.5 | 满足源码的 3.22+ 要求 |
 | make、flex、bison | 可用 | 仍须在执行阶段记录精确版本 |
-| 默认 GCC/G++ | 8.5.0 | **低于 `INSTALL.md` 所列 GCC 9+ 基线** |
-| 已安装 Trilinos | `/home/eda/.local/xyce-deps/install/lib/cmake/Trilinos/TrilinosConfig.cmake`，版本为 14.4 | 可先审计，合格时复用，不应无故重建 |
+| 默认 GCC/G++ | 8.5.0 | **低于 `INSTALL.md` 所列 GCC 9+ 基线**，不作为正式构建工具链 |
+| GCC Toolset 15 | `/opt/rh/gcc-toolset-15/root/usr/bin/gcc` 与 `/opt/rh/gcc-toolset-15/root/usr/bin/g++`，版本 15.2.1 | **作为本计划推荐工具链** |
+| Clang/Clang++ | 21.1.8 | 可作为备选，但本计划优先使用 GCC Toolset 15 |
+| 已安装 Trilinos | `/home/eda/.local/xyce-deps/install/lib/cmake/Trilinos/TrilinosConfig.cmake`，版本为 14.4，记录显示由 `/usr/bin/gcc` 和 `/usr/bin/g++` 构建 | 与推荐 GCC 15 工具链不一致，不作为正式最小构建的复用目标 |
 | 已安装 AMD | 同一前缀中存在 `lib64/libamd.*` | 依赖栈已有部分证据 |
 | 旧 Xyce build | `build/` 为串行 Release cache，仅有 `src/libxyce.a`，未见最终 `Xyce` | 不作为本计划的目标 build tree |
 
-### 第一条继续条件：先确定合规的 C/C++ 编译器
+### 第一条继续条件：固定 GCC Toolset 15 为专用工具链
 
-当前 `gcc` / `g++` 为 8.5，且当前 PATH 中没有检测到 `gcc-9` 或更高版本的备用命令。为获得“按上游前提构建”的结果，正式执行前必须由用户选择或安装一套 GCC 9+（或其他 C++17 合规编译器），并让 **SuiteSparse、Trilinos、Xyce 三层全部使用同一套 C/C++ 编译器**。
+当前系统默认 `gcc` / `g++` 仍为 8.5，但系统已经安装并验证可用 `gcc-toolset-15`。为获得“按上游前提构建”的结果，正式执行时固定使用以下绝对路径，并让 **SuiteSparse、Trilinos、Xyce 三层全部使用同一套 C/C++ 编译器**：
 
-在这项条件未满足前，可以把 GCC 8.5 的工作仅视为探索性尝试，不能把其构建成功当成计划验收通过。不要先用 GCC 8.5 构建 Trilinos、再改用新编译器构建 Xyce。
+```sh
+xyce_cc="/opt/rh/gcc-toolset-15/root/usr/bin/gcc"
+xyce_cxx="/opt/rh/gcc-toolset-15/root/usr/bin/g++"
+```
+
+不要替换系统默认 `/usr/bin/gcc`，也不要通过 `alternatives` 改变全局 GCC。Xyce 只需要项目专用工具链；全局替换可能影响系统包、老 EDA 工具或其他项目。
+
+现有 `/home/eda/.local/xyce-deps/install` 中的 Trilinos 14.4 由 GCC 8.5 构建。切换到 GCC 15 后，不应把这套 Trilinos 作为正式依赖复用；它只保留为历史参考或对照审计对象。
 
 ## 目录、命名与不覆盖规则
 
@@ -99,17 +111,17 @@ out/xyce-7.10-serial-release/             # 最终 Xyce 安装前缀
 ```sh
 cmake --version
 make --version | head -n 1
-gcc --version | head -n 1
-g++ --version | head -n 1
-flex --version
-bison --version
+/opt/rh/gcc-toolset-15/root/usr/bin/gcc --version | head -n 1
+/opt/rh/gcc-toolset-15/root/usr/bin/g++ --version | head -n 1
+/home/eda/.local/xyce-tools/bin/flex --version
+/home/eda/.local/xyce-tools/bin/bison --version
 ```
 
-确定将实际使用的合规编译器绝对路径，并在后续所有 CMake 命令中固定它们。例如：
+确定将实际使用的合规编译器绝对路径，并在后续所有 CMake 命令中固定它们：
 
 ```sh
-xyce_cc="/absolute/path/to/gcc-9-or-newer"
-xyce_cxx="/absolute/path/to/g++-9-or-newer"
+xyce_cc="/opt/rh/gcc-toolset-15/root/usr/bin/gcc"
+xyce_cxx="/opt/rh/gcc-toolset-15/root/usr/bin/g++"
 ```
 
 若 Trilinos 保留 Fortran 支持，还应固定 `xyce_fc`；若不具备 Fortran 编译器，则在 Trilinos 配置中显式关闭 `Trilinos_ENABLE_Fortran`。
@@ -118,19 +130,22 @@ xyce_cxx="/absolute/path/to/g++-9-or-newer"
 
 - 已记录所有工具的版本和绝对路径；
 - `xyce_cc`、`xyce_cxx` 指向同一发行版/工具链的合规编译器；
+- `xyce_cc`、`xyce_cxx` 分别等于 `/opt/rh/gcc-toolset-15/root/usr/bin/gcc` 和 `/opt/rh/gcc-toolset-15/root/usr/bin/g++`；
 - 已确认此次是 `serial + Release + static + no-plugin + no-FFT + no-test`。
 
 ### 停止条件
 
 - 没有合规 C/C++ 编译器；
 - 计划在中途切换编译器；
-- 不确定现有依赖由何种编译器或 MPI 模式构建。
+- 准备复用的依赖由其他编译器或 MPI 模式构建。
 
 出现任一项时，先解决工具链选择；不要开始构建任何一层。
 
-## 阶段 1：审计可复用依赖，而不是立刻重建
+## 阶段 1：审计现有依赖，并决定是否重建
 
-现有前缀 `/home/eda/.local/xyce-deps/install` 已提供 Trilinos 14.4 和 AMD 的证据。先判断能否复用：
+现有前缀 `/home/eda/.local/xyce-deps/install` 已提供 Trilinos 14.4 和 AMD 的证据。但 2026-07-22 的检查已确认该 Trilinos 记录的编译器为 `/usr/bin/gcc` 和 `/usr/bin/g++`，即 GCC 8.5。由于本计划推荐使用 GCC Toolset 15，正式最小构建默认进入阶段 2、3 重建受控依赖栈。
+
+仍保留下面的只读审计步骤，目的不是复用，而是记录“为什么不复用”：
 
 ```sh
 xyce_existing_deps="/home/eda/.local/xyce-deps/install"
@@ -142,9 +157,9 @@ rg -n 'Trilinos_VERSION|Trilinos_PACKAGE_LIST' \
   "$xyce_existing_deps/lib/cmake/Trilinos/TrilinosConfig.cmake"
 ```
 
-随后需要从该 Trilinos 的安装记录或 `CMakeCache.txt` 确认：
+随后从该 Trilinos 的安装记录或 `CMakeCache.txt` 摘录：
 
-- `CMAKE_C_COMPILER`、`CMAKE_CXX_COMPILER` 与阶段 0 的工具链相同；
+- `CMAKE_C_COMPILER`、`CMAKE_CXX_COMPILER` 是否与阶段 0 的工具链相同；
 - `TPL_ENABLE_MPI=OFF` 或等价配置，即它是串行 Trilinos；
 - 配置包含 Xyce cache 所需的 NOX、EpetraExt、Ifpack、AztecOO、Belos、Teuchos、Amesos/KLU、Sacado、Stokhos、ROL、Amesos2/KLU2/Basker 等能力；
 - 使用的 AMD、BLAS 和 LAPACK 库仍可从该前缀或系统运行库路径找到。
@@ -159,9 +174,9 @@ Trilinos 14.4 + 所需 package + 串行 + 编译器一致
   -> 按阶段 2、3 重建受控依赖栈
 ```
 
-注意：即使可复用，也不要把旧前缀“迁移”到新的目录；本轮先将它作为只读输入。若最终需要完整可复现性，再依阶段 2、3 在 `out/deps/...` 中创建新前缀。
+对当前机器而言，该分支决策已经落在第二条：现有 Trilinos 与 GCC Toolset 15 不一致，所以正式构建应按阶段 2、3 在 `out/deps/...` 中创建新前缀。即使后续发现它是串行且包列表完整，也不改变这个工具链一致性结论。
 
-## 阶段 2：构建 SuiteSparse 的最小子集（仅在阶段 1 不可复用时）
+## 阶段 2：构建 SuiteSparse 的最小子集（当前推荐执行）
 
 ### 输入与版本
 
@@ -202,7 +217,7 @@ find "$xyce_deps_prefix" -maxdepth 3 -type f -name 'libamd.*'
 
 验收要求是安装前缀中同时出现 AMD 头文件和库；如果库位于 `lib64/`，阶段 3 必须显式传递该路径。安装失败时先保留 build tree 和 `CMakeFiles/CMakeError.log`，不覆盖重配。
 
-## 阶段 3：构建 Xyce 所需的串行 Trilinos 14.4（仅在阶段 1 不可复用时）
+## 阶段 3：构建 Xyce 所需的串行 Trilinos 14.4（当前推荐执行）
 
 ### 输入
 
@@ -265,13 +280,13 @@ rg -n 'Trilinos_VERSION|Trilinos_PACKAGE_LIST' \
 
 ### 选择依赖前缀
 
-只有当阶段 1 的复用审计通过时，才设置：
+只有当阶段 1 的复用审计通过且编译器与阶段 0 完全一致时，才设置：
 
 ```sh
 xyce_trilinos_prefix="/home/eda/.local/xyce-deps/install"
 ```
 
-若阶段 2、3 完成，则设置：
+当前推荐路线是阶段 2、3 重建完成后设置：
 
 ```sh
 xyce_trilinos_prefix="$xyce_deps_prefix"
@@ -411,10 +426,9 @@ R1 1 0 1k
 ## 执行顺序总览
 
 ```text
-0. 选择合规编译器（当前唯一的硬门槛）
-1. 审计现有 Trilinos 14.4 / AMD 前缀
-   ├─ 合格：复用 -> 4. 配置 Xyce
-   └─ 不合格：2. SuiteSparse -> 3. Trilinos -> 4. 配置 Xyce
+0. 固定 GCC Toolset 15 编译器绝对路径
+1. 审计现有 Trilinos 14.4 / AMD 前缀，记录其 GCC 8.5 来源
+2. SuiteSparse -> 3. Trilinos -> 4. 配置 Xyce
 4. 审核 Xyce 的 CMake cache
 5. 编译 Xyce -> 确认 build/src/Xyce
 6. 安装 -> 确认 out/.../bin/Xyce -> 帮助与电阻冒烟测试
@@ -423,4 +437,4 @@ R1 1 0 1k
 
 ## 下一步
 
-尚未执行任何构建命令。最自然的下一次操作是阶段 0：由用户指定或准备一套 GCC 9+（或兼容替代编译器），随后只读审计当前 Trilinos 14.4 的编译器和 MPI 配置，决定复用还是从 SuiteSparse 开始重建。
+尚未执行任何构建命令。最自然的下一次操作是阶段 0：固定 `gcc-toolset-15` 的 `gcc/g++` 绝对路径并记录版本；随后只读审计当前 Trilinos 14.4 的 GCC 8.5 来源，正式构建从 SuiteSparse 开始重建受控依赖栈。
