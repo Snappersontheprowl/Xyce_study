@@ -2257,3 +2257,51 @@ build/xyce-7.10-serial-release/src/CMakeFiles/Xyce.dir/link.txt
 - 安装前缀中没有旧 Cadence BLAS/LAPACK 路径。
 
 下一步进入阶段 4B：重新配置 Xyce，并检查新的 `src/CMakeFiles/Xyce.dir/link.txt` 是否使用 Mentor OpenBLAS。
+
+## 2026-07-22：阶段 4B Xyce 重新配置后链接命令已切换到 Mentor OpenBLAS
+
+### 用户反馈的 link.txt 检查
+
+检查命令：
+
+```bash
+rg -n 'libopenblas|/opt/mentor|/opt/cadence|libblas\.so|liblapack\.so' \
+  "$xyce_build/src/CMakeFiles/Xyce.dir/link.txt"
+```
+
+新的 Xyce 链接命令中，运行时搜索路径已经包含 Mentor OpenBLAS 目录：
+
+```text
+-Wl,-rpath,...:/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib:...
+```
+
+在 `libkokkoskernels.a` 之后，链接命令已经使用 Mentor OpenBLAS：
+
+```text
+/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so
+/opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so
+```
+
+未再出现旧的 Cadence BLAS/LAPACK：
+
+```text
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+```
+
+### 判断
+
+阶段 4B 通过。
+
+两个 `libopenblas.so` 同时出现可以接受：当前构建把同一个 OpenBLAS 同时作为 BLAS 与 LAPACK 传递，因此链接命令中出现两次不表示冲突。关键是它们都来自同一目录、同一库文件，且旧 Cadence BLAS/LAPACK 已从最终 Xyce 链接命令中消失。
+
+当前状态：
+
+```text
+Xyce reconfigured after OpenBLAS switch: yes
+Xyce link.txt uses Mentor OpenBLAS:      yes
+Xyce link.txt contains Cadence BLAS:     no
+Xyce build allowed:                     yes
+```
+
+下一步可以重新执行 Xyce build。若再次出现 undefined reference，需要以新的 `xyce-build-openblas-j8.log` 为准重新定位；但当前已解决上一轮 `srotm_` / `drotm_` / `srotmg_` / `drotmg_` 缺失问题。
