@@ -1,6 +1,6 @@
-** Translated using xdm 2.7.0 on Jul_22_2026_23_37_18_PM
-** from /tmp/_MEIeTDyFv/hspice.xml
-** to /tmp/_MEIeTDyFv/xyce.xml
+** Translated using xdm 2.7.0 on Jul_22_2026_23_49_57_PM
+** from /tmp/_MEIfYO3Wv/hspice.xml
+** to /tmp/_MEIfYO3Wv/xyce.xml
 
 
 

@@ -33,7 +33,7 @@ XDM User Guide 2.7 说明：
 ```text
 artifacts/tools/xdm-2.7.0-Linux.zip
 out/tools/xdm-2.7.0-Linux/
-functional-verification/cases/fv-009-xdm-hspice-minimal/
+functional-verification/cases/fv009-xdm-hspice-minimal/
 ```
 
 这样做的好处：
@@ -130,10 +130,10 @@ rg -n 'not found|boost|python|libstdc\+\+|glibc|GLIBC' build/logs/xdm-ldd.log
 ```bash
 cd /home/eda/my_lab/projects/study/xyce_study
 
-mkdir -p functional-verification/cases/fv-009-xdm-hspice-minimal/input
-mkdir -p functional-verification/cases/fv-009-xdm-hspice-minimal/out
+mkdir -p functional-verification/cases/fv009-xdm-hspice-minimal/input
+mkdir -p functional-verification/cases/fv009-xdm-hspice-minimal/out
 
-cat > functional-verification/cases/fv-009-xdm-hspice-minimal/input/resistor-hspice.sp <<'EOF'
+cat > functional-verification/cases/fv009-xdm-hspice-minimal/input/resistor-hspice.sp <<'EOF'
 * FV-009 XDM HSPICE-like minimal resistor test
 .option post
 V1 1 0 DC 1
@@ -149,24 +149,24 @@ EOF
 ```bash
 xdm_bdl \
   -s hspice \
-  -d functional-verification/cases/fv-009-xdm-hspice-minimal/out \
+  -d functional-verification/cases/fv009-xdm-hspice-minimal/out \
   -o xyce \
   --auto \
-  functional-verification/cases/fv-009-xdm-hspice-minimal/input/resistor-hspice.sp \
-  2>&1 | tee build/logs/xdm-fv-009-hspice-convert.log
+  functional-verification/cases/fv009-xdm-hspice-minimal/input/resistor-hspice.sp \
+  2>&1 | tee build/logs/xdm-fv009-hspice-convert.log
 ```
 
 检查转换日志：
 
 ```bash
 rg -n "ERROR|Error|error|Traceback|WARNING|Warning|warning" \
-  build/logs/xdm-fv-009-hspice-convert.log || true
+  build/logs/xdm-fv009-hspice-convert.log || true
 ```
 
 检查输出文件：
 
 ```bash
-find functional-verification/cases/fv-009-xdm-hspice-minimal/out -maxdepth 2 -type f -print -exec sed -n '1,80p' {} \;
+find functional-verification/cases/fv009-xdm-hspice-minimal/out -maxdepth 2 -type f -print -exec sed -n '1,80p' {} \;
 ```
 
 ## 9. 用当前 Xyce 验证转换结果
@@ -181,7 +181,7 @@ test -x "$xyce_install/bin/Xyce" && "$xyce_install/bin/Xyce" -v
 找到转换后的网表：
 
 ```bash
-xyce_xdm_out_netlist="$(find functional-verification/cases/fv-009-xdm-hspice-minimal/out -type f \( -name '*.sp' -o -name '*.cir' -o -name '*.ckt' \) | sort | head -n 1)"
+xyce_xdm_out_netlist="$(find functional-verification/cases/fv009-xdm-hspice-minimal/out -type f \( -name '*.sp' -o -name '*.cir' -o -name '*.ckt' \) | sort | head -n 1)"
 echo "$xyce_xdm_out_netlist"
 ```
 
@@ -189,28 +189,28 @@ echo "$xyce_xdm_out_netlist"
 
 ```bash
 "$xyce_install/bin/Xyce" -syntax "$xyce_xdm_out_netlist" \
-  2>&1 | tee build/logs/xdm-fv-009-xyce-syntax.log
+  2>&1 | tee build/logs/xdm-fv009-xyce-syntax.log
 ```
 
 再实际运行：
 
 ```bash
 "$xyce_install/bin/Xyce" "$xyce_xdm_out_netlist" \
-  2>&1 | tee build/logs/xdm-fv-009-xyce-run.log
+  2>&1 | tee build/logs/xdm-fv009-xyce-run.log
 ```
 
 检查错误：
 
 ```bash
 rg -n "Netlist error|MSG_FATAL|MSG_ERROR|Simulation aborted|Xyce Abort|failed|fatal|error|Traceback" \
-  build/logs/xdm-fv-009-xyce-syntax.log \
-  build/logs/xdm-fv-009-xyce-run.log || true
+  build/logs/xdm-fv009-xyce-syntax.log \
+  build/logs/xdm-fv009-xyce-run.log || true
 ```
 
 检查输出值：
 
 ```bash
-find functional-verification/cases/fv-009-xdm-hspice-minimal/out -type f \( -name '*.prn' -o -name '*.csd' \) -print -exec sed -n '1,80p' {} \;
+find functional-verification/cases/fv009-xdm-hspice-minimal/out -type f \( -name '*.prn' -o -name '*.csd' \) -print -exec sed -n '1,80p' {} \;
 ```
 
 预期数值仍应接近：

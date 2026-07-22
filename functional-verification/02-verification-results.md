@@ -231,19 +231,19 @@ Vg=1.80 V: I(VDS)=-9.888e-04
 输入网表：
 
 ```text
-functional-verification/cases/fv-009-xdm-hspice-minimal/input/resistor-hspice.sp
+functional-verification/cases/fv009-xdm-hspice-minimal/input/resistor-hspice.sp
 ```
 
 XDM 转换后网表：
 
 ```text
-functional-verification/cases/fv-009-xdm-hspice-minimal/out/resistor-hspice.sp
+functional-verification/cases/fv009-xdm-hspice-minimal/out/resistor-hspice.sp
 ```
 
 Xyce 输出文件：
 
 ```text
-functional-verification/cases/fv-009-xdm-hspice-minimal/out/resistor-hspice.sp.csd
+functional-verification/cases/fv009-xdm-hspice-minimal/out/resistor-hspice.sp.csd
 ```
 
 转换摘要：

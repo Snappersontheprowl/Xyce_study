@@ -1,8 +1,8 @@
 #H
 SOURCE='Xyce' VERSION='7.10.0'
-TITLE='* functional-verification/cases/fv-009-xdm-hspice-minimal/out/resistor-hspice.sp'
+TITLE='* functional-verification/cases/fv009-xdm-hspice-minimal/out/resistor-hspice.sp'
 SUBTITLE='Xyce data'
-TIME='11:41:16 PM' DATE='Jul 22, 2026' TEMPERATURE='2.50000000e+01'
+TIME='11:49:59 PM' DATE='Jul 22, 2026' TEMPERATURE='2.50000000e+01'
 ANALYSIS='DC Sweep' SERIALNO='12345'
 ALLVALUES='NO' COMPLEXVALUES='NO' NODES='2'
 SWEEPVAR='' SWEEPMODE='VAR_STEP'
