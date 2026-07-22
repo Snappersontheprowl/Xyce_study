@@ -447,3 +447,83 @@ build/deps/xyce-7.10-serial-release/suitesparse/install_manifest.txt
 阶段 2C 通过。SuiteSparse 最小子集 `suitesparse_config + AMD` 已经安装到目标依赖前缀。
 
 下一阶段是 2.5：在进入 Trilinos 前，复核 Cadence IC231 BLAS/LAPACK fallback 的路径、符号和运行时依赖。
+
+## 2026-07-22：阶段 2.5 Cadence BLAS/LAPACK fallback 复核通过
+
+### 用户已执行
+
+```bash
+xyce_blas_lapack_libdir="/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit"
+xyce_blas="$xyce_blas_lapack_libdir/libblas.so"
+xyce_lapack="$xyce_blas_lapack_libdir/liblapack.so"
+
+test -f "$xyce_blas" && echo "BLAS exists: $xyce_blas"
+test -f "$xyce_lapack" && echo "LAPACK exists: $xyce_lapack"
+
+nm -D "$xyce_blas" | rg ' (sgemm_|dgemm_)$'
+nm -D "$xyce_lapack" | rg ' (dgesv_|dgeev_)$'
+
+ldd "$xyce_blas"
+ldd "$xyce_lapack"
+```
+
+### 观察结果
+
+库文件存在：
+
+```text
+BLAS exists: /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+LAPACK exists: /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+```
+
+BLAS 符号存在：
+
+```text
+0000000000055e90 T dgemm_
+000000000007ef60 T sgemm_
+```
+
+LAPACK 符号存在：
+
+```text
+00000000001d8f40 T dgeev_
+00000000001f4350 T dgesv_
+```
+
+`libblas.so` 运行时依赖：
+
+```text
+libgfortran.so.5 => /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/../../../lib/64bit/libgfortran.so.5
+libm.so.6 => /lib64/libm.so.6
+libc.so.6 => /lib64/libc.so.6
+libquadmath.so.0 => /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/../../../lib/64bit/libquadmath.so.0
+libgcc_s.so.1 => /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/../../../lib/64bit/libgcc_s.so.1
+```
+
+`liblapack.so` 运行时依赖：
+
+```text
+libblas.so => /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/../../../lapack/lib/64bit/libblas.so
+libgfortran.so.5 => /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/../../../lib/64bit/libgfortran.so.5
+libm.so.6 => /lib64/libm.so.6
+libc.so.6 => /lib64/libc.so.6
+libquadmath.so.0 => /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/../../../lib/64bit/libquadmath.so.0
+libgcc_s.so.1 => /opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/../../../lib/64bit/libgcc_s.so.1
+```
+
+`ldd` 对两个 `.so` 都提示没有 execution permission。该 warning 不影响本次判断；共享库不需要执行位即可被动态链接器加载。
+
+### 阶段判断
+
+阶段 2.5 通过。
+
+本轮正式接受 Cadence IC231 BLAS/LAPACK fallback，并记录其已知代价：运行时依赖 Cadence 安装树中的 Fortran runtime。后续 Trilinos 配置必须显式使用：
+
+```text
+BLAS_LIBRARY_DIRS=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit
+LAPACK_LIBRARY_DIRS=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit
+BLAS_LIBRARY_NAMES=blas
+LAPACK_LIBRARY_NAMES=lapack
+```
+
+下一阶段是阶段 3：准备并配置 Trilinos 14.4。
