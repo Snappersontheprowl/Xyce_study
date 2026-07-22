@@ -306,7 +306,87 @@ FV-012: KLayout/Netgen LVS-style SPICE netlist -> Xyce syntax check
 FV-013: PTM/BSIM model card through XDM or direct Xyce include
 ```
 
-## 6. 参考资料
+## 6. XDM 安装复杂度判断
+
+### 6.1 结论
+
+XDM 的安装复杂度应按两条路线区分：
+
+1. 使用官方发布的二进制包；
+2. 从源码自行编译。
+
+如果能取得并使用与当前 Linux 环境兼容的官方二进制包，安装复杂度预计较低，主要是解压、设置 `PATH`、运行 `xdm_bdl` 或 `xdm_bdl.py` 做验证。
+
+如果从源码编译，复杂度预计中等偏高。它不需要 Trilinos 级别的大型依赖链，但对以下三者的匹配比较敏感：
+
+- Boost / Boost.Python；
+- Python 3；
+- C++ 编译器。
+
+官方 XDM README 明确说明：
+
+```text
+Building XDM can be tricky since there are many versions of Boost, Python 3, and C++ compilers available not all of which are compatible with each other.
+```
+
+### 6.2 当前本机环境风险点
+
+当前机器上已经观察到：
+
+```text
+Python 3.10.19
+CMake 3.26.5
+GCC 15.2.1
+system Boost 1.66.0
+```
+
+其中 Boost 1.66.0 低于官方 README 中提到的 Boost 1.70.0+ 开发/推荐线；Python 3.10 也高于官方说明的 Python 3.8 / 3.9 开发线；GCC 15 明显新于官方说明的 GCC 8.x 开发线。
+
+这不代表一定不能构建，但意味着不能把 XDM 当成“直接 cmake 一次就稳过”的小工具。
+
+### 6.3 推荐策略
+
+本项目建议采用分层策略：
+
+1. 优先尝试官方 release/binary 形式的 XDM；
+2. 若 binary 不适配，再考虑源码构建；
+3. 源码构建时，不建议混用系统 Boost 1.66 与默认 Python 3.10；
+4. 更干净的方式是单独准备一套 XDM 专用依赖前缀，例如：
+
+```text
+out/tools/xdm-2.7/
+out/tools/xdm-deps/
+```
+
+5. 若需要源码构建，优先考虑：
+
+```text
+Boost 1.70+ / 1.74 / 1.78
+Python 3.8 或 3.9
+C++11-compatible compiler
+```
+
+6. 先只验证 `xdm_bdl --help`、最小 HSPICE/PSpice/Spectre 输入转换，不要一开始就拿 PDK 级网表做压力测试。
+
+### 6.4 是否值得安装
+
+值得，但不应插入当前 Xyce 最小构建主线。
+
+XDM 更适合作为 functional verification 的下一阶段工具链：
+
+```text
+Xyce binary 已验证可用
+  -> 安装/验证 XDM
+  -> 转换简单网表
+  -> Xyce -syntax 检查
+  -> Xyce 实跑
+  -> 与手工 Xyce deck 对比结果
+  -> 再进入真实 PDK / commercial SPICE 方言迁移
+```
+
+这样即使 XDM 构建遇到 Boost.Python 问题，也不会污染已经完成的 Xyce 主安装。
+
+## 7. 参考资料
 
 - Xyce Documentation & Tutorials: https://xyce.sandia.gov/documentation-tutorials/
 - Xyce/XDM GitHub: https://github.com/Xyce/XDM
