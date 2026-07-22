@@ -5,6 +5,8 @@ vendor/*
 # Downloaded archives
 artifacts/source/*
 !artifacts/source/README.md
+artifacts/tools/*
+!artifacts/tools/README.md
 
 # Local build and scratch output
 build/

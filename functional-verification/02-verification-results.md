@@ -21,6 +21,7 @@ Xyce Release 7.10.0-opensource
 | FV-006 | common-source AC | 通过 | MOS 放大器 OP + AC 可用，低频小信号增益约 `-9.51 V/V` |
 | FV-007 | noise | 通过 | `.NOISE` 语法与噪声输出可用，生成 `NOISE.prn` 与 `_noise.dat` |
 | FV-008 | model-card compat | 通过 | `.include` 模型卡、模型识别、MOS DC sweep 可用 |
+| FV-009 | XDM HSPICE minimal | 通过 | XDM 2.7.0 可将最小 HSPICE-like 网表转为 Xyce，当前 Xyce 可解析并运行，`V(1)=1.0 V`、`I(V1)=-1 mA` |
 
 ## 运行约定
 
@@ -225,9 +226,62 @@ Vg=1.80 V: I(VDS)=-9.888e-04
 
 判断：通过。`.include` 模型卡机制、模型识别和 MOS DC sweep 均可用。
 
+### FV-009 XDM HSPICE-like minimal conversion
+
+输入网表：
+
+```text
+functional-verification/cases/fv-009-xdm-hspice-minimal/input/resistor-hspice.sp
+```
+
+XDM 转换后网表：
+
+```text
+functional-verification/cases/fv-009-xdm-hspice-minimal/out/resistor-hspice.sp
+```
+
+Xyce 输出文件：
+
+```text
+functional-verification/cases/fv-009-xdm-hspice-minimal/out/resistor-hspice.sp.csd
+```
+
+转换摘要：
+
+```text
+xdm_bdl 2.7.0
+input format=hspice
+output format=xyce
+Total critical issues reported = 0
+Total errors reported          = 0
+Total warnings reported        = 1
+```
+
+唯一 warning 是 `.option post` 被 HSPICE parser 保留为注释：
+
+```text
+* .option post; HSpice Parser Retained (as a comment). Continuing.
+```
+
+Xyce 语法检查：
+
+```text
+Netlist syntax OK
+Device counts: R=1, V=1
+```
+
+代表点：
+
+```text
+V(1)  =  1.00000000e+00
+I(V1) = -1.00000000e-03
+```
+
+判断：通过。XDM binary 安装、HSPICE-like 最小网表转换、Xyce `-syntax` 检查和 Xyce 实跑链路均可用。
+
 ## 总体结论
 
-本轮功能验证矩阵 FV-001 至 FV-008 全部通过。
+本轮功能验证矩阵 FV-001 至 FV-009 全部通过。
 
 当前 Xyce 7.10.0 串行最小构建已经验证可用于：
 
@@ -238,8 +292,9 @@ Vg=1.80 V: I(VDS)=-9.888e-04
 - Level 1 MOS DC sweep；
 - 简单 MOS 共源放大器 OP + AC；
 - 基础 NOISE 分析；
-- 简单 `.include` 模型卡兼容性。
+- 简单 `.include` 模型卡兼容性；
+- XDM 2.7.0 binary 的最小 HSPICE-like 网表到 Xyce 转换链路。
 
 这进一步支持当前判断：该安装足够用于学习 Xyce 内核、基础/中等复杂度开源模拟电路验证和 SPICE 求解流程研究。
 
-仍需注意：本轮 FV-008 使用的是简单 Level 1 模型卡，不等价于 foundry PDK 或复杂 BSIM/PSP/FinFET 模型兼容性验证。
+仍需注意：本轮 FV-008 使用的是简单 Level 1 模型卡，不等价于 foundry PDK 或复杂 BSIM/PSP/FinFET 模型兼容性验证；FV-009 只验证了最小 HSPICE-like 网表转换，不代表 XDM 对复杂 HSPICE/Spectre/PDK deck 已经完成覆盖。

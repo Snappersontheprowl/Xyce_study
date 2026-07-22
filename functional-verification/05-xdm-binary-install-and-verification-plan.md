@@ -210,7 +210,7 @@ rg -n "Netlist error|MSG_FATAL|MSG_ERROR|Simulation aborted|Xyce Abort|failed|fa
 检查输出值：
 
 ```bash
-find functional-verification/cases/fv-009-xdm-hspice-minimal/out -type f -name '*.prn' -print -exec sed -n '1,40p' {} \;
+find functional-verification/cases/fv-009-xdm-hspice-minimal/out -type f \( -name '*.prn' -o -name '*.csd' \) -print -exec sed -n '1,80p' {} \;
 ```
 
 预期数值仍应接近：
@@ -231,6 +231,8 @@ FV-009 通过条件：
 5. 当前 Xyce 对转换后网表 `-syntax` 通过；
 6. 当前 Xyce 实跑成功；
 7. 输出值满足最小电阻电路预期。
+
+注：由于 XDM 会把 `.print dc` 转换为 `.PRINT DC FORMAT=PROBE ...`，Xyce 可能生成 `.csd` 结果文件，而不是 `.prn`。本用例中 `.csd` 是正常输出。
 
 ## 11. 暂不做的事情
 
