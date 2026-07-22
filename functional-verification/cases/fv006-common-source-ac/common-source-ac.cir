@@ -1,0 +1,11 @@
+* FV-006: simple NMOS common-source amplifier AC smoke test
+VDD vdd 0 DC 5
+VIN in 0 DC 1.2 AC 1
+RD vdd out 10k
+RS src 0 200
+M1 out in src 0 NM L=1u W=20u
+.MODEL NM NMOS LEVEL=1 VTO=0.5 KP=100u LAMBDA=0.02
+.OP
+.AC DEC 20 1 1MEG
+.PRINT AC V(out) V(in)
+.END

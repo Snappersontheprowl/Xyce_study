@@ -1,0 +1,8 @@
+* FV-005: NMOS Id-Vgs smoke test, simple level 1 model
+VDS d 0 DC 1
+VGS g 0 DC 0
+M1 d g 0 0 NM L=1u W=10u
+.MODEL NM NMOS LEVEL=1 VTO=0.5 KP=100u LAMBDA=0.02
+.DC VGS 0 1.8 0.01
+.PRINT DC V(g) I(VDS)
+.END

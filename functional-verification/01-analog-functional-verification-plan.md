@@ -87,6 +87,12 @@ D1 anode 0 DMOD
 - 电流随电压指数上升；
 - `I(V1)` 符号按电压源电流参考方向解释。
 
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
+
 ### FV-003：RC transient 阶跃响应
 
 目的：
@@ -113,6 +119,12 @@ C1 out 0 1n
 - 时间常数约为 `R*C = 1 us`；
 - 输出无 fatal/error。
 
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
+
 ### FV-004：RC AC 小信号频响
 
 目的：
@@ -138,6 +150,12 @@ C1 out 0 1n
 - 低频 `|V(out)|` 接近 1；
 - 截止频率约为 `1/(2*pi*R*C) ≈ 159 kHz`；
 - 高频幅度下降。
+
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
 
 ### FV-005：MOSFET DC 曲线
 
@@ -166,6 +184,12 @@ M1 d g 0 0 NM L=1u W=10u
 - 超过阈值后电流上升；
 - 输出曲线可用于后续 gm/ID 或器件模型学习。
 
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
+
 ### FV-006：共源放大器 OP + AC
 
 目的：
@@ -182,6 +206,12 @@ M1 d g 0 0 NM L=1u W=10u
 - 小信号增益符号与量级符合预期；
 - 可从 `.PRINT AC` 输出频响。
 
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
+
 ### FV-007：NOISE 基础验证
 
 目的：
@@ -197,6 +227,12 @@ M1 d g 0 0 NM L=1u W=10u
 - netlist 语法被接受；
 - 输出中出现噪声相关结果；
 - 结果数量级与热噪声直觉一致。
+
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
 
 ### FV-008：实际模型卡兼容性检查
 
@@ -218,6 +254,12 @@ M1 d g 0 0 NM L=1u W=10u
 - model level 可识别；
 - 简单 Id-Vg / Id-Vd 曲线能跑通；
 - 若失败，记录首个错误和是否属于语法、模型参数、器件级别或 Xyce 构建缺项。
+
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
 
 ## 4. 输出目录建议
 

@@ -1,0 +1,2 @@
+* FV-008 simple model card for include compatibility
+.MODEL NM_INC NMOS LEVEL=1 VTO=0.5 KP=120u LAMBDA=0.03

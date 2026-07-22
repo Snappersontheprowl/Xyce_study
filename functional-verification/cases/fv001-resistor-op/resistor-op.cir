@@ -1,0 +1,6 @@
+* FV-001: 1 V source through 1 kOhm resistor
+V1 1 0 DC 1
+R1 1 0 1k
+.OP
+.PRINT DC V(1) I(V1)
+.END

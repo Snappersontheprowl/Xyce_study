@@ -1,0 +1,7 @@
+* FV-003: RC transient step response
+V1 in 0 PULSE(0 1 0 1n 1n 1u 2u)
+R1 in out 1k
+C1 out 0 1n
+.TRAN 1n 5u
+.PRINT TRAN V(in) V(out)
+.END

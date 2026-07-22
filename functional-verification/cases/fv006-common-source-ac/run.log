@@ -1,0 +1,204 @@
+
+*****
+***** Welcome to the Xyce(TM) Parallel Electronic Simulator
+*****
+***** This is version Xyce Release 7.10.0-opensource
+***** Date: Wed Jul 22 21:39:16 CST 2026
+
+
+***** Executing netlist common-source-ac.cir
+
+***** Reading and parsing netlist...
+***** Setting up topology...
+
+***** Device Count Summary ...
+       M level 1 (MOSFET level 1)             1
+       R level 1 (Resistor)                   2
+       V level 1 (Independent Voltage Source) 2
+       ----------------------------------------
+       Total Devices                          5
+***** Setting up matrix structure...
+***** Number of Unknowns = 6
+***** Initializing...
+
+------------------------------------------------------------
+Operating point information:
+Number of Independent Voltage Source models: 1
+          name V level 1 (Independent Voltage Source)
+          type                
+         level               1
+
+Number of Independent Voltage Source instances: 2
+          name             VDD            VIN
+         model V level 1 (Independent Voltage Source)V level 1 (Independent Voltage Source)
+             Z0             50             50
+            NUM              0              0
+   DCSOURCETYPE              6              6
+TRANSIENTSOURCETYPE              6              6
+             RB              1              1
+              V              0              0
+              T              0              0
+             FS              0              0
+           DATA                              
+        ACPHASE              0              0
+          ACMAG              0              1
+           PORT              0              0
+        TSAMPLE              0              0
+             TR              0              0
+             V0              0              0
+             TD              0              0
+            TD2              0              0
+             V1              0              0
+   ACSOURCETYPE              7              7
+            VLO              0              0
+           DCV0              5            1.2
+             TF              0              0
+              R              0              0
+             PW              0              0
+             FC              0              0
+             V2              0              0
+            PER              0              0
+            VHI              0              0
+             VA              0              0
+           FREQ              0              0
+          THETA              0              0
+            MDI              0              0
+           TAU2              0              0
+          PHASE              0              0
+            TD1              0              0
+           TAU1              0              0
+
+
+Number of MOSFET level 1 models: 1
+          name              NM
+          type            NMOS
+         level               1
+            TPG              0
+             AF              1
+           TNOM             27
+             UO            600
+             LD              0
+            TOX          1e-07
+             CJ              0
+
+            RSH              0
+             JS              0
+           CGBO              0
+             U0            600
+             KP         0.0001
+      TEMPMODEL           NONE
+           CJSW              0
+            VTO            0.5
+
+             KF              0
+              L         0.0001
+             FC            0.5
+            PHI            0.6
+            CBS              0
+             MJ            0.5
+            VT0            0.5
+          GAMMA              0
+
+              W         0.0001
+             IS          1e-14
+         LAMBDA           0.02
+            NSS              0
+           MJSW            0.5
+             RD              0
+           NSUB              0
+             RS              0
+
+            CBD              0
+           CGSO              0
+             PB            0.8
+           CGDO              0
+
+Number of MOSFET level 1 instances: 1
+          name              M1
+         model              NM
+            IC1              0
+            IC3              0
+              M              1
+            NRS              1
+            IC2              0
+              L          1e-06
+           TEMP             27
+          DTEMP              0
+              W          2e-05
+             PS              0
+             PD              0
+             AD              0
+             AS              0
+            OFF              0
+            NRD              1
+
+
+Number of Resistor models: 1
+          name R level 1 (Resistor)
+          type                
+         level               1
+            TC2              0
+         NARROW              0
+           DEFW          1e-05
+            TCE              0
+           TNOM             27
+            TC1              0
+              R              1
+
+            RSH              0
+
+Number of Resistor instances: 2
+          name              RD             RS
+         model R level 1 (Resistor)R level 1 (Resistor)
+            TCE              0              0
+            TC2              0              0
+              M              1              1
+              L              0              0
+          DTEMP              0              0
+              W          1e-05          1e-05
+           TEMP             27             27
+              R          10000            200
+            TC1              0              0
+
+------------------------------------------------------------
+
+***** Solution Summary *****
+	Number Successful Steps Taken:		121
+	Number Failed Steps Attempted:		0
+	Number Jacobians Evaluated:		4
+	Number Linear Solves:			4
+	Number Failed Linear Solves:		0
+	Number Residual Evaluations:		6
+	Number Nonlinear Convergence Failures:	0
+	Total Residual Load Time:		2.90871e-05 seconds
+	Total Jacobian Load Time:		7.86781e-06 seconds
+	Total Linear Solution Time:		7.29561e-05 seconds
+
+
+***** Total Simulation Solvers Run Time: 0.00366092 seconds
+***** Total Elapsed Run Time:            0.00588799 seconds
+*****
+***** End of Xyce(TM) Simulation
+*****
+
+Timing summary of 1 processor
+                 Stats                   Count       CPU Time              Wall Time
+---------------------------------------- ----- --------------------- ---------------------
+Xyce                                         1        0.027 (100.0%)        0.006 (100.0%)
+  Analysis                                   1        0.015 (55.11%)        0.004 (60.12%)
+    AC                                       1        0.015 (55.11%)        0.004 (59.99%)
+      DC Nonlinear Solve                     1        0.003 (12.12%)        0.000 ( 6.35%)
+        Residual                             6        0.001 ( 2.02%)        0.000 ( 0.69%)
+        Jacobian                             4        0.000 ( 0.71%)        0.000 ( 0.28%)
+        Linear Solve                         4        0.001 ( 3.69%)        0.000 ( 1.35%)
+      AC Linear Solve                      121        0.005 (18.97%)        0.001 (22.70%)
+        Linear Solve                       121        0.003 (11.14%)        0.001 (13.46%)
+  Netlist Import                             1        0.004 (15.56%)        0.001 (15.40%)
+    Parse Context                            1        0.001 ( 5.39%)        0.000 ( 1.98%)
+    Distribute Devices                       1        0.000 ( 0.31%)        0.000 ( 5.41%)
+    Verify Devices                           1        0.000 ( 0.20%)        0.000 ( 0.07%)
+    Instantiate                              1        0.001 ( 3.43%)        0.000 ( 1.28%)
+  Late Initialization                        1        0.002 ( 8.38%)        0.001 ( 9.05%)
+    Global Indices                           1        0.000 ( 1.36%)        0.000 ( 0.51%)
+  Setup Matrix Structure                     1        0.001 ( 4.44%)        0.000 ( 1.64%)
+

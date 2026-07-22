@@ -1,0 +1,8 @@
+* FV-008: include model-card compatibility smoke test
+.include simple-nmos-model.lib
+VDS d 0 DC 1
+VGS g 0 DC 0
+M1 d g 0 0 NM_INC L=1u W=10u
+.DC VGS 0 1.8 0.02
+.PRINT DC V(g) I(VDS)
+.END

@@ -1,0 +1,7 @@
+* FV-004: RC low-pass AC response
+V1 in 0 DC 0 AC 1
+R1 in out 1k
+C1 out 0 1n
+.AC DEC 20 1 1MEG
+.PRINT AC V(out)
+.END
