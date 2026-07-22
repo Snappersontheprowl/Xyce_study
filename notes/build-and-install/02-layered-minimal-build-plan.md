@@ -448,12 +448,18 @@ find "$xyce_install" -maxdepth 2 -type f | sort
 在一个明确的临时工作目录创建以下输入（文件名建议 `smoke-resistor.cir`）：
 
 ```spice
-Xyce smoke test: 1 V source and 1 kOhm resistor
+* Xyce smoke test: 1 V source and 1 kOhm resistor
 V1 1 0 DC 1
 R1 1 0 1k
 .OP
-.PRINT OP V(1) I(V1)
+.PRINT DC V(1) I(V1)
 .END
+```
+
+注意：Xyce 7.10 中，只有 `.OP` 而没有其它分析时，会创建 DC analysis 作为 primary analysis；因此打印行应使用 `.PRINT DC ...`。`.PRINT OP ...` 会触发：
+
+```text
+Analysis type OP and print type OP are inconsistent.
 ```
 
 运行：

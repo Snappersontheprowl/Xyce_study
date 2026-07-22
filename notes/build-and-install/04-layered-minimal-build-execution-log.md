@@ -2376,3 +2376,86 @@ Smoke simulation tested:       no
 上一轮由 Cadence BLAS 缺失 `srotm_` / `drotm_` / `srotmg_` / `drotmg_` 导致的最终链接失败已经解决。
 
 下一步进入阶段 6：安装 Xyce，并对安装前缀中的 `bin/Xyce` 做版本、动态依赖与最小 netlist 冒烟测试。
+
+## 2026-07-22：阶段 6A Xyce 安装与 installed binary 基本检查通过，第一次 smoke netlist 语法需修正
+
+### 用户反馈的安装后检查
+
+安装前缀中的 Xyce 可执行文件存在：
+
+```text
+Xyce installed binary exists
+```
+
+版本输出：
+
+```text
+Xyce Release 7.10.0-opensource
+```
+
+帮助输出正常：
+
+```text
+Usage: Xyce [arguments] netlist
+
+Arguments:
+  -b                          batch mode flag for spice compatibility (ignored)
+  -h                          print usage and exit
+  -v                          print version info and exit
+  -capabilities               print compiled-in options and exit
+```
+
+动态依赖已经绑定到 Mentor OpenBLAS，未显示 Cadence BLAS/LAPACK：
+
+```text
+libopenblas.so.0 => /opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so.0
+libgcc_s.so.1 => /lib64/libgcc_s.so.1
+libgfortran.so.5 => /lib64/libgfortran.so.5
+libquadmath.so.0 => /lib64/libquadmath.so.0
+```
+
+### 第一次 smoke netlist 失败
+
+第一次最小电阻网表为：
+
+```spice
+* Xyce smoke test: 1 V source through 1 kOhm resistor
+V1 1 0 1
+R1 1 0 1k
+.OP
+.PRINT OP V(1) I(V1)
+.END
+```
+
+Xyce 报错：
+
+```text
+Netlist error: Analysis type OP and print type OP are inconsistent.
+Simulation aborted due to error.  There are 0 MSG_FATAL errors and 1 MSG_ERROR errors
+```
+
+### 根因
+
+这是 smoke netlist 的打印类型写法错误，不是 Xyce 安装、链接或求解器问题。
+
+本地源码说明：如果没有其它 analysis，而 netlist 指定了 `.OP`，Xyce 会创建一个 DC analysis 作为 primary analysis：
+
+```text
+vendor/Xyce-7.10.0/src/AnalysisPKG/N_ANP_AnalysisManager.C
+```
+
+因此最小 `.OP` 冒烟测试应使用 `.PRINT DC ...`，不能使用 `.PRINT OP ...`。
+
+### 判断
+
+阶段 6A 的安装与 installed binary 基本检查通过：
+
+```text
+Xyce installed:               yes
+Installed binary runs:        yes
+Runtime BLAS/LAPACK provider: Mentor OpenBLAS
+Smoke netlist syntax:         failed, needs correction
+Smoke simulation tested:      no
+```
+
+下一步修正 smoke netlist 为 `.PRINT DC V(1) I(V1)` 后重跑。
