@@ -246,7 +246,7 @@ liblapack.so: dgeev_, dgesv_
 
 阶段 2B 未通过，需要带显式 BLAS/LAPACK 路径重新配置 SuiteSparse。
 
-当前推荐的临时路线是使用 Cadence IC231 自带 BLAS/LAPACK 作为本机可用数值库。后续 Trilinos 配置也应使用同一组 BLAS/LAPACK，避免 SuiteSparse 和 Trilinos 使用不同数值后端。
+当时的临时路线是使用 Cadence IC231 自带 BLAS/LAPACK 作为本机可用数值库。该结论已在本文件末尾的“数值库策略复核”中被更新：Cadence 库不再作为后续 Trilinos 的正式依赖。
 
 ## 2026-07-22：阶段 2B SuiteSparse 重新配置通过
 
@@ -306,8 +306,36 @@ libamd.so.3.3.3 links with libsuitesparseconfig.so.7.8.3 and -lm
 libamd.a is archived from AMD object files
 ```
 
-因此 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 的 unused warning 对当前 SuiteSparse 最小子集可接受。保留这两个变量的价值在于记录本轮统一数值库选择；后续 Trilinos 必须使用同一 Cadence IC231 BLAS/LAPACK。
+因此 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 的 unused warning 对当前 SuiteSparse 最小子集可接受。这两个 cache 变量未参与该子集链接；后续 Trilinos 不使用 Cadence 库，而改用项目专用 OpenBLAS，见本文件末尾的策略复核记录。
 
 ### 阶段判断
 
 阶段 2B 通过。可以进入阶段 2C：编译并安装 SuiteSparse。
+
+## 2026-07-22：数值库策略复核——从 Cadence 临时库切换至项目专用 OpenBLAS
+
+### 触发原因
+
+用户提出应否以更干净的方式提供 BLAS/LAPACK。复核发现，当前 SuiteSparse 的最小 `suitesparse_config + AMD` 子集并不链接先前传入的 Cadence BLAS/LAPACK；该路径仅用于使其顶层配置的 BLAS 探测通过。
+
+同时，Cadence IC231 的 `libblas.so`、`liblapack.so` 依赖 Cadence 安装树中的 `libgfortran.so.5`、`libquadmath.so.0`、`libgcc_s.so.1`。这会让最终 Trilinos/Xyce 的数值库运行时依赖一个项目外的 EDA 软件安装，降低可移植性与可追溯性。
+
+### 决策
+
+正式最小构建的数值库策略改为：使用 GCC Toolset 15 的 `gfortran` 构建固定版本的单线程 OpenBLAS（含 LAPACK），并安装到：
+
+```text
+out/deps/xyce-7.10-serial-release/
+```
+
+后续 Trilinos 的 `BLAS_LIBRARY_DIRS` 与 `LAPACK_LIBRARY_DIRS` 都应指向 OpenBLAS 安装目录，两个 library name 都为 `openblas`。这确保 BLAS、LAPACK、Fortran 运行时与 C/C++ 工具链都由同一项目依赖栈控制。
+
+Trilinos 仍保持 `Trilinos_ENABLE_Fortran=OFF`；OpenBLAS 构建使用 Fortran 只是为了提供 LAPACK，不会启用 Trilinos 的 Fortran 接口，也不会引入 MPI。
+
+### 对现有工作物的影响
+
+- 已成功配置的 SuiteSparse build tree 不需要删除或重配：Cadence 的 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 在该最小子集中未被消费。
+- SuiteSparse 可按原计划先完成 build/install。
+- 在配置 Trilinos 前，必须完成 OpenBLAS build/install，并验证 `libopenblas.so` 同时导出 `dgemm_` 与 `dgesv_`，且其运行时不解析到 Cadence 库。
+
+详细操作已更新至 [02-layered-minimal-build-plan.md](./02-layered-minimal-build-plan.md) 的“阶段 2.5”。
