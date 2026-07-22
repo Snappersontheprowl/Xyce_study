@@ -2,6 +2,17 @@ diff --git a/packages/aztecoo/src/az_aztec.h b/packages/aztecoo/src/az_aztec.h
 index 0829e35..fe673dc 100644
 --- a/packages/aztecoo/src/az_aztec.h
 +++ b/packages/aztecoo/src/az_aztec.h
+@@ -649,6 +649,10 @@ void PREFIX AZ_SLASWP_F77(int *, float *, int *, int *, int *, int *, int *);
+ 
+ void PREFIX AZ_SLAIC1_F77(int * , int *, float *, float *, float *, float *,
+ 			  float *, float *, float *);
++#else
++extern int AZ_DLASWP_F77(int *, double *, int *, int *, int *, int *, int *);
++extern int AZ_DLAIC1_F77(int *, int *, double *, double *, double *, double *,
++                         double *, double *, double *);
+ #endif /* FORTRAN_DISABLED */
+   /* Aztec function prototypes that can be called by the user */
+ 
 @@ -1502,6 +1502,9 @@ extern void MC64AD_F77(int *, int *, int *, int *, int *, double*,
                      int *, int *);
  

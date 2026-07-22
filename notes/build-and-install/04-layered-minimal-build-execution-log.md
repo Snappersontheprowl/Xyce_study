@@ -1282,3 +1282,86 @@ extern int AZ_DLAIC1_F77(int *, int *, double *, double *, double *, double *,
 ```bash
 cmake --build "$xyce_trilinos_build" --parallel 2
 ```
+
+## 2026-07-22：阶段 3C Trilinos AztecOO fallback 原型补丁已扩展
+
+### 用户确认
+
+用户确认：
+
+```text
+允许扩展 AztecOO fallback 原型补丁
+```
+
+### 实际修改
+
+已继续修补当前 Trilinos 源码树：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h
+```
+
+在 LAPACK auxiliary routine 声明块中，为 `FORTRAN_DISABLED` 分支补充 double-precision C fallback 原型：
+
+```c
+#else
+extern int AZ_DLASWP_F77(int *, double *, int *, int *, int *, int *, int *);
+extern int AZ_DLAIC1_F77(int *, int *, double *, double *, double *, double *,
+                         double *, double *, double *);
+#endif /* FORTRAN_DISABLED */
+```
+
+### 补丁理由
+
+当前构建关闭 Fortran：
+
+```cmake
+Trilinos_ENABLE_Fortran=OFF
+```
+
+因此：
+
+```c
+AZ_DLASWP_F77  -> az_dlaswp_c
+AZ_DLAIC1_F77  -> az_dlaic1_c
+```
+
+实际 C fallback 函数存在于：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_util.c
+```
+
+且返回类型为 `int`。补丁只补充函数原型，不改变算法实现。
+
+本次没有补充 `AZ_SLASWP_F77` / `AZ_SLAIC1_F77` 的 C fallback 原型，因为当前 `FORTRAN_DISABLED` 分支并未定义对应宏，源码中也未发现对应 C fallback 函数定义。
+
+### 可复现补丁
+
+已扩展同一个 AztecOO 补丁文件：
+
+```text
+notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+```
+
+该补丁现在覆盖两组 `FORTRAN_DISABLED` C fallback 原型：
+
+- `AZ_DLASWP_F77` / `AZ_DLAIC1_F77`
+- `AZ_FNROOT_F77` / `AZ_RCM_F77`
+
+如果将来重新解压 Trilinos 源码，可在源码根目录应用：
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+```
+
+### 下一步
+
+无需重新配置 Trilinos CMake。请继续执行：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
+
+若继续失败，仍然只回传第一处真实错误即可。
