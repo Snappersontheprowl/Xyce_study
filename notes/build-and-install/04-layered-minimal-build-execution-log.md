@@ -107,3 +107,87 @@ set(Trilinos_PACKAGE_LIST "TrilinosCouplings;ROL;Stokhos;NOX;Amesos2;Belos;Ifpac
 ### 当前源码状态
 
 只读检查未在 `artifacts/source/` 下发现 SuiteSparse 或 Trilinos 源码目录/归档。进入阶段 2 前，需要先获取 SuiteSparse 7.8.3 或更新版本的源码，并记录来源。
+
+## 2026-07-22：阶段 2A SuiteSparse 源码获取
+
+### 用户已执行
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study
+mkdir -p artifacts/source
+cd artifacts/source
+
+curl -L \
+  -o SuiteSparse-7.8.3.tar.gz \
+  https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.8.3.tar.gz
+
+sha256sum SuiteSparse-7.8.3.tar.gz
+tar -xf SuiteSparse-7.8.3.tar.gz
+test -d SuiteSparse-7.8.3 && echo "SuiteSparse source ready"
+
+find SuiteSparse-7.8.3 -maxdepth 2 -type f \( -name 'CMakeLists.txt' -o -name '*version*' -o -name '*Version*' \) | sort | head -n 40
+```
+
+### 观察结果
+
+源码归档下载完成：
+
+```text
+SuiteSparse-7.8.3.tar.gz
+```
+
+校验值：
+
+```text
+ce39b28d4038a09c14f21e02c664401be73c0cb96a9198418d6a98a7db73a259  SuiteSparse-7.8.3.tar.gz
+```
+
+解压目录存在：
+
+```text
+SuiteSparse source ready
+```
+
+源码树中存在顶层和关键子项目的 CMake 文件：
+
+```text
+SuiteSparse-7.8.3/CMakeLists.txt
+SuiteSparse-7.8.3/AMD/CMakeLists.txt
+SuiteSparse-7.8.3/SuiteSparse_config/CMakeLists.txt
+```
+
+### Codex 只读检查
+
+SuiteSparse 7.8.3 顶层 `CMakeLists.txt` 定义了：
+
+```cmake
+set ( SUITESPARSE_ENABLE_PROJECTS "all" CACHE STRING ... )
+```
+
+其中合法项目列表包含 `suitesparse_config` 和 `amd`。因此本计划中的最小项目选择是合法的：
+
+```bash
+-DSUITESPARSE_ENABLE_PROJECTS="suitesparse_config;amd"
+```
+
+版本信息：
+
+```text
+SuiteSparse_config: 7.8.3
+AMD: 3.3.3
+```
+
+SuiteSparse policy 文件显示：
+
+```cmake
+option ( SUITESPARSE_DEMOS ... OFF )
+option ( BUILD_SHARED_LIBS ... ON )
+option ( BUILD_STATIC_LIBS ... ON )
+option ( SUITESPARSE_USE_FORTRAN ... ON )
+```
+
+为保持最小构建，后续配置将显式关闭 Fortran 与 OpenMP，并显式保留 static/shared 产物。
+
+### 阶段判断
+
+阶段 2A 通过。可以进入 SuiteSparse CMake 配置，但先只配置并审查 `CMakeCache.txt`，不要直接编译。
