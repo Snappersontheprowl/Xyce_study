@@ -1571,3 +1571,98 @@ cmake --build "$xyce_trilinos_build" --parallel 2
 ```
 
 若继续失败，仍然只回传第一处真实错误即可。
+
+## 2026-07-22：阶段 3C Trilinos 编译通过，尚未安装
+
+### 用户反馈的结果
+
+使用更高并发重新执行 Trilinos build 后，构建到 100% 并完成最终目标：
+
+```text
+[100%] Built target stokhos_amesos2
+[100%] Built target trilinoscouplings
+```
+
+用户随后执行错误检索：
+
+```bash
+rg -n "error:|fatal error|undefined reference|collect2|ld:|Error [0-9]|FAILED" build/logs/trilinos-build-j8.log | head -n 40
+```
+
+未反馈任何错误输出。
+
+### Codex 只读复核
+
+日志错误检索无输出，说明 `trilinos-build-j8.log` 中未匹配到常见编译/链接错误模式。
+
+关键库已在 build tree 中生成：
+
+```text
+build/deps/xyce-7.10-serial-release/trilinos/packages/amesos2/src/libamesos2.a
+build/deps/xyce-7.10-serial-release/trilinos/packages/amesos/src/libamesos.a
+build/deps/xyce-7.10-serial-release/trilinos/packages/aztecoo/src/libaztecoo.a
+build/deps/xyce-7.10-serial-release/trilinos/packages/belos/src/libbelos.a
+build/deps/xyce-7.10-serial-release/trilinos/packages/epetraext/src/libepetraext.a
+build/deps/xyce-7.10-serial-release/trilinos/packages/nox/src/libnox.a
+build/deps/xyce-7.10-serial-release/trilinos/packages/trilinoscouplings/src/libtrilinoscouplings.a
+```
+
+但安装前缀中尚未出现新的 Trilinos CMake package 配置：
+
+```text
+out/deps/xyce-7.10-serial-release/lib/cmake/Trilinos/TrilinosConfig.cmake
+```
+
+检查结果：
+
+```text
+installed TrilinosConfig not present yet
+```
+
+### 判断
+
+阶段 3C 的 build 子步骤通过。
+
+当前状态是：
+
+```text
+Trilinos configured: yes
+Trilinos built:      yes
+Trilinos installed:  no
+```
+
+因此还不能进入 Xyce 配置阶段。Xyce 后续需要通过 install prefix 查找 Trilinos，因此必须先执行 Trilinos install。
+
+### 下一步
+
+进入阶段 3D：安装 Trilinos。
+
+建议继续保留日志：
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study
+
+mkdir -p build/logs
+
+set -o pipefail
+cmake --install "$xyce_trilinos_build" 2>&1 | tee build/logs/trilinos-install.log
+```
+
+安装完成后检查：
+
+```bash
+test -f "$xyce_deps_prefix/lib/cmake/Trilinos/TrilinosConfig.cmake" && echo "TrilinosConfig installed"
+
+rg -n 'Trilinos_VERSION|Trilinos_PACKAGE_LIST|Trilinos_(C|CXX)_COMPILER|Trilinos_ENABLE_Fortran|Trilinos_MPI_EXEC' \
+  "$xyce_deps_prefix/lib/cmake/Trilinos/TrilinosConfig.cmake"
+
+find "$xyce_deps_prefix" -maxdepth 4 -type f \( \
+  -name 'libtrilinoscouplings.*' -o \
+  -name 'libaztecoo.*' -o \
+  -name 'libnox.*' -o \
+  -name 'libamesos.*' -o \
+  -name 'libamesos2.*' -o \
+  -name 'libbelos.*' -o \
+  -name 'libepetraext.*' \
+\) | sort
+```
