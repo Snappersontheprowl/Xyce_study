@@ -2198,3 +2198,62 @@ No Cadence BLAS/LAPACK remains in Trilinos cache
 - Trilinos cache 中已经没有 Cadence BLAS/LAPACK 旧路径。
 
 下一步进入阶段 3F：重新 build/install Trilinos，使安装前缀中的 `TrilinosConfig.cmake` 也导出 OpenBLAS，而不是 Cadence BLAS/LAPACK。
+
+## 2026-07-22：阶段 3F Trilinos rebuild/install 后 installed config 基本复核通过
+
+### 用户反馈的 installed config 检查
+
+安装前缀中的 Trilinos CMake package 仍存在：
+
+```text
+out/deps/xyce-7.10-serial-release/lib/cmake/Trilinos/TrilinosConfig.cmake
+```
+
+关键内容：
+
+```cmake
+set(Trilinos_CXX_COMPILER "/opt/rh/gcc-toolset-15/root/usr/bin/g++")
+set(Trilinos_C_COMPILER "/opt/rh/gcc-toolset-15/root/usr/bin/gcc")
+set(Trilinos_VERSION "14.4")
+set(Trilinos_MPI_EXEC "")
+set(Trilinos_CXX_COMPILER_ID "GNU")
+set(Trilinos_C_COMPILER_ID "GNU")
+set(Trilinos_PACKAGE_LIST "TrilinosCouplings;ROL;Stokhos;NOX;Amesos2;Belos;Ifpack;Amesos;AztecOO;TrilinosSS;Tpetra;TpetraCore;EpetraExt;Triutils;Epetra;Sacado;KokkosKernels;Teuchos;TeuchosKokkosComm;TeuchosKokkosCompat;TeuchosRemainder;TeuchosNumerics;TeuchosComm;TeuchosParameterList;TeuchosParser;TeuchosCore;Kokkos")
+```
+
+### Codex 只读复核
+
+在安装前缀的 CMake 文件中未发现旧 Cadence 路径：
+
+```text
+/opt/cadence/IC231/tools.lnx86/lapack
+```
+
+`TrilinosConfig.cmake` 本身没有直接显示 OpenBLAS 路径；这说明不能只靠该文件判断最终链接行。最终验收应以下一步 Xyce 重新配置后生成的：
+
+```text
+build/xyce-7.10-serial-release/src/CMakeFiles/Xyce.dir/link.txt
+```
+
+为准。
+
+当前旧的 Xyce `link.txt` 仍然保留 Cadence BLAS/LAPACK，因为它是在切换 Trilinos TPL 之前生成的 CMake 产物：
+
+```text
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+```
+
+这不是 Trilinos 重配失败的证据，而是提示必须重新配置 Xyce，让其重新生成链接命令。
+
+### 判断
+
+阶段 3F 的 installed config 基本复核通过：
+
+- Trilinos 版本仍为 14.4；
+- 编译器仍为 GCC Toolset 15；
+- MPI 执行器为空，仍是 serial；
+- 包列表仍包含 Xyce 所需核心包；
+- 安装前缀中没有旧 Cadence BLAS/LAPACK 路径。
+
+下一步进入阶段 4B：重新配置 Xyce，并检查新的 `src/CMakeFiles/Xyce.dir/link.txt` 是否使用 Mentor OpenBLAS。
