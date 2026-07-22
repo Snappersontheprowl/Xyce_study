@@ -1883,3 +1883,107 @@ cmake -S "$xyce_source" -B "$xyce_build" \
 rg -n '^(CMAKE_(C|CXX)_COMPILER|CMAKE_BUILD_TYPE|CMAKE_INSTALL_PREFIX|Trilinos_(ROOT|DIR)|Xyce_(PARALLEL_MPI|USE_FFT|PLUGIN_SUPPORT|ADMS_MODELS|NEURON_MODELS|NONFREE_MODELS|RAD_MODELS|REGRESSION|TEST_BINARIES|GTEST_UNIT_TESTS)|BUILD_(TESTING|SHARED_LIBS)|FLEX_EXECUTABLE|FLEX_INCLUDE_DIR|BISON_EXECUTABLE)' \
   "$xyce_build/CMakeCache.txt"
 ```
+
+## 2026-07-22：阶段 4 Xyce 最小配置通过
+
+### 用户反馈的结果
+
+重新配置 Xyce 后，关键 CMake cache 输出如下：
+
+```cmake
+BISON_EXECUTABLE=/home/eda/.local/xyce-tools/bin/bison
+BUILD_SHARED_LIBS=OFF
+BUILD_TESTING=OFF
+CMAKE_BUILD_TYPE=Release
+CMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/g++
+CMAKE_C_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/gcc
+CMAKE_INSTALL_PREFIX=/home/eda/my_lab/projects/study/xyce_study/out/xyce-7.10-serial-release
+FLEX_EXECUTABLE=/home/eda/.local/xyce-tools/bin/flex
+FLEX_INCLUDE_DIR=/usr/include
+Trilinos_DIR=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib/cmake/Trilinos
+Trilinos_ROOT=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release
+Xyce_ADMS_MODELS=OFF
+Xyce_GTEST_UNIT_TESTS=OFF
+Xyce_NEURON_MODELS=OFF
+Xyce_NONFREE_MODELS=OFF
+Xyce_PARALLEL_MPI=OFF
+Xyce_PLUGIN_SUPPORT=OFF
+Xyce_RAD_MODELS=OFF
+Xyce_REGRESSION=OFF
+Xyce_TEST_BINARIES=OFF
+Xyce_USE_FFT=OFF
+```
+
+### Codex 只读复核
+
+Xyce build system 已生成：
+
+```text
+build/xyce-7.10-serial-release/Makefile
+```
+
+核心配置均符合本轮最小构建目标：
+
+- `Release`；
+- GCC toolset 15；
+- install prefix 为 `out/xyce-7.10-serial-release`；
+- Trilinos 指向 `out/deps/xyce-7.10-serial-release`；
+- serial：`Xyce_PARALLEL_MPI=OFF`；
+- FFT：`Xyce_USE_FFT=OFF`；
+- plugin：`Xyce_PLUGIN_SUPPORT=OFF`；
+- ADMS/Neuron/Nonfree/Rad 模型：均为 `OFF`；
+- 测试、测试二进制、回归、GTest：均为 `OFF`；
+- shared libs：`OFF`；
+- flex/bison 路径明确。
+
+只读扫描中出现：
+
+```text
+CMAKE_DLLTOOL=...-NOTFOUND
+FL_LIBRARY=...-NOTFOUND
+```
+
+判断：
+
+- `CMAKE_DLLTOOL-NOTFOUND` 对当前 Linux/GCC 非 Windows 构建不构成问题；
+- `FL_LIBRARY-NOTFOUND` 未阻断配置，且当前已显式设置 `FLEX_EXECUTABLE` 与 `FLEX_INCLUDE_DIR`。若后续链接阶段出现 flex 相关 undefined reference，再回到该点处理；当前不作为阶段 4 阻塞项。
+
+### 判断
+
+阶段 4 通过。
+
+当前状态：
+
+```text
+Xyce configured: yes
+Xyce minimal cache accepted: yes
+Xyce build allowed: yes
+```
+
+可以进入阶段 5：编译 Xyce。
+
+### 下一步
+
+建议使用并发 8，并保留日志：
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study
+
+mkdir -p build/logs
+
+set -o pipefail
+cmake --build "$xyce_build" --parallel 8 2>&1 | tee build/logs/xyce-build-j8.log
+```
+
+若失败，提取第一处真实错误：
+
+```bash
+rg -n "error:|fatal error|undefined reference|collect2|ld:|Error [0-9]|FAILED" build/logs/xyce-build-j8.log | head -n 60
+```
+
+若成功，检查：
+
+```bash
+test -x "$xyce_build/src/Xyce" && echo "Xyce build binary exists"
+"$xyce_build/src/Xyce" -h | head -n 30
+```
