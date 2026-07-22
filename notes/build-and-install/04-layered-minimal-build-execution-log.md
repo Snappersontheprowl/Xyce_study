@@ -925,3 +925,144 @@ cmake --build "$xyce_trilinos_build" --parallel 2
 ```
 
 若继续失败，仍然只回传第一处真实错误即可。
+
+## 2026-07-22：阶段 3C Trilinos 第二次编译失败，推进到 AztecOO
+
+### 用户反馈的结果
+
+应用 KokkosKernels `sort_option` 最小补丁后，Trilinos 编译已越过此前 19% 的 `kokkoskernels` 失败点，继续推进到约 41%。
+
+新的第一处真实错误位于 AztecOO：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h:611:42:
+error: implicit declaration of function ‘az_fnroot_c’ [-Wimplicit-function-declaration]
+
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h:613:42:
+error: implicit declaration of function ‘az_rcm_c’ [-Wimplicit-function-declaration]
+```
+
+触发编译单元：
+
+```text
+packages/aztecoo/src/CMakeFiles/aztecoo.dir/az_domain_decomp.c.o
+```
+
+最终失败目标：
+
+```text
+packages/aztecoo/src/CMakeFiles/aztecoo.dir/all
+```
+
+### Codex 只读复核
+
+相关宏位于：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h
+```
+
+在 `FORTRAN_DISABLED` 条件下，AztecOO 将 Fortran 例程名映射到 C fallback 函数：
+
+```c
+#else /* FORTRAN_DISABLED*/
+#   define AZ_FNROOT_F77                 az_fnroot_c
+#   define MC64AD_F77                    mc64ad_c
+#   define AZ_RCM_F77                    az_rcm_c
+#endif /* ndef FORTRAN_DISABLED */
+```
+
+但同一头文件中的外部函数声明只在未禁用 Fortran 时启用：
+
+```c
+#ifndef FORTRAN_DISABLED
+extern void AZ_FNROOT_F77(int *,int *,int *,int *, int *, int *, int *);
+extern void AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
+#endif /* ndef FORTRAN_DISABLED */
+```
+
+实际 C fallback 函数定义存在：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_reorder.c
+```
+
+对应函数：
+
+```c
+int az_rcm_c(integer *root, integer *xadj, integer *adjncy,
+             integer *mask, integer *perm, integer *ccsize, integer *deg)
+
+int az_fnroot_c(integer *root, integer *xadj, integer *adjncy,
+                integer *mask, integer *nlvl, integer *xls, integer *ls)
+```
+
+其中 `integer` 在该文件中为：
+
+```c
+typedef int integer;
+```
+
+因此在本构建的 `Trilinos_ENABLE_Fortran=OFF` 路径下，宏调用会落到 `az_fnroot_c` / `az_rcm_c`，但当前编译单元在调用前没有看到相应函数声明。GCC 15 将 implicit function declaration 视为错误，导致编译失败。
+
+### 判断
+
+阶段 3C 仍未通过，但已有正向推进：
+
+- KokkosKernels `sort_option` 补丁有效；
+- 当前失败点从 KokkosKernels 转移到 AztecOO；
+- 问题仍属于 Trilinos 14.4 老源码在新编译器下暴露的 C 声明完整性问题；
+- 不是 BLAS/LAPACK、SuiteSparse、MPI、Fortran 或链接问题。
+
+### 建议处置
+
+建议继续采用最小源码补丁：在 `FORTRAN_DISABLED` 分支下为 C fallback 函数补充外部声明。
+
+建议补丁位置：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_aztec.h
+```
+
+建议把声明区从：
+
+```c
+#ifndef FORTRAN_DISABLED
+extern void AZ_FNROOT_F77(int *,int *,int *,int *, int *, int *, int *);
+
+extern void MC64AD_F77(int *, int *, int *, int *, int *, double*,
+                    int *, int *, int *, int *, int *, double*,
+                    int *, int *);
+
+extern void AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
+#endif /* ndef FORTRAN_DISABLED */
+```
+
+调整为：
+
+```c
+#ifndef FORTRAN_DISABLED
+extern void AZ_FNROOT_F77(int *,int *,int *,int *, int *, int *, int *);
+
+extern void MC64AD_F77(int *, int *, int *, int *, int *, double*,
+                    int *, int *, int *, int *, int *, double*,
+                    int *, int *);
+
+extern void AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
+#else
+extern int AZ_FNROOT_F77(int *,int *,int *,int *, int *, int *, int *);
+extern int AZ_RCM_F77(int *, int *,int *, int *,int *, int *, int *);
+#endif /* ndef FORTRAN_DISABLED */
+```
+
+这里使用 `int` 返回类型，是为了匹配 `az_c_reorder.c` 中 f2c 生成的 C fallback 函数定义。当前调用点忽略返回值。
+
+### 下一步
+
+先暂停 Trilinos 编译。待确认是否允许对 AztecOO 头文件应用该第二个最小补丁。
+
+若确认应用补丁，补丁后仍无需重新配置 CMake，直接继续：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
