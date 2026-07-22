@@ -2520,3 +2520,155 @@ Minimal resistor smoke simulation: yes
 ```
 
 本轮 `serial + Release + static + no-plugin + no-FFT + no-test` 的 Xyce 7.10.0 最小分层构建与安装已完成。
+
+
+## 2026-07-22：安装可见性与多用户启动权限评估
+
+### 问题
+
+当前安装是否满足：
+
+```text
+所有用户都能在任意工作目录启动 Xyce
+```
+
+### 结论
+
+当前安装不是系统级公共安装，而是 `eda` 用户家目录下的项目内安装。
+
+```text
+eda 用户：可在任意工作目录用绝对路径启动；加入 PATH 后也可直接运行 Xyce
+其它用户：当前不可直接使用
+```
+
+### 只读检查依据
+
+当前安装的 Xyce binary：
+
+```text
+/home/eda/my_lab/projects/study/xyce_study/out/xyce-7.10-serial-release/bin/Xyce
+```
+
+可执行文件权限：
+
+```text
+-rwxr-xr-x eda eda Xyce
+```
+
+二进制文件的动态依赖与 RUNPATH：
+
+```text
+NEEDED:  libamd.so.3
+NEEDED:  libopenblas.so.0
+RUNPATH: $ORIGIN/../lib
+RUNPATH: /home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib64
+RUNPATH: /opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib
+```
+
+实际解析结果：
+
+```text
+libamd.so.3      => /home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib64/libamd.so.3
+libopenblas.so.0 => /opt/mentor/Calibre2023/aok_cal_2023.2_16.9/pkgs/icv.aok/julia/1.5/lib/libopenblas.so.0
+libgfortran.so.5 => /lib64/libgfortran.so.5
+libquadmath.so.0 => /lib64/libquadmath.so.0
+libgcc_s.so.1    => /lib64/libgcc_s.so.1
+```
+
+路径权限检查显示：
+
+```text
+/home      drwxr-xr-x root root
+/home/eda  drwx------ eda  eda
+```
+
+虽然 `/home/eda/my_lab` 及以下项目目录多为 `drwxrwxr-x`，但其它用户无法穿越 `/home/eda`。因此其它 Linux 用户无法访问当前 Xyce 可执行文件，也无法访问当前 RUNPATH 中的项目依赖：
+
+```text
+/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib64/libamd.so.3
+```
+
+### 对 `eda` 用户的使用方式
+
+`eda` 用户可以在任意工作目录用绝对路径启动：
+
+```bash
+/home/eda/my_lab/projects/study/xyce_study/out/xyce-7.10-serial-release/bin/Xyce -v
+```
+
+如果希望直接运行 `Xyce`，可在 `eda` 用户 shell 中加入：
+
+```bash
+export PATH="/home/eda/my_lab/projects/study/xyce_study/out/xyce-7.10-serial-release/bin:$PATH"
+```
+
+然后执行：
+
+```bash
+Xyce -v
+```
+
+### 当前安装的局限
+
+当前安装不适合作为全系统公共安装，原因有三点：
+
+1. 安装前缀位于 `/home/eda/...`，被 `/home/eda` 的 `700` 权限阻断；
+2. `libamd.so.3` 位于 `/home/eda/.../out/deps/.../lib64`，其它用户同样无法访问；
+3. `libopenblas.so.0` 来自 Mentor Calibre 安装树，虽然当前路径看起来对普通用户可读可执行，但这仍把 Xyce 运行时绑定到外部 EDA 软件安装树，不是完全自包含、可移植的 Xyce 安装。
+
+### 若需要所有用户可用
+
+不建议把 `/home/eda` 改成开放权限。更好的路线是做公共安装前缀，例如：
+
+```text
+/opt/xyce/7.10.0-serial-openblas
+/opt/xyce/deps/xyce-7.10-serial-openblas
+```
+
+或：
+
+```text
+/usr/local/xyce/7.10.0-serial-openblas
+/usr/local/xyce/deps/xyce-7.10-serial-openblas
+```
+
+推荐目录结构：
+
+```text
+/opt/xyce/
+├── 7.10.0-serial-openblas/
+│   ├── bin/Xyce
+│   ├── lib/
+│   └── share/
+├── deps/
+│   └── xyce-7.10-serial-openblas/
+│       ├── lib/
+│       ├── lib64/
+│       └── include/
+└── env/
+    └── xyce-7.10.0-serial-openblas.sh
+```
+
+公共安装完成后，应保证所有用户至少有读和路径穿越权限：
+
+```bash
+sudo chmod -R a+rX /opt/xyce
+```
+
+环境脚本示例：
+
+```bash
+# /opt/xyce/env/xyce-7.10.0-serial-openblas.sh
+export PATH="/opt/xyce/7.10.0-serial-openblas/bin:$PATH"
+```
+
+用户使用：
+
+```bash
+source /opt/xyce/env/xyce-7.10.0-serial-openblas.sh
+Xyce -v
+```
+
+如果目标是稳定的多用户公共安装，优先重新以公共 prefix 配置、安装 Trilinos 与 Xyce，使最终 `RUNPATH` 自然指向 `/opt/xyce/...`。单纯复制当前 `/home/eda/.../out` 目录到公共位置并不干净，因为当前 binary 已记录家目录中的 deps 路径。
+
+多用户场景下，BLAS/LAPACK 最干净的选择是系统 OpenBLAS/LAPACK 或公共前缀内的项目专用 OpenBLAS。继续依赖 Mentor OpenBLAS 可以作为本机务实 fallback，但需要确认所有目标用户都有读取 `/opt/mentor/...` 的权限，并接受对 Mentor 安装树的运行时依赖。
