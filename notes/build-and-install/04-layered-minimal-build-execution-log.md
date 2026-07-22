@@ -742,3 +742,122 @@ build/deps/xyce-7.10-serial-release/trilinos/CMakeFiles/CMakeConfigureLog.yaml
 ### 阶段判断
 
 阶段 3B 通过。可以进入阶段 3C：编译并安装 Trilinos。由于 Trilinos 较重，首轮仍使用 `--parallel 2`，失败时保留 build tree 并回传第一处错误。
+
+## 2026-07-22：阶段 3C Trilinos 首次编译失败
+
+### 用户反馈的结果
+
+执行 Trilinos 编译时，进度到约 19% 后失败：
+
+```text
+[ 19%] Building CXX object packages/kokkos-kernels/...
+```
+
+第一处真实错误位于 KokkosKernels：
+
+```text
+artifacts/source/Trilinos-14.4/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp:75:44:
+error: ‘class KokkosSparse::SPADDHandle<...>’ has no member named ‘sort_option’; did you mean ‘set_sort_option’? [-Wtemplate-body]
+
+artifacts/source/Trilinos-14.4/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp:77:40:
+error: ‘class KokkosSparse::SPADDHandle<...>’ has no member named ‘sort_option’; did you mean ‘set_sort_option’? [-Wtemplate-body]
+```
+
+最终失败目标：
+
+```text
+packages/kokkos-kernels/CMakeFiles/kokkoskernels.dir/all
+```
+
+### Codex 只读复核
+
+本地源码文件：
+
+```text
+artifacts/source/Trilinos-14.4/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp
+```
+
+在该类中可以看到：
+
+```cpp
+void set_sort_option(int option) { this->sort_option = option; }
+
+int get_sort_option() { return this->sort_option; }
+```
+
+但类的 private 成员区只有：
+
+```cpp
+bool input_sorted;
+size_type result_nnz_size;
+bool called_symbolic;
+bool called_numeric;
+nnz_lno_view_t a_pos;
+nnz_lno_view_t b_pos;
+```
+
+未定义 `sort_option` 成员。
+
+该问题与上游已知问题一致：
+
+- KokkosKernels issue: `error: no member named 'sort_option' in 'SPADDHandle'`
+- Trilinos issue: `Build fails with clang-19: no member named 'sort_option'...`
+
+虽然上游 issue 的触发编译器示例包含 Clang 19，但本次 GCC 15.2.1 也会在模板体检查阶段暴露同一缺陷。
+
+### 判断
+
+阶段 3C 未通过。
+
+这不是：
+
+- BLAS/LAPACK 配置问题；
+- SuiteSparse/AMD 安装问题；
+- MPI/Fortran 配置问题；
+- 链接阶段问题。
+
+这是 Trilinos 14.4 分支中内置 KokkosKernels 代码的源码级缺陷：成员函数访问了不存在的 `sort_option` 成员。
+
+### 建议处置
+
+首选采用最小源码补丁，而不是更换整个工具链或重配复杂 package 组合。
+
+建议补丁位置：
+
+```text
+artifacts/source/Trilinos-14.4/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp
+```
+
+建议补丁内容：
+
+```cpp
+private:
+  bool input_sorted;
+
+  size_type result_nnz_size;
+
+  bool called_symbolic;
+  bool called_numeric;
+  int sort_option;
+```
+
+并在构造函数初始化列表中补充：
+
+```cpp
+SPADDHandle(bool input_is_sorted)
+    : input_sorted(input_is_sorted),
+      result_nnz_size(0),
+      called_symbolic(false),
+      called_numeric(false),
+      sort_option(0) {}
+```
+
+### 下一步
+
+先暂停 Trilinos 编译。待确认是否允许对第三方源码树应用该最小补丁。
+
+若确认应用补丁，补丁后无需重新配置 CMake，直接重新执行：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
