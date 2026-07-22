@@ -633,3 +633,112 @@ tpetra
 ### 阶段判断
 
 阶段 3A 通过。可以进入阶段 3B：配置 Trilinos，但先只配置并审查 `CMakeCache.txt`，不要直接编译。
+
+## 2026-07-22：阶段 3B Trilinos 配置通过
+
+### 用户反馈的结果
+
+Trilinos CMake 配置完成：
+
+```text
+Finished configuring Trilinos!
+-- Configuring done (10.8s)
+-- Generating done (0.5s)
+-- Build files have been written to:
+   /home/eda/my_lab/projects/study/xyce_study/build/deps/xyce-7.10-serial-release/trilinos
+```
+
+### Cache 检查
+
+关键工具链与前缀：
+
+```cmake
+CMAKE_BUILD_TYPE=Release
+CMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/g++
+CMAKE_C_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/gcc
+CMAKE_INSTALL_PREFIX=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release
+Trilinos_ENABLE_Fortran=OFF
+```
+
+SuiteSparse/AMD：
+
+```cmake
+AMD_INCLUDE_DIRS=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/include/suitesparse
+AMD_LIBRARY_DIRS=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib64
+TPL_ENABLE_AMD=ON
+```
+
+Cadence BLAS/LAPACK fallback：
+
+```cmake
+BLAS_LIBRARY_DIRS=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit
+BLAS_LIBRARY_NAMES=blas
+LAPACK_LIBRARY_DIRS=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit
+LAPACK_LIBRARY_NAMES=lapack
+TPL_ENABLE_BLAS=ON
+TPL_ENABLE_LAPACK=ON
+```
+
+Serial mode:
+
+```cmake
+TPL_ENABLE_MPI=OFF
+```
+
+Xyce 需要的关键 Trilinos packages：
+
+```cmake
+Trilinos_ENABLE_Amesos=ON
+Trilinos_ENABLE_Amesos2=ON
+Trilinos_ENABLE_AztecOO=ON
+Trilinos_ENABLE_Belos=ON
+Trilinos_ENABLE_COMPLEX_DOUBLE=ON
+Trilinos_ENABLE_EpetraExt=ON
+Trilinos_ENABLE_Ifpack=ON
+Trilinos_ENABLE_NOX=ON
+Trilinos_ENABLE_ROL=ON
+Trilinos_ENABLE_Sacado=ON
+Trilinos_ENABLE_Stokhos=ON
+Trilinos_ENABLE_Teuchos=ON
+Trilinos_ENABLE_TrilinosCouplings=ON
+```
+
+### Codex 只读复核
+
+进一步确认 TPL 最终解析：
+
+```cmake
+TPL_AMD_INCLUDE_DIRS=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/include/suitesparse
+TPL_AMD_LIBRARIES=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib64/libamd.so
+TPL_BLAS_LIBRARIES=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+TPL_LAPACK_LIBRARIES=/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+TPL_AMD_NOT_FOUND=FALSE
+TPL_BLAS_NOT_FOUND=FALSE
+TPL_LAPACK_NOT_FOUND=FALSE
+```
+
+LAPACK 探测测试：
+
+```cmake
+LAPACK_SLAPY2_WORKS=1
+LAPACK_SLAPY2_WORKS_COMPILED=TRUE
+LAPACK_SLAPY2_WORKS_EXITCODE=0
+```
+
+CMake 生成了顶层 Makefile：
+
+```text
+build/deps/xyce-7.10-serial-release/trilinos/Makefile
+```
+
+日志位置：
+
+```text
+build/deps/xyce-7.10-serial-release/trilinos/CMakeFiles/CMakeConfigureLog.yaml
+```
+
+未发现旧式 `CMakeError.log` / `CMakeOutput.log`，这不构成失败。
+
+### 阶段判断
+
+阶段 3B 通过。可以进入阶段 3C：编译并安装 Trilinos。由于 Trilinos 较重，首轮仍使用 `--parallel 2`，失败时保留 build tree 并回传第一处错误。
