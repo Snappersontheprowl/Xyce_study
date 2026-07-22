@@ -1767,3 +1767,119 @@ xyce_trilinos_prefix="$xyce_deps_prefix"
 ```
 
 然后配置 Xyce，并仅检查 CMake cache，不要直接编译。
+
+## 2026-07-22：阶段 4 Xyce 首次配置完成，但需修正最小开关
+
+### 用户反馈的结果
+
+Xyce CMake 配置已经生成 `CMakeCache.txt`，关键 cache 输出如下：
+
+```cmake
+BISON_EXECUTABLE=/home/eda/.local/xyce-tools/bin/bison
+BUILD_SHARED_LIBS=OFF
+BUILD_TESTING=OFF
+CMAKE_BUILD_TYPE=Release
+CMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/g++
+CMAKE_C_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/gcc
+CMAKE_INSTALL_PREFIX=/home/eda/my_lab/projects/study/xyce_study/out/xyce-7.10-serial-release
+FLEX_EXECUTABLE=/home/eda/.local/xyce-tools/bin/flex
+Trilinos_DIR=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release/lib/cmake/Trilinos
+Trilinos_ROOT=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release
+Xyce_PARALLEL_MPI=OFF
+Xyce_PLUGIN_SUPPORT=OFF
+Xyce_REGRESSION=OFF
+Xyce_USE_FFT=OFF
+```
+
+### 通过项
+
+以下项目符合本轮目标：
+
+- 构建类型为 `Release`；
+- C/C++ 编译器均为 GCC toolset 15；
+- Xyce 安装前缀为本项目专属 `out/xyce-7.10-serial-release`；
+- Trilinos 指向刚安装的本项目依赖前缀；
+- `Xyce_PARALLEL_MPI=OFF`；
+- `Xyce_USE_FFT=OFF`；
+- `Xyce_PLUGIN_SUPPORT=OFF`；
+- `BUILD_TESTING=OFF`；
+- `BUILD_SHARED_LIBS=OFF`；
+- flex/bison 指向本项目工具路径。
+
+CMake build system 已生成：
+
+```text
+build/xyce-7.10-serial-release/Makefile
+```
+
+### 需修正项
+
+进一步只读复核发现，以下选项不符合“最小配置”口径：
+
+```cmake
+Xyce_ADMS_MODELS=TRUE
+Xyce_NEURON_MODELS=TRUE
+Xyce_TEST_BINARIES=ON
+```
+
+原因：
+
+- `Xyce_TEST_BINARIES` 在 Xyce 7.10 的 `feature_modes.cmake` 中默认 `ON`，会执行 `add_subdirectory(src/test)`；
+- `Xyce_ADMS_MODELS` 和 `Xyce_NEURON_MODELS` 在对应源码目录存在时默认 `TRUE`；
+- 当前源码树中确实存在：
+
+```text
+vendor/Xyce-7.10.0/src/DeviceModelPKG/ADMS
+vendor/Xyce-7.10.0/src/DeviceModelPKG/NeuronModels
+```
+
+这不是配置失败，但它偏离了本轮的“serial + Release + no-plugin + no-FFT + no-test + minimal model surface”目标。
+
+### 判断
+
+阶段 4 尚不通过。
+
+当前状态是：
+
+```text
+Xyce configured: yes
+Xyce minimal cache accepted: no
+Xyce build allowed: no
+```
+
+不要直接编译。需要在同一个 Xyce build tree 上重新运行 CMake，显式关闭这些默认开启的可选组件。
+
+### 修正命令
+
+建议重新执行配置命令，补充最小开关：
+
+```bash
+cmake -S "$xyce_source" -B "$xyce_build" \
+  -DCMAKE_BUILD_TYPE=Release \
+  -DCMAKE_C_COMPILER="$xyce_cc" \
+  -DCMAKE_CXX_COMPILER="$xyce_cxx" \
+  -DCMAKE_INSTALL_PREFIX="$xyce_install" \
+  -DTrilinos_ROOT="$xyce_trilinos_prefix" \
+  -DXyce_PARALLEL_MPI=OFF \
+  -DXyce_USE_FFT=OFF \
+  -DXyce_PLUGIN_SUPPORT=OFF \
+  -DXyce_ADMS_MODELS=OFF \
+  -DXyce_NEURON_MODELS=OFF \
+  -DXyce_NONFREE_MODELS=OFF \
+  -DXyce_RAD_MODELS=OFF \
+  -DBUILD_TESTING=OFF \
+  -DXyce_TEST_BINARIES=OFF \
+  -DXyce_REGRESSION=OFF \
+  -DXyce_GTEST_UNIT_TESTS=OFF \
+  -DBUILD_SHARED_LIBS=OFF \
+  -DFLEX_EXECUTABLE=/home/eda/.local/xyce-tools/bin/flex \
+  -DFLEX_INCLUDE_DIR=/usr/include \
+  -DBISON_EXECUTABLE=/home/eda/.local/xyce-tools/bin/bison
+```
+
+然后复查：
+
+```bash
+rg -n '^(CMAKE_(C|CXX)_COMPILER|CMAKE_BUILD_TYPE|CMAKE_INSTALL_PREFIX|Trilinos_(ROOT|DIR)|Xyce_(PARALLEL_MPI|USE_FFT|PLUGIN_SUPPORT|ADMS_MODELS|NEURON_MODELS|NONFREE_MODELS|RAD_MODELS|REGRESSION|TEST_BINARIES|GTEST_UNIT_TESTS)|BUILD_(TESTING|SHARED_LIBS)|FLEX_EXECUTABLE|FLEX_INCLUDE_DIR|BISON_EXECUTABLE)' \
+  "$xyce_build/CMakeCache.txt"
+```

@@ -355,7 +355,12 @@ cmake -S "$xyce_source" -B "$xyce_build" \
   -DXyce_PARALLEL_MPI=OFF \
   -DXyce_USE_FFT=OFF \
   -DXyce_PLUGIN_SUPPORT=OFF \
+  -DXyce_ADMS_MODELS=OFF \
+  -DXyce_NEURON_MODELS=OFF \
+  -DXyce_NONFREE_MODELS=OFF \
+  -DXyce_RAD_MODELS=OFF \
   -DBUILD_TESTING=OFF \
+  -DXyce_TEST_BINARIES=OFF \
   -DXyce_REGRESSION=OFF \
   -DXyce_GTEST_UNIT_TESTS=OFF \
   -DBUILD_SHARED_LIBS=OFF \
@@ -371,7 +376,7 @@ cmake -S "$xyce_source" -B "$xyce_build" \
 在发起编译前逐项检查：
 
 ```sh
-rg -n '^(CMAKE_(C|CXX)_COMPILER|CMAKE_BUILD_TYPE|CMAKE_INSTALL_PREFIX|Trilinos_(ROOT|DIR)|Xyce_(PARALLEL_MPI|USE_FFT|PLUGIN_SUPPORT|REGRESSION)|BUILD_(TESTING|SHARED_LIBS)|FLEX_EXECUTABLE|BISON_EXECUTABLE)' \
+rg -n '^(CMAKE_(C|CXX)_COMPILER|CMAKE_BUILD_TYPE|CMAKE_INSTALL_PREFIX|Trilinos_(ROOT|DIR)|Xyce_(PARALLEL_MPI|USE_FFT|PLUGIN_SUPPORT|ADMS_MODELS|NEURON_MODELS|NONFREE_MODELS|RAD_MODELS|REGRESSION|TEST_BINARIES|GTEST_UNIT_TESTS)|BUILD_(TESTING|SHARED_LIBS)|FLEX_EXECUTABLE|FLEX_INCLUDE_DIR|BISON_EXECUTABLE)' \
   "$xyce_build/CMakeCache.txt"
 ```
 
@@ -382,7 +387,7 @@ rg -n '^(CMAKE_(C|CXX)_COMPILER|CMAKE_BUILD_TYPE|CMAKE_INSTALL_PREFIX|Trilinos_(
 - 新的、专属的安装前缀；
 - 正确的 Trilinos 前缀；
 - `Xyce_PARALLEL_MPI=OFF`；
-- FFT、插件、测试、回归、共享库均为 `OFF`；
+- FFT、插件、ADMS 模型、Neuron 模型、测试二进制、回归、共享库均为 `OFF`；
 - flex 与 bison 的实际可执行文件路径。
 
 若任何一项不同，删除的只能是这个新建的、已确认归属的 `xyce_build` 目录；修正参数后重新配置。不得修改旧的裸 `build/` 目录来“试试”。
