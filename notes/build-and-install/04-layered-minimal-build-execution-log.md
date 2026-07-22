@@ -246,7 +246,7 @@ liblapack.so: dgeev_, dgesv_
 
 阶段 2B 未通过，需要带显式 BLAS/LAPACK 路径重新配置 SuiteSparse。
 
-当时的临时路线是使用 Cadence IC231 自带 BLAS/LAPACK 作为本机可用数值库。该结论已在本文件末尾的“数值库策略复核”中被更新：Cadence 库不再作为后续 Trilinos 的正式依赖。
+当时的临时路线是使用 Cadence IC231 自带 BLAS/LAPACK 作为本机可用数值库。后续复核认为更干净路线应优先使用系统 BLAS/LAPACK 或项目专用 OpenBLAS；但由于当前缺少可用的 GCC Toolset 15 `gfortran`，本轮最小构建接受 Cadence 路线作为显式 fallback。
 
 ## 2026-07-22：阶段 2B SuiteSparse 重新配置通过
 
@@ -306,13 +306,13 @@ libamd.so.3.3.3 links with libsuitesparseconfig.so.7.8.3 and -lm
 libamd.a is archived from AMD object files
 ```
 
-因此 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 的 unused warning 对当前 SuiteSparse 最小子集可接受。这两个 cache 变量未参与该子集链接；后续 Trilinos 不使用 Cadence 库，而改用项目专用 OpenBLAS，见本文件末尾的策略复核记录。
+因此 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 的 unused warning 对当前 SuiteSparse 最小子集可接受。这两个 cache 变量未参与该子集链接；后续 Trilinos 将显式使用同一组 Cadence IC231 BLAS/LAPACK fallback，见本文件末尾的策略复核记录。
 
 ### 阶段判断
 
 阶段 2B 通过。可以进入阶段 2C：编译并安装 SuiteSparse。
 
-## 2026-07-22：数值库策略复核——从 Cadence 临时库切换至项目专用 OpenBLAS
+## 2026-07-22：数值库策略复核——本轮接受 Cadence fallback
 
 ### 触发原因
 
@@ -322,20 +322,40 @@ libamd.a is archived from AMD object files
 
 ### 决策
 
-正式最小构建的数值库策略改为：使用 GCC Toolset 15 的 `gfortran` 构建固定版本的单线程 OpenBLAS（含 LAPACK），并安装到：
+更干净的优先级仍是：
 
-```text
-out/deps/xyce-7.10-serial-release/
+1. 系统包提供的 OpenBLAS/LAPACK 开发库；
+2. 项目本地前缀中用同一 GCC Toolset 构建的 OpenBLAS/LAPACK；
+3. Cadence IC231 自带 BLAS/LAPACK fallback。
+
+用户随后检查：
+
+```bash
+test -x /opt/rh/gcc-toolset-15/root/usr/bin/gfortran && \
+  /opt/rh/gcc-toolset-15/root/usr/bin/gfortran --version | head -n 1
+
+dnf list available 'gcc-toolset-15*gfortran*' 'gcc-toolset-15*fortran*'
 ```
 
-后续 Trilinos 的 `BLAS_LIBRARY_DIRS` 与 `LAPACK_LIBRARY_DIRS` 都应指向 OpenBLAS 安装目录，两个 library name 都为 `openblas`。这确保 BLAS、LAPACK、Fortran 运行时与 C/C++ 工具链都由同一项目依赖栈控制。
+第一条没有输出，说明当前没有 GCC Toolset 15 `gfortran`。第二条被外部 `nodesource-nodejs` 仓库元数据下载错误阻断：
 
-Trilinos 仍保持 `Trilinos_ENABLE_Fortran=OFF`；OpenBLAS 构建使用 Fortran 只是为了提供 LAPACK，不会启用 Trilinos 的 Fortran 接口，也不会引入 MPI。
+```text
+Error: Failed to download metadata for repo 'nodesource-nodejs'
+```
+
+因此本轮不再强制新增项目专用 OpenBLAS 层。正式最小构建接受 Cadence IC231 自带 BLAS/LAPACK 作为显式 fallback，并在后续 Trilinos 配置中统一使用：
+
+```text
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+```
+
+Trilinos 仍保持 `Trilinos_ENABLE_Fortran=OFF`；使用 Cadence BLAS/LAPACK 不表示启用 Trilinos 的 Fortran 接口，也不会引入 MPI。
 
 ### 对现有工作物的影响
 
 - 已成功配置的 SuiteSparse build tree 不需要删除或重配：Cadence 的 `BLAS_LIBRARIES`、`LAPACK_LIBRARIES` 在该最小子集中未被消费。
 - SuiteSparse 可按原计划先完成 build/install。
-- 在配置 Trilinos 前，必须完成 OpenBLAS build/install，并验证 `libopenblas.so` 同时导出 `dgemm_` 与 `dgesv_`，且其运行时不解析到 Cadence 库。
+- 在配置 Trilinos 前，需要复核并记录 Cadence BLAS/LAPACK 的符号和运行时依赖。
 
 详细操作已更新至 [02-layered-minimal-build-plan.md](./02-layered-minimal-build-plan.md) 的“阶段 2.5”。
