@@ -359,3 +359,91 @@ Trilinos 仍保持 `Trilinos_ENABLE_Fortran=OFF`；使用 Cadence BLAS/LAPACK �
 - 在配置 Trilinos 前，需要复核并记录 Cadence BLAS/LAPACK 的符号和运行时依赖。
 
 详细操作已更新至 [02-layered-minimal-build-plan.md](./02-layered-minimal-build-plan.md) 的“阶段 2.5”。
+
+## 2026-07-22：阶段 2C SuiteSparse 编译与安装通过
+
+### 用户反馈的结果
+
+SuiteSparse build 完成，最终目标均构建成功：
+
+```text
+[ 98%] Linking C static library libamd.a
+[100%] Linking C shared library libamd.so
+[100%] Built target AMD_static
+[100%] Built target AMD
+```
+
+安装命令：
+
+```bash
+cmake --install "$xyce_suitesparse_build"
+```
+
+安装前缀：
+
+```text
+/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release
+```
+
+### 安装产物
+
+已安装 SuiteSparse_config：
+
+```text
+lib64/libsuitesparseconfig.so.7.8.3
+lib64/libsuitesparseconfig.so.7
+lib64/libsuitesparseconfig.so
+lib64/libsuitesparseconfig.a
+include/suitesparse/SuiteSparse_config.h
+lib64/cmake/SuiteSparse_config/SuiteSparse_configConfig.cmake
+lib64/cmake/SuiteSparse_config/SuiteSparse_configConfigVersion.cmake
+lib64/pkgconfig/SuiteSparse_config.pc
+```
+
+已安装 AMD：
+
+```text
+lib64/libamd.so.3.3.3
+lib64/libamd.so.3
+lib64/libamd.so
+lib64/libamd.a
+include/suitesparse/amd.h
+lib64/cmake/AMD/AMDConfig.cmake
+lib64/cmake/AMD/AMDConfigVersion.cmake
+lib64/pkgconfig/AMD.pc
+```
+
+验收检查通过：
+
+```text
+libamd.a ready
+AMDConfig ready
+SuiteSparse_configConfig ready
+```
+
+### Codex 只读复核
+
+复核确认以下关键文件存在：
+
+```text
+out/deps/xyce-7.10-serial-release/include/suitesparse/amd.h
+out/deps/xyce-7.10-serial-release/include/suitesparse/SuiteSparse_config.h
+out/deps/xyce-7.10-serial-release/lib64/cmake/AMD/AMDConfig.cmake
+out/deps/xyce-7.10-serial-release/lib64/cmake/SuiteSparse_config/SuiteSparse_configConfig.cmake
+out/deps/xyce-7.10-serial-release/lib64/libamd.a
+out/deps/xyce-7.10-serial-release/lib64/libamd.so.3.3.3
+out/deps/xyce-7.10-serial-release/lib64/libsuitesparseconfig.a
+out/deps/xyce-7.10-serial-release/lib64/libsuitesparseconfig.so.7.8.3
+```
+
+SuiteSparse build tree 中已生成：
+
+```text
+build/deps/xyce-7.10-serial-release/suitesparse/install_manifest.txt
+```
+
+### 阶段判断
+
+阶段 2C 通过。SuiteSparse 最小子集 `suitesparse_config + AMD` 已经安装到目标依赖前缀。
+
+下一阶段是 2.5：在进入 Trilinos 前，复核 Cadence IC231 BLAS/LAPACK fallback 的路径、符号和运行时依赖。
