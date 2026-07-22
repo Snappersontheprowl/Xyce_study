@@ -1365,3 +1365,122 @@ cmake --build "$xyce_trilinos_build" --parallel 2
 ```
 
 若继续失败，仍然只回传第一处真实错误即可。
+
+## 2026-07-22：阶段 3C Trilinos 第四次编译失败，AztecOO `az_c_util.c` 缺少 BLAS `sswap_` 原型
+
+### 用户反馈的结果
+
+应用扩展后的 AztecOO fallback 原型补丁后，Trilinos 编译继续推进。
+
+新的第一处真实错误：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_util.c:58:35:
+error: implicit declaration of function ‘sswap_’; did you mean ‘sswap_c’? [-Wimplicit-function-declaration]
+```
+
+触发编译单元：
+
+```text
+packages/aztecoo/src/CMakeFiles/aztecoo.dir/az_c_util.c.o
+```
+
+实际调用点：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_util.c:1148
+```
+
+构建日志显示其他目标仍继续向前，例如 Tpetra 已推进到约 52%：
+
+```text
+[52%] Building CXX object packages/tpetra/core/src/CMakeFiles/tpetra.dir/...
+```
+
+### Codex 只读复核
+
+`az_c_util.c` 顶部定义了 BLAS 符号名宏：
+
+```c
+#define SSWAP_F77 F77_BLAS_MANGLE(sswap,SSWAP)
+```
+
+在当前生成的配置中：
+
+```c
+#define F77_BLAS_MANGLE(name,NAME) name ## _
+```
+
+因此：
+
+```c
+SSWAP_F77 -> sswap_
+```
+
+Cadence BLAS 中存在该符号：
+
+```text
+0000000000087d80 T sswap_
+```
+
+但 `az_slaswp_c` 函数内部的局部声明写成了：
+
+```c
+extern /* Subroutine */ int sswap_c(integer *, real *, integer *, real *, integer *);
+```
+
+实际调用却是：
+
+```c
+SSWAP_F77(n, &a[i__ + a_dim1], lda, &a[ip + a_dim1], lda);
+```
+
+也就是说，声明的是 `sswap_c`，调用的是 `SSWAP_F77`，后者展开为 `sswap_`。GCC 15 在看到 `sswap_` 调用时没有对应原型，于是报 implicit function declaration。
+
+### 判断
+
+阶段 3C 仍未通过。
+
+这次问题和前几次仍然属于同一大类：Trilinos 14.4 / AztecOO 老 C/F2C 兼容代码在新编译器下暴露出声明不完整或声明名不一致的问题。
+
+但这次细节略有不同：
+
+- 前几次是 `FORTRAN_DISABLED` 下 C fallback 函数存在，但头文件没有暴露原型；
+- 这次是 `az_c_util.c` 局部声明写成了 `sswap_c`，而实际调用走 `SSWAP_F77` 宏，即真实 BLAS 符号 `sswap_`；
+- BLAS 符号本身存在，不是 BLAS 库缺失。
+
+### 建议处置
+
+建议继续采用最小源码补丁：把 `az_c_util.c` 中 `az_slaswp_c` 函数内的局部 extern 声明从 `sswap_c` 改为 `SSWAP_F77`。
+
+建议补丁位置：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_util.c
+```
+
+建议把：
+
+```c
+extern /* Subroutine */ int sswap_c(integer *, real *, integer *, real *,
+  integer *);
+```
+
+改成：
+
+```c
+extern /* Subroutine */ int SSWAP_F77(integer *, real *, integer *, real *,
+  integer *);
+```
+
+这样声明和调用会通过同一个宏名 `SSWAP_F77` 绑定到 `sswap_`，与当前 BLAS name mangling 一致。
+
+### 下一步
+
+先暂停 Trilinos 编译。待确认是否允许应用 AztecOO `az_c_util.c` 的 `SSWAP_F77` 最小补丁。
+
+若确认应用补丁，补丁后仍无需重新配置 CMake，直接继续：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
