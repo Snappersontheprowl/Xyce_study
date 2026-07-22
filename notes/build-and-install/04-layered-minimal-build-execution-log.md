@@ -527,3 +527,109 @@ LAPACK_LIBRARY_NAMES=lapack
 ```
 
 下一阶段是阶段 3：准备并配置 Trilinos 14.4。
+
+## 2026-07-22：阶段 3A Trilinos 14.4 源码获取
+
+### 用户已执行
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source
+
+curl -L \
+  -o Trilinos-14.4.zip \
+  https://github.com/trilinos/Trilinos/archive/refs/heads/trilinos-release-14-4-branch.zip
+
+wget --no-check-certificate \
+  https://github.com/trilinos/Trilinos/archive/refs/heads/trilinos-release-14-4-branch.zip \
+  -O Trilinos-14.4.zip
+
+sha256sum Trilinos-14.4.zip
+unzip -q Trilinos-14.4.zip
+
+if test -d Trilinos-trilinos-release-14-4-branch; then
+  mv Trilinos-trilinos-release-14-4-branch Trilinos-14.4
+fi
+
+test -d Trilinos-14.4 && echo "Trilinos source ready"
+
+find Trilinos-14.4 -maxdepth 2 -type f \( \
+  -name 'CMakeLists.txt' -o \
+  -name 'Version.cmake' -o \
+  -name '*Version*' -o \
+  -name 'Trilinos_version.h.in' \
+\) | sort | head -n 60
+```
+
+### 观察结果
+
+`curl` 首次下载失败：
+
+```text
+curl: (35) OpenSSL SSL_connect: SSL_ERROR_SYSCALL in connection to github.com:443
+```
+
+随后 `wget --no-check-certificate` 成功下载：
+
+```text
+Trilinos-14.4.zip saved [231528416]
+```
+
+校验值：
+
+```text
+ab3d0d1cc73be4bc3c92c6a991b66ada89fcd6a59663c47c079592b497c3d1f3  Trilinos-14.4.zip
+```
+
+解压目录存在：
+
+```text
+Trilinos source ready
+```
+
+关键文件存在：
+
+```text
+Trilinos-14.4/CMakeLists.txt
+Trilinos-14.4/Version.cmake
+```
+
+### Codex 只读复核
+
+`Version.cmake` 中的版本信息：
+
+```cmake
+SET(Trilinos_VERSION 14.4)
+SET(Trilinos_MAJOR_VERSION 14)
+SET(Trilinos_MAJOR_MINOR_VERSION 140400)
+SET(Trilinos_VERSION_STRING "14.4")
+SET(Trilinos_REPOSITORY_BRANCH "trilinos-release-14-4-branch" CACHE INTERNAL "")
+```
+
+源码树中存在关键目录：
+
+```text
+Trilinos-14.4/cmake
+Trilinos-14.4/commonTools
+Trilinos-14.4/packages
+```
+
+Xyce 所需关键 package 目录存在：
+
+```text
+amesos
+amesos2
+aztecoo
+belos
+epetraext
+ifpack
+nox
+rol
+sacado
+stokhos
+teuchos
+tpetra
+```
+
+### 阶段判断
+
+阶段 3A 通过。可以进入阶段 3B：配置 Trilinos，但先只配置并审查 `CMakeCache.txt`，不要直接编译。
