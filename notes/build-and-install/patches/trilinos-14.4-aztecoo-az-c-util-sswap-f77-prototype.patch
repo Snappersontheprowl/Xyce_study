@@ -1,0 +1,13 @@
+diff --git a/packages/aztecoo/src/az_c_util.c b/packages/aztecoo/src/az_c_util.c
+index ee03d34..6c57296 100644
+--- a/packages/aztecoo/src/az_c_util.c
++++ b/packages/aztecoo/src/az_c_util.c
+@@ -1064,7 +1064,7 @@ int az_slaswp_c(integer *n, real *a, integer *lda, integer *
+ 
+   /* Local variables */
+   static integer i__, ip, ix;
+-  extern /* Subroutine */ int sswap_c(integer *, real *, integer *, real *, 
++  extern /* Subroutine */ int SSWAP_F77(integer *, real *, integer *, real *, 
+     integer *);
+ 
+ 

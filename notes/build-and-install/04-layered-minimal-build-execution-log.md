@@ -1484,3 +1484,90 @@ extern /* Subroutine */ int SSWAP_F77(integer *, real *, integer *, real *,
 ```bash
 cmake --build "$xyce_trilinos_build" --parallel 2
 ```
+
+## 2026-07-22：阶段 3C Trilinos AztecOO `az_c_util.c` `SSWAP_F77` 最小补丁已应用
+
+### 用户确认
+
+用户确认：
+
+```text
+允许应用 AztecOO az_c_util.c SSWAP_F77 最小补丁
+```
+
+### 实际修改
+
+已修补当前 Trilinos 源码树：
+
+```text
+artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_util.c
+```
+
+将 `az_slaswp_c` 内部局部 extern 声明从：
+
+```c
+extern /* Subroutine */ int sswap_c(integer *, real *, integer *, real *,
+  integer *);
+```
+
+改为：
+
+```c
+extern /* Subroutine */ int SSWAP_F77(integer *, real *, integer *, real *,
+  integer *);
+```
+
+### 补丁理由
+
+`az_c_util.c` 中定义：
+
+```c
+#define SSWAP_F77 F77_BLAS_MANGLE(sswap,SSWAP)
+```
+
+当前配置中：
+
+```c
+#define F77_BLAS_MANGLE(name,NAME) name ## _
+```
+
+因此 `SSWAP_F77` 展开为 BLAS 符号：
+
+```c
+sswap_
+```
+
+而实际调用也使用：
+
+```c
+SSWAP_F77(...)
+```
+
+原源码声明的是 `sswap_c`，和实际调用符号不一致。改为声明 `SSWAP_F77` 后，声明和调用都经由同一个宏展开，避免 GCC 15 报 `sswap_` implicit declaration。
+
+### 可复现补丁
+
+由于 `artifacts/source/*` 被 `.gitignore` 忽略，当前源码树中的改动不会自然进入 git 跟踪。
+
+为保证后续可复现，已保存补丁文件：
+
+```text
+notes/build-and-install/patches/trilinos-14.4-aztecoo-az-c-util-sswap-f77-prototype.patch
+```
+
+如果将来重新解压 Trilinos 源码，可在源码根目录应用：
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-aztecoo-az-c-util-sswap-f77-prototype.patch
+```
+
+### 下一步
+
+无需重新配置 Trilinos CMake。请继续执行：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
+
+若继续失败，仍然只回传第一处真实错误即可。
