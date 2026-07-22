@@ -1666,3 +1666,104 @@ find "$xyce_deps_prefix" -maxdepth 4 -type f \( \
   -name 'libepetraext.*' \
 \) | sort
 ```
+
+## 2026-07-22：阶段 3D Trilinos 安装通过
+
+### 用户反馈的结果
+
+Trilinos 安装前缀中已经出现 CMake package 配置：
+
+```text
+TrilinosConfig installed
+```
+
+实际位置：
+
+```text
+out/deps/xyce-7.10-serial-release/lib/cmake/Trilinos/TrilinosConfig.cmake
+```
+
+### TrilinosConfig 关键内容
+
+编译器路径正确，均为本轮固定的 GCC toolset 15：
+
+```cmake
+Trilinos_CXX_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/g++
+Trilinos_C_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/gcc
+```
+
+版本正确：
+
+```cmake
+Trilinos_VERSION=14.4
+```
+
+MPI 执行器为空，符合 serial build 预期：
+
+```cmake
+Trilinos_MPI_EXEC=""
+```
+
+包列表包含 Xyce 所需关键包：
+
+```text
+TrilinosCouplings
+ROL
+Stokhos
+NOX
+Amesos2
+Belos
+Ifpack
+Amesos
+AztecOO
+Tpetra
+EpetraExt
+Triutils
+Epetra
+Sacado
+KokkosKernels
+Teuchos
+Kokkos
+```
+
+### 已安装关键库
+
+安装前缀中已出现关键静态库：
+
+```text
+out/deps/xyce-7.10-serial-release/lib/libamesos2.a
+out/deps/xyce-7.10-serial-release/lib/libamesos.a
+out/deps/xyce-7.10-serial-release/lib/libaztecoo.a
+out/deps/xyce-7.10-serial-release/lib/libbelos.a
+out/deps/xyce-7.10-serial-release/lib/libepetraext.a
+out/deps/xyce-7.10-serial-release/lib/libnox.a
+out/deps/xyce-7.10-serial-release/lib/libtrilinoscouplings.a
+```
+
+### 判断
+
+阶段 3D 通过。
+
+当前依赖层状态：
+
+```text
+SuiteSparse configured: yes
+SuiteSparse built:      yes
+SuiteSparse installed:  yes
+
+Trilinos configured:    yes
+Trilinos built:         yes
+Trilinos installed:     yes
+```
+
+因此可以进入阶段 4：以最小选项配置 Xyce 本体。
+
+### 下一步
+
+进入阶段 4 前，先设置：
+
+```bash
+xyce_trilinos_prefix="$xyce_deps_prefix"
+```
+
+然后配置 Xyce，并仅检查 CMake cache，不要直接编译。
