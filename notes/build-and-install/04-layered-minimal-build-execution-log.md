@@ -2672,3 +2672,99 @@ Xyce -v
 如果目标是稳定的多用户公共安装，优先重新以公共 prefix 配置、安装 Trilinos 与 Xyce，使最终 `RUNPATH` 自然指向 `/opt/xyce/...`。单纯复制当前 `/home/eda/.../out` 目录到公共位置并不干净，因为当前 binary 已记录家目录中的 deps 路径。
 
 多用户场景下，BLAS/LAPACK 最干净的选择是系统 OpenBLAS/LAPACK 或公共前缀内的项目专用 OpenBLAS。继续依赖 Mentor OpenBLAS 可以作为本机务实 fallback，但需要确认所有目标用户都有读取 `/opt/mentor/...` 的权限，并接受对 Mentor 安装树的运行时依赖。
+
+## 2026-07-22：当前最小串行 Xyce 对常规模拟电路仿真的适用性评估
+
+### 问题
+
+当前已经完成安装的这个 Xyce 是否足够用于正常模拟电路仿真需求。
+
+### 当前 binary 能力证据
+
+`Xyce -capabilities` 显示当前构建为：
+
+```text
+Serial
+Reaction parser
+ROL enabled
+Build compiler is C++17 compliant
+Stokhos enabled
+Amesos2 (Basker and KLU2) enabled
+```
+
+这说明当前安装是串行版本，不是 MPI 并行版本；同时保留了 Trilinos 求解器栈中的关键能力，包括 Amesos2/KLU2/Basker 等线性求解器组件。
+
+`Xyce -param` 的设备参数列表中可见常见模拟器件类型，包括：
+
+```text
+R: Resistor
+C: Capacitor
+L: Inductor
+V/I: independent sources
+E/F/G/H: controlled sources
+B: expression based voltage/current source
+D: Diode
+Q: BJT
+J: JFET
+M: MOSFET, multiple model levels
+MESFET
+ADC/DAC and simple behavioral digital interface devices
+```
+
+当前已实际通过的最小电路冒烟测试覆盖：
+
+```text
+.OP / DC operating point
+linear resistor network
+voltage source current sign convention
+输出文件生成
+```
+
+### 当前构建明确关闭的能力
+
+CMake cache 显示当前最小构建关闭了：
+
+```text
+Xyce_PARALLEL_MPI=OFF
+Xyce_USE_FFT=OFF
+Xyce_PLUGIN_SUPPORT=OFF
+Xyce_ADMS_MODELS=OFF
+Xyce_NEURON_MODELS=OFF
+Xyce_NONFREE_MODELS=OFF
+Xyce_RAD_MODELS=OFF
+Xyce_TEST_BINARIES=OFF
+BUILD_TESTING=OFF
+```
+
+因此当前 binary 的定位不是“完整功能最大化版本”，而是“开源、串行、最小可用、适合学习和基础仿真的版本”。
+
+### 判断
+
+对下面这类正常模拟电路需求，当前安装基本够用：
+
+- 基础 R/C/L、源、受控源、二极管、BJT、JFET、MOSFET 电路；
+- 小到中等规模的串行 DC operating point、DC sweep、瞬态仿真、基础小信号分析类学习；
+- 行为源、简单混合信号接口、模型参数阅读和源码学习；
+- 使用公开 SPICE 模型做教学、验证、算法学习、器件/电路原理实验。
+
+对下面这类需求，当前安装不能直接视为完善生产环境：
+
+- 依赖 foundry PDK 的完整工艺签核仿真；
+- 需要厂商非自由模型、ADMS 自定义 Verilog-A 模型、插件模型或辐照/神经元扩展模型；
+- 需要大规模并行仿真的超大电路；
+- 需要 FFT 相关功能或更完整的频域/周期稳态生产流程；
+- 需要与 Cadence ADE/Spectre/HSPICE 生态完全兼容的模型、语法、收敛策略和 sign-off 结果一致性。
+
+### 一句话结论
+
+当前 Xyce 对“学习 Xyce 内核、运行基础/中等复杂度开源模拟电路、理解 SPICE 求解流程”已经足够完善；但对“商业 PDK 下的日常生产级模拟 IC 设计仿真”，还不能直接替代 Spectre/HSPICE，也不应视为完整 sign-off 仿真器。
+
+下一步若要更严谨评估“正常模拟电路仿真”边界，应建立一组分层回归 netlist：
+
+```text
+1. DC：二极管 IV、MOS Id-Vg/Id-Vd
+2. AC：RC 低通、共源放大器增益/带宽
+3. TRAN：RC 阶跃、反相器/环振或简单放大器大信号响应
+4. NOISE：电阻热噪声或简单放大器输出噪声
+5. PDK 兼容性：挑选一个实际模型卡，检查语法、模型级别、温度/角落参数
+```
