@@ -1,0 +1,22 @@
+diff --git a/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp b/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp
+index 1b3a0aa..bb6d763 100644
+--- a/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp
++++ b/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp
+@@ -39,6 +39,7 @@ class SPADDHandle {
+ 
+   bool called_symbolic;
+   bool called_numeric;
++  int sort_option;
+ 
+   // a_pos and b_pos are used by the unsorted version of the kernel
+   // both have same length as a_entries and b_entries
+@@ -83,7 +84,8 @@ class SPADDHandle {
+       : input_sorted(input_is_sorted),
+         result_nnz_size(0),
+         called_symbolic(false),
+-        called_numeric(false) {}
++        called_numeric(false),
++        sort_option(0) {}
+ 
+   virtual ~SPADDHandle(){};
+ 

@@ -861,3 +861,67 @@ SPADDHandle(bool input_is_sorted)
 ```bash
 cmake --build "$xyce_trilinos_build" --parallel 2
 ```
+
+## 2026-07-22：阶段 3C Trilinos KokkosKernels 最小源码补丁已应用
+
+### 用户确认
+
+用户确认：
+
+```text
+好的，请你修补源码
+```
+
+### 实际修改
+
+已修补当前 Trilinos 源码树：
+
+```text
+artifacts/source/Trilinos-14.4/packages/kokkos-kernels/sparse/src/KokkosSparse_spadd_handle.hpp
+```
+
+修改内容：
+
+```cpp
+bool called_symbolic;
+bool called_numeric;
+int sort_option;
+```
+
+构造函数初始化列表同步补充：
+
+```cpp
+SPADDHandle(bool input_is_sorted)
+    : input_sorted(input_is_sorted),
+      result_nnz_size(0),
+      called_symbolic(false),
+      called_numeric(false),
+      sort_option(0) {}
+```
+
+### 可复现补丁
+
+由于 `artifacts/source/*` 被 `.gitignore` 忽略，当前源码树中的改动不会自然进入 git 跟踪。
+
+为保证后续可复现，已保存补丁文件：
+
+```text
+notes/build-and-install/patches/trilinos-14.4-kokkoskernels-spadd-sort-option.patch
+```
+
+如果将来重新解压 Trilinos 源码，可在源码根目录应用：
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-kokkoskernels-spadd-sort-option.patch
+```
+
+### 下一步
+
+无需重新配置 Trilinos CMake。请继续执行：
+
+```bash
+cmake --build "$xyce_trilinos_build" --parallel 2
+```
+
+若继续失败，仍然只回传第一处真实错误即可。
