@@ -2459,3 +2459,64 @@ Smoke simulation tested:      no
 ```
 
 下一步修正 smoke netlist 为 `.PRINT DC V(1) I(V1)` 后重跑。
+
+## 2026-07-22：阶段 6B 修正版 smoke-resistor 冒烟测试通过
+
+### 用户反馈的错误检查
+
+修正 netlist 后，重新检查 smoke 日志：
+
+```bash
+rg -n "Netlist error|MSG_FATAL|MSG_ERROR|Simulation aborted|Xyce Abort|failed|fatal|error" \
+  build/logs/xyce-smoke-resistor-dc-print.log
+```
+
+该命令无输出，说明未发现 netlist error、fatal、abort 或常见失败关键词。
+
+### 输出结果
+
+结果文件：
+
+```text
+build/smoke/smoke-resistor.cir.prn
+```
+
+前几行内容：
+
+```text
+Index       V(1)              I(V1)
+0        1.00000000e+00   -1.00000000e-03
+End of Xyce(TM) Simulation
+```
+
+### 判断
+
+阶段 6B 通过。
+
+该电路为 1 V 电压源串/并接 1 kΩ 电阻到地，欧姆定律预期电流量级为：
+
+```text
+1 V / 1 kΩ = 1 mA
+```
+
+输出中：
+
+```text
+V(1)  =  1.00000000e+00
+I(V1) = -1.00000000e-03
+```
+
+电压正确；电流绝对值为 1 mA，负号来自电压源电流参考方向，符合预期。
+
+### 最终验收状态
+
+```text
+Xyce installed:                    yes
+Installed Xyce version:            7.10.0-opensource
+Serial minimal configuration:      yes
+Runtime BLAS/LAPACK provider:      Mentor OpenBLAS
+Cadence BLAS/LAPACK removed:       yes
+Minimal resistor smoke simulation: yes
+```
+
+本轮 `serial + Release + static + no-plugin + no-FFT + no-test` 的 Xyce 7.10.0 最小分层构建与安装已完成。
