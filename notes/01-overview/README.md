@@ -19,8 +19,6 @@
   把 `src/` 里的核心 package 按职责分层整理，建立真正的源码地图。
 - [04-structure-reading-order.md](./04-structure-reading-order.md)
   说明从入口到各主干子系统的结构主线，以及最适合的阅读顺序。
-- [05-build-and-install-architecture.md](./05-build-and-install-architecture.md)
-  从依赖栈、CMake、构建目录隔离到测试验收，解释 Xyce 大型工程的编译与安装模型。
 
 ## 本目录的边界
 

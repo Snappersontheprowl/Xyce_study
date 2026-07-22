@@ -5,6 +5,7 @@
 当前目录结构按学习顺序组织：
 
 - `01-overview/`：整体导航地图与高层结构
+- `build-and-install/`：编译、安装、依赖栈与构建验证
 - `02-startup/`：程序启动流程与顶层 `Simulator`
 - `03-netlist-and-circuit-build/`：`netlist` 解析与电路构建
 - `04-device-trace/`：普通器件到实例化、装配的纵向追踪
