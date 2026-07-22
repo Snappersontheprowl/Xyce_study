@@ -191,3 +191,59 @@ option ( SUITESPARSE_USE_FORTRAN ... ON )
 ### 阶段判断
 
 阶段 2A 通过。可以进入 SuiteSparse CMake 配置，但先只配置并审查 `CMakeCache.txt`，不要直接编译。
+
+## 2026-07-22：阶段 2B SuiteSparse 首次配置失败
+
+### 用户反馈的失败
+
+SuiteSparse CMake 配置在 `SuiteSparse_config` 的 BLAS 探测处停止：
+
+```text
+-- Could NOT find BLAS (missing: BLAS_LIBRARIES)
+-- Looking for any 32-bit BLAS
+-- Looking for sgemm_
+-- Looking for sgemm_ - not found
+CMake Error at .../FindBLAS.cmake:
+  Could NOT find BLAS (missing: BLAS_LIBRARIES)
+```
+
+### Codex 只读检查
+
+失败后的 `CMakeCache.txt` 中，阶段 0 固定的工具链和阶段 2 的 SuiteSparse 开关是正确的：
+
+```cmake
+CMAKE_C_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/gcc
+CMAKE_CXX_COMPILER=/opt/rh/gcc-toolset-15/root/usr/bin/g++
+CMAKE_BUILD_TYPE=Release
+CMAKE_INSTALL_PREFIX=/home/eda/my_lab/projects/study/xyce_study/out/deps/xyce-7.10-serial-release
+SUITESPARSE_ENABLE_PROJECTS=suitesparse_config;amd
+SUITESPARSE_USE_FORTRAN=OFF
+SUITESPARSE_USE_OPENMP=OFF
+SUITESPARSE_DEMOS=OFF
+BUILD_SHARED_LIBS=ON
+BUILD_STATIC_LIBS=ON
+```
+
+因此本次失败不是工具链混用，而是缺少可被 CMake 自动发现的 BLAS。
+
+本机未发现标准系统 BLAS/OpenBLAS/LAPACK 开发包；`dnf list available` 当前也未列出可安装候选。只读搜索发现 Cadence IC231 自带 BLAS/LAPACK：
+
+```text
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/libblas.so
+/opt/cadence/IC231/tools.lnx86/lapack/lib/64bit/liblapack.so
+```
+
+这两个库为 x86-64 ELF 动态库。符号检查显示：
+
+```text
+libblas.so:   dgemm_, sgemm_
+liblapack.so: dgeev_, dgesv_
+```
+
+`ldd` 显示 Cadence BLAS/LAPACK 会依赖同一 Cadence 安装树中的 `libgfortran.so.5`、`libquadmath.so.0` 和 `libgcc_s.so.1`。
+
+### 阶段判断
+
+阶段 2B 未通过，需要带显式 BLAS/LAPACK 路径重新配置 SuiteSparse。
+
+当前推荐的临时路线是使用 Cadence IC231 自带 BLAS/LAPACK 作为本机可用数值库。后续 Trilinos 配置也应使用同一组 BLAS/LAPACK，避免 SuiteSparse 和 Trilinos 使用不同数值后端。
