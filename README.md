@@ -1,61 +1,131 @@
 # Xyce 源码学习仓库
 
-## 项目目的
-这个仓库是一个用于阅读和整理 Xyce 源码的个人学习工作区。主要有以下目的：
-1. Xyce 源码学习，包括 Xyce 仿真器/晶体管级仿真底层原理及工程代码实现。
-2. Xyce 这个大型CPP 项目的构建，包括源码及依赖的编译安装
-3. 也可能尝试更改源码实现某些想要的功能，暂定。
+本仓库是用于学习 Xyce 仿真器源码、构建流程和基础验证方法的个人工作区。
 
-至于具体的学习计划、约定、方式、节奏等问题，请参考 `/home/eda/my_lab/projects/study/xyce_study/notes/README.md` 。
+项目关注三件事：
 
-目标不是维护一个 Xyce 分叉版本，而是把源码快照、学习笔记、阅读计划和辅助脚本放在一个结构清晰的地方，方便长期积累。
+1. 阅读 Xyce 源码，理解 SPICE 类仿真器的网表解析、器件建模、矩阵装配、非线性求解和分析流程；
+2. 记录 Xyce 及其依赖的本地编译、安装、补丁和环境配置；
+3. 通过小型可复现用例验证当前安装的功能边界，为后续源码学习提供参照。
+
+本仓库不是 Xyce 上游分叉，也不以维护可发布版本为目标。上游源码、构建产物和下载归档主要保留在本地，项目 Git 重点跟踪学习笔记、验证用例、构建记录和少量必要补丁。
 
 ## 仓库结构
 
-- `vendor/Xyce-7.10.0/`：本地解压后的 Xyce 源码快照，用于阅读
-- `artifacts/source/`：下载的发布包归档，不纳入版本控制
-- `docs/`：结构化的学习文档和主题总结
-  其中 `docs/cpp/` 专门用于沉淀 C++ 语言学习笔记和自测题
-- `notes/`：按日期记录的阅读笔记、追踪过程和简短结论
-- `scripts/`：用于检索、构建或追踪源码的辅助脚本
+本级目录如下：
 
-## 本级目录下：
+```text
 .
 ├── AGENTS.md
-├── artifacts       // 历史遗留文件，主要是 Xyce 源码压缩包
-├── build           // 编译过程中的生成物
-├── docs            // 存放项目所有文档
-├── notes           // 存放源码学习笔记
 ├── README.md
-├── scripts         // 存放有用的脚本
-└── vendor          // 存放实际源码
+├── artifacts/
+├── build/
+├── docs/
+├── functional-verification/
+├── notes/
+├── out/
+├── scripts/
+└── vendor/
+```
+
+各项职责：
+
+- `AGENTS.md`：本项目的人机协作约定和执行规范。
+- `README.md`：项目入口说明。
+- `artifacts/`：本地下载或保留的源码包、工具包等归档文件。
+- `build/`：本地构建目录、编译中间产物和构建日志。
+- `docs/`：横向专题文档，例如 C++ 阅读补充。
+- `functional-verification/`：当前 Xyce 安装的功能验证计划、用例和结果记录。
+- `notes/`：源码阅读笔记、构建安装笔记和阶段性学习记录。
+- `out/`：本地安装前缀，例如已安装的 Xyce、依赖库和工具。
+- `scripts/`：项目辅助脚本。
+- `vendor/`：本地展开的第三方/上游源码快照，例如 Xyce 源码。
+
+## 主要入口
+
+学习计划与笔记索引：
+
+```text
+notes/README.md
+```
+
+构建与安装记录：
+
+```text
+notes/build-and-install/
+```
+
+功能验证工作区：
+
+```text
+functional-verification/
+```
+
+当前本地 Xyce 源码快照：
+
+```text
+vendor/Xyce-7.10.0/
+```
+
+## 当前工作对象
+
+当前主要学习和验证对象是 Xyce 7.10.0：
+
+```text
+vendor/Xyce-7.10.0/
+```
+
+当前项目内安装的 Xyce 可执行文件位于：
+
+```text
+out/xyce-7.10-serial-release/bin/Xyce
+```
+
+确认版本：
+
+```bash
+cd /home/eda/my_lab/projects/study/xyce_study
+out/xyce-7.10-serial-release/bin/Xyce -v
+```
 
 ## 版本控制策略
 
-- 这个仓库只跟踪学习资料，不跟踪 Xyce 上游源码树本身。
-- `vendor/Xyce-7.10.0/` 保留在本地，但被 Git 忽略。
-- `artifacts/source/Release-7.10.0.tar.gz` 也保留在本地，但被 Git 忽略。
+本仓库主要跟踪：
 
-这样既能保持学习仓库足够轻量，也能保留当前阅读所对应的稳定源码副本。
+- 学习笔记；
+- 构建与安装记录；
+- 功能验证用例；
+- 小型文本结果；
+- 为完成本地构建所需的补丁说明。
+
+本仓库通常不跟踪：
+
+- 上游源码树本体；
+- 大型源码包和二进制工具包；
+- 构建中间产物；
+- 本地安装输出；
+- 临时日志。
+
+对应地，以下目录主要作为本地工作区使用：
+
+```text
+vendor/
+artifacts/
+build/
+out/
+```
+
+如需复现某个阶段，应优先查看 `notes/` 和 `functional-verification/` 中的记录，而不是依赖未纳入 Git 的构建产物。
 
 ## 官方来源
 
-截至 2026-05-12：
+- Xyce 官方主页：https://xyce.sandia.gov/
+- Xyce 官方源码下载页：https://xyce.sandia.gov/downloads/source-code/
+- Xyce 官方 GitHub 仓库：https://github.com/Xyce/Xyce
+- XDM GitHub 仓库：https://github.com/Xyce/XDM
 
-- 官方项目主页：https://xyce.sandia.gov/
-- 官方源码下载页：https://xyce.sandia.gov/downloads/source-code/
-- 官方 GitHub 仓库：https://github.com/Xyce/Xyce
-
-## 版本说明
-
-- GitHub 默认分支是 `master`。
-- 当前发布标签是 `Release-7.10.0`。
-- Sandia 下载页列出的当前源码版本是 `Xyce-7.10.tar.gz`。
-- 本地源码目录是解压得到的发布版快照，不是 Git checkout。
-
-如果以后需要查看完整的上游提交历史，可以单独克隆官方仓库：
+如果需要查看完整上游提交历史，可以单独克隆官方仓库：
 
 ```bash
 git clone https://github.com/Xyce/Xyce.git
 ```
-
