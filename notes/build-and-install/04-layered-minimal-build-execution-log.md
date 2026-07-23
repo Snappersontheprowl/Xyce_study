@@ -2608,6 +2608,12 @@ export PATH="/home/eda/my_lab/projects/study/xyce_study/out/xyce-7.10-serial-rel
 Xyce -v
 ```
 
+永久生效方式：
+```bash
+echo 'export PATH="/home/eda/my_lab/projects/study/xyce_study/out/xyce-7.10-serial-release/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+```
+
 ### 当前安装的局限
 
 当前安装不适合作为全系统公共安装，原因有三点：
