@@ -21,6 +21,7 @@
   - 其中 `05-mosfet-b4/` 是 `B4` 的独立子专题
   - 其中 `device/` 是器件家族地图和 `ADMS` 接入方式的扩展阅读
   - `05-mosfet-b4/`：把 `MOSFET_B4` 单独拆成一条复杂 compact model 学习支线
+- `08-interfaces/`：Xyce 被外部程序驱动、嵌入或包装时涉及的 C/Python/REST 接口层
 
 其中需要单独沉淀但不属于主线顺序的横向内容，放到 `docs/` 下维护：
 
