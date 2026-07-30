@@ -48,13 +48,21 @@ I(V1) = -1.00000000e-03
 functional-verification/
 ├── README.md
 ├── 00-current-install-scope.md
-└── 01-analog-functional-verification-plan.md
+├── 01-analog-functional-verification-plan.md
+├── 02-verification-results.md
+├── 03-gui-and-frontend-notes.md
+├── 04-netlist-syntax-and-conversion-notes.md
+├── 05-xdm-binary-install-and-verification-plan.md
+├── 06-interactive-mode-source-implementation-assessment.md
+└── cases/
 ```
 
 其中：
 
 - `00-current-install-scope.md`：记录当前 Xyce binary、已知能力、关闭项、适用边界；
 - `01-analog-functional-verification-plan.md`：定义后续模拟电路功能验证矩阵、用例优先级和验收标准。
+- `02-verification-results.md`：记录已执行用例的结果和数值验收结论；
+- `cases/`：保存每个可复现 netlist 用例、运行日志和输出结果。
 
 ## 验证目标
 

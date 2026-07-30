@@ -22,6 +22,7 @@ Xyce Release 7.10.0-opensource
 | FV-007 | noise | 通过 | `.NOISE` 语法与噪声输出可用，生成 `NOISE.prn` 与 `_noise.dat` |
 | FV-008 | model-card compat | 通过 | `.include` 模型卡、模型识别、MOS DC sweep 可用 |
 | FV-009 | XDM HSPICE minimal | 通过 | XDM 2.7.0 可将最小 HSPICE-like 网表转为 Xyce，当前 Xyce 可解析并运行，`V(1)=1.0 V`、`I(V1)=-1 mA` |
+| FV-010 | cube resistor equivalent | 通过 | 12 边立方体电阻网络的空间对角等效电阻验证通过，`|I(VTEST)|=1.2 mA`，`Req=833.333 Ω=5R/6` |
 
 ## 运行约定
 
@@ -47,7 +48,8 @@ rg -n "Netlist error|MSG_FATAL|MSG_ERROR|Simulation aborted|Xyce Abort|failed|fa
 执行时间：
 
 ```text
-2026-07-22
+FV-001 ~ FV-009: 2026-07-22
+FV-010: 2026-07-30
 ```
 
 执行命令模式：
@@ -278,6 +280,45 @@ I(V1) = -1.00000000e-03
 ```
 
 判断：通过。XDM binary 安装、HSPICE-like 最小网表转换、Xyce `-syntax` 检查和 Xyce 实跑链路均可用。
+
+### FV-010 cube resistor equivalent resistance
+
+输出文件：
+
+```text
+functional-verification/cases/fv010-cube-resistor-equivalent/cube-resistor-equivalent.cir.prn
+```
+
+电路：
+
+```text
+12 条边的立方体电阻网络
+每条边 R = 1 kΩ
+空间对角顶点 a-g 之间加 1 V 测试源
+g 接为 SPICE ground 0
+```
+
+理论值：
+
+```text
+Req = 5R/6 = 833.333333 Ω
+I   = 1 V / Req = 1.2 mA
+```
+
+仿真代表点：
+
+```text
+V(a)      =  1.00000000e+00
+V(b)      =  6.00000000e-01
+V(c)      =  4.00000000e-01
+V(d)      =  6.00000000e-01
+V(e)      =  6.00000000e-01
+V(f)      =  4.00000000e-01
+V(h)      =  4.00000000e-01
+I(VTEST)  = -1.20000000e-03
+```
+
+判断：通过。对称节点电压符合理论预期，电压源电流绝对值为 `1.2 mA`，换算等效电阻为 `833.333333 Ω`，等于 `5R/6`。
 
 ## 总体结论
 

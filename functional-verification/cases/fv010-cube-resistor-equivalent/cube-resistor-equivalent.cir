@@ -1,0 +1,31 @@
+* FV-010: equivalent resistance between opposite vertices of a resistor cube
+* All cube edges are 1 kOhm.  The theoretical diagonal equivalent
+* resistance is Req = 5R/6 = 833.333333 Ohm.
+
+.PARAM R_EDGE=1k
+
+* Test source between opposite cube vertices a=(0,0,0) and g=(1,1,1).
+* Node g is tied to SPICE ground 0.
+VTEST a 0 DC 1
+
+* Top face z=0: a-b-c-d-a
+RAB a b {R_EDGE}
+RBC b c {R_EDGE}
+RCD c d {R_EDGE}
+RDA d a {R_EDGE}
+
+* Bottom face z=1: e-f-g-h-e, with g represented by ground 0
+REF e f {R_EDGE}
+RFG f 0 {R_EDGE}
+RGH 0 h {R_EDGE}
+RHE h e {R_EDGE}
+
+* Vertical edges
+RAE a e {R_EDGE}
+RBF b f {R_EDGE}
+RCG c 0 {R_EDGE}
+RDH d h {R_EDGE}
+
+.OP
+.PRINT DC V(a) V(b) V(c) V(d) V(e) V(f) V(h) I(VTEST)
+.END

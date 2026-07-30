@@ -261,6 +261,55 @@ M1 d g 0 0 NM L=1u W=10u
 已通过，见 02-verification-results.md
 ```
 
+### FV-009：XDM HSPICE-like 最小转换验证
+
+目的：
+
+```text
+确认 XDM binary 安装、HSPICE-like 最小网表到 Xyce 网表的转换链路、以及转换后网表的 Xyce 解析和运行链路可用。
+```
+
+验收：
+
+- XDM 转换无 critical issue / error；
+- 转换后网表可被 Xyce `-syntax` 接受；
+- 转换后网表可实际运行；
+- 最小电阻电路结果符合 `1 V / 1 kΩ = 1 mA`。
+
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
+
+### FV-010：立方体电阻网络等效电阻
+
+目的：
+
+```text
+确认 Xyce 对稍复杂线性电阻网络的 DC operating point / MNA 求解是否正确。
+```
+
+电路：
+
+```text
+8 个顶点、12 条边的立方体电阻网络，每条边为 1 kΩ。
+在一对空间对角顶点之间加 1 V 测试源。
+```
+
+验收：
+
+- 运行无 netlist error / fatal / abort；
+- 对称节点电压满足 `V(b,d,e)≈0.6 V`、`V(c,f,h)≈0.4 V`；
+- `|I(VTEST)|≈1.2 mA`；
+- 等效电阻 `Req≈833.333333 Ω = 5R/6`。
+
+状态：
+
+```text
+已通过，见 02-verification-results.md
+```
+
 ## 4. 输出目录建议
 
 后续建议按用例创建：
@@ -275,7 +324,9 @@ functional-verification/
 │   ├── fv005-mos-dc/
 │   ├── fv006-common-source-ac/
 │   ├── fv007-noise/
-│   └── fv008-model-card-compat/
+│   ├── fv008-model-card-compat/
+│   ├── fv009-xdm-hspice-minimal/
+│   └── fv010-cube-resistor-equivalent/
 ├── logs/
 └── results/
 ```
@@ -306,20 +357,25 @@ sed -n '1,40p' *.prn
 
 ## 6. 当前优先级
 
-建议下一步顺序：
+已完成：
 
 ```text
+FV-001 resistor OP
 FV-002 diode IV
 FV-003 RC transient
 FV-004 RC AC
 FV-005 MOSFET DC
+FV-006 common-source AC
+FV-007 noise
+FV-008 model-card compat
+FV-009 XDM HSPICE minimal
+FV-010 cube resistor equivalent
 ```
 
-原因：
+后续可继续扩展：
 
-- FV-002 首次引入非线性器件；
-- FV-003 首次引入时间积分；
-- FV-004 首次引入频域小信号分析；
-- FV-005 首次引入 MOS 模型，是后续晶体管级学习的核心。
-
-完成这四项后，才能更有把握地评价“当前 Xyce 对正常模拟电路仿真是否足够”。
+- 更复杂的线性网络；
+- 受控源与小信号等效电路；
+- 子电路 `.subckt` 层次验证；
+- 更接近真实 PDK 的模型卡兼容性验证；
+- Python/C interface 驱动仿真验证。
