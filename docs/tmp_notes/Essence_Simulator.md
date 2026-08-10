@@ -1,4 +1,4 @@
-# 更详细的内容请参考 Xyce 的学习笔记
+# 有关SPICE仿真器更详细的内容请参考 Xyce 的学习笔记
 
 ## 一、最本质的三类：DC、Transient、AC
 
@@ -617,28 +617,3 @@ $$
 | Optimization   | 反复调用基础仿真 + 优化算法                         |
 | Yield Analysis | Monte Carlo / Corner / Worst-case 的统计封装 |
 
-
-## 九、结合 Xyce / SPICE 的角度
-
-对于传统 SPICE / Xyce 这类仿真器，最核心的仿真类型一般可以看成：
-
-1. **DC operating point**
-   求静态非线性代数方程。
-
-2. **Transient analysis**
-   求非线性微分-代数方程的时域演化。
-
-3. **AC analysis**
-   在 DC 工作点附近线性化，求频域小信号响应。
-
-4. **Sensitivity analysis**
-   在 DC、AC、Transient 的基础上，对参数求导；它不是完全独立于前三者的仿真，但在算法上很重要。
-
-其他很多功能，如 sweep、Monte Carlo、corner、measure，更像是：
-
-> 对这些核心仿真的批量调用、参数扰动、统计分析和指标提取。
-
-
-一句话总结：
-
-> **最本质的晶体管级仿真是 DC、Transient、AC；RF 场景下再加 PSS 和 Harmonic Balance。其余多数所谓仿真类型，本质上是这些核心仿真的循环调用、小信号派生、统计封装或结果后处理。**
