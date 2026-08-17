@@ -1,41 +1,24 @@
-# sensitivity analysis flow
+# 05-analysis-flow / 03-sensitivity
 
-记录日期：2026-07-03
+## 功能
 
-这个子目录放的是灵敏度分析在 **工程代码实现层** 的专题。
+本目录记录灵敏度分析在工程代码层如何附着到 `DC / AC / Transient` 等主分析流程上。
 
-这一组只回答：
+本目录不推导 direct/adjoint sensitivity 的数学公式。
 
-- 灵敏度分析怎样附着在现有主分析上
-- `.SENS` / `SENSITIVITY` 在调度层如何进入系统
-- `DC / AC / Transient` 在生命周期上怎样分别挂入灵敏度求解
-- 为什么灵敏度更像一个 capability layer，而不是独立主分析类型
+## 本级模块职责
 
-## 当前内容
+- `README.md`：说明本组笔记职责和阅读顺序。
+- `01-sensitivity-lifecycle.md`：灵敏度能力层的整体生命周期。
+- `02-dc-sensitivity-lifecycle.md`：DC 灵敏度的工程挂接路径。
+- `03-ac-sensitivity-lifecycle.md`：AC 灵敏度的工程挂接路径。
+- `04-transient-sensitivity-lifecycle.md`：瞬态灵敏度的工程挂接路径。
 
-1. [01-sensitivity-lifecycle.md](01-sensitivity-lifecycle.md)
-2. [02-dc-sensitivity-lifecycle.md](02-dc-sensitivity-lifecycle.md)
-3. [03-ac-sensitivity-lifecycle.md](03-ac-sensitivity-lifecycle.md)
-4. [04-transient-sensitivity-lifecycle.md](04-transient-sensitivity-lifecycle.md)
+## 使用建议
 
-## 这一组的边界
+先读本组理解 `.SENS` 如何进入调度层；再到 [../../06-solver-and-assembly/03-sensitivity/](../../06-solver-and-assembly/03-sensitivity/) 学习 direct/adjoint 的数学与求解。
 
-这一组仍然属于 `05-analysis-flow`，所以只讲工程实现上的：
+## 当前约定
 
-- 注册
-- 选择
-- 生命周期
-- 灵敏度功能在主分析流程中的接入位置
-- 哪一层打开 `sensFlag_`
-- 哪一层进入 `direct / adjoint` 分支
-
-真正涉及：
-
-- 解对参数的敏感度
-- 输出对参数的敏感度
-- direct / adjoint 的数学推导
-- 为什么 adjoint 更省计算
-
-这些内容统一放到：
-
-- [../../06-solver-and-assembly/03-sensitivity/README.md](../../06-solver-and-assembly/03-sensitivity/README.md)
+- 本目录把灵敏度视为主分析上的 capability layer，而不是独立主分析类型。
+- 数学推导、成本结构和转置求解统一放在 `06-solver-and-assembly/03-sensitivity/`。

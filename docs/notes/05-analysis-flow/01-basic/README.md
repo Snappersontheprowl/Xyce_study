@@ -1,37 +1,24 @@
-# basic analysis flow
+# 05-analysis-flow / 01-basic
 
-记录日期：2026-07-03
+## 功能
 
-这个子目录从 **工程实现** 的角度，只讲最基本的分析代码主线：
+本目录记录基础分析类型在工程代码中的主线：`Simulator::runSimulation()` 如何进入分析层，`.OP / .DC / .TRAN` 如何注册、选择和执行。
 
-- `Simulator::runSimulation()` 怎样进入分析层
-- `.OP / .DC / .TRAN` 怎样注册和选择
-- `DCSweep` / `Transient` 的生命周期怎样组织
-- `AnalysisManager` 什么时候创建共用基础设施
+本目录不讲 residual、Jacobian 或 Newton 求解数学。
 
-## 推荐阅读顺序
+## 本级模块职责
 
-1. [01-simulation-entry-to-analysis-manager.md](01-simulation-entry-to-analysis-manager.md)
-2. [02-analysis-registration-and-selection.md](02-analysis-registration-and-selection.md)
-3. [03-analysis-lifecycle-dc-and-tran.md](03-analysis-lifecycle-dc-and-tran.md)
-4. [04-analysis-manager-common-infrastructure.md](04-analysis-manager-common-infrastructure.md)
+- `README.md`：说明本组笔记职责和阅读顺序。
+- `01-simulation-entry-to-analysis-manager.md`：从 `Simulator::runSimulation()` 进入 `AnalysisManager` 的路径。
+- `02-analysis-registration-and-selection.md`：基础分析类型的注册与选择。
+- `03-analysis-lifecycle-dc-and-tran.md`：`DCSweep` 与 `Transient` 的生命周期。
+- `04-analysis-manager-common-infrastructure.md`：`AnalysisManager` 创建和持有的共用基础设施。
 
-## 这一组的边界
+## 使用建议
 
-这一组只讲：
+按编号顺序阅读即可。读完后，如果想理解底层方程，转到 [../../06-solver-and-assembly/01-basic/](../../06-solver-and-assembly/01-basic/)。
 
-```text
-谁决定跑什么分析
-谁持有分析对象
-分析控制流程怎样展开
-代码层的组织关系和调用顺序
-```
+## 当前约定
 
-不讲：
-
-- 方程推导
-- residual / Jacobian 数学形式
-- `Q / F / B / dQdx / dFdx` 的数学意义
-- Newton / linear solve 的底层原理
-
-这些内容统一放到 [../../06-solver-and-assembly/README.md](../../06-solver-and-assembly/README.md)。
+- 本目录只讲“谁调用谁、谁持有谁、什么时候切换到下一层”。
+- 方程推导和数值求解细节不在本目录展开。

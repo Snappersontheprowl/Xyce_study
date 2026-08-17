@@ -1,37 +1,27 @@
-# basic solver and assembly
+# 06-solver-and-assembly / 01-basic
 
-记录日期：2026-07-03
+## 功能
 
-这个子目录从 **底层数学原理** 的角度，只讲最基础、最通用的求解骨架：
+本目录记录最基础、最通用的电路方程与求解骨架：电路 DAE、DC operating point、transient 时间步、residual/Jacobian、Newton 和 linear solve。
 
-- 电路 DAE 是怎样装配出来的
-- `DC operating point` 在数学上解什么
-- `transient` 每个时间步在数学上解什么
-- residual / Jacobian、Newton、linear solve 在这两类分析里怎样协作
+本目录不讲 `AC / NOISE / HB / MPDE` 等进阶分析。
 
-## 推荐阅读顺序
+## 本级模块职责
 
-1. [01-dae-assembly-pipeline.md](01-dae-assembly-pipeline.md)
-2. [02-dae-math-solving.md](02-dae-math-solving.md)
-3. [03-dc-operating-point-solving.md](03-dc-operating-point-solving.md)
-4. [03-dcop-convergence-analysis.md](03-dcop-convergence-analysis.md)
-5. [04-transient-time-discretization-and-solving.md](04-transient-time-discretization-and-solving.md)
+- `README.md`：说明本组笔记职责和阅读顺序。
+- `01-dae-assembly-pipeline.md`：电路 DAE 的装配路径。
+- `02-dae-math-solving.md`：DAE 数学结构和求解入口。
+- `03-dc-operating-point-solving.md`：DC operating point 在数学上解什么。
+- `03-dcop-convergence-analysis.md`：DCOP 收敛相关问题。
+- `03-detail-singular-matrix.md`：奇异矩阵细节说明。
+- `03-detail-unsmooth.md`：非光滑问题细节说明。
+- `04-transient-time-discretization-and-solving.md`：瞬态时间离散与时间步求解。
 
-## 这一组的边界
+## 使用建议
 
-这一组只讲：
+按编号顺序阅读主线文件；`03-detail-*` 属于遇到对应问题时再读的补充材料。
 
-```text
-DC / transient 的通用求解骨架
-```
+## 当前约定
 
-不讲：
-
-- `AC / NOISE / HB / MPDE`
-- 分析对象注册与生命周期调度
-- 代码层的 factory / manager 组织关系
-
-这些内容分别放在：
-
-- [../../05-analysis-flow/README.md](../../05-analysis-flow/README.md)
-- [../02-advanced/README.md](../02-advanced/README.md)
+- 本目录只覆盖 `DC / transient` 的通用求解骨架。
+- 分析对象生命周期回到 `../../05-analysis-flow/`；进阶求解进入 `../02-advanced/`。

@@ -1,46 +1,26 @@
-# device model contributions
+# 07-device-model-contributions
 
-这个专题承接 [06-solver-and-assembly](../06-solver-and-assembly/README.md)。
+## 功能
 
-`06` 已经回答了：
+本目录记录器件模型如何把自身物理关系贡献到全局电路方程中，包括 `Q/F/B/dQdx/dFdx`、stamp、instance/master/model 分工。
 
-- 求解器到底在解什么方程
-- `DC` 和 `transient` 在数学上分别做什么
-- Newton 和 linear solve 在代码里怎样展开
+本目录承接 [../06-solver-and-assembly/](../06-solver-and-assembly/)；求解器已经假定方程存在，本目录追问这些方程贡献来自哪里。
 
-接下来的关键问题就是反过来问：
+## 本级模块职责
 
-```text
-这些方程里的 Q / F / B / dQdx / dFdx
-到底是谁写出来的？
-器件模型怎样把自己的物理关系翻译成求解器需要的量？
-```
+- `README.md`：说明器件贡献专题的职责、阅读顺序和边界。
+- `01-device-model-roadmap.md`：器件模型贡献路线图。
+- `02-capacitor-and-q-contribution.md`：电容如何贡献 `Q`。
+- `03-diode-and-nonlinear-f.md`：二极管如何贡献非线性 `F`。
+- `04-from-device-equations-to-stamp.md`：器件方程如何变成 stamp。
+- `05-mosfet-b4/`：以 `MOSFET_B4` 为复杂 compact model 进行独立追踪。
+- `device/`：器件家族地图和 ADMS 接入方式扩展阅读。
 
-所以这个专题的主线不是再讲 solver，而是讲：
+## 使用建议
 
-```text
-device model
--> instance / master
--> Q/F/B/dQdx/dFdx
--> residual / Jacobian
--> solver
-```
+建议按 `resistor/capacitor/diode -> stamp -> MOSFET_B4` 的复杂度递增路线阅读；需要器件家族背景时，再读 `device/`。
 
-## 推荐阅读顺序
+## 当前约定
 
-1. 先读 [01-device-model-roadmap.md](01-device-model-roadmap.md)
-2. 再读 [02-capacitor-and-q-contribution.md](02-capacitor-and-q-contribution.md)
-3. 再读 [03-diode-and-nonlinear-f.md](03-diode-and-nonlinear-f.md)
-4. 再读 [04-from-device-equations-to-stamp.md](04-from-device-equations-to-stamp.md)
-5. 再进入 [05-mosfet-b4/README.md](05-mosfet-b4/README.md)
-6. 后面再继续：
-   - 再换一个器件做横向对比
-   - 或回到 solver 视角看 `B4` 的贡献如何进入时间积分和 Newton
-7. 如果想补“器件家族地图”和“ADMS 接入方式”这些背景，再读 [device/README.md](device/README.md)
-
-## 这一专题最想回答的 4 个问题
-
-1. 一个器件到底给总方程增加了什么？
-2. 这些贡献是在 `Model`、`Master` 还是 `Instance` 里实现的？
-3. 器件的公式是如何变成 `Q/F/B/dQdx/dFdx` 的？
-4. 数值求解的需求，为什么会反过来影响器件代码的写法？
+- 本目录关注器件如何贡献方程，不重复推导求解器如何解方程。
+- 复杂模型优先拆成独立子专题，避免把根目录 README 写成长篇模型综述。

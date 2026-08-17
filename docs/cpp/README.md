@@ -1,32 +1,28 @@
-# C++ 语言学习模块
+# C++ 学习补充
 
-这个目录专门用于沉淀本项目阅读过程中遇到的 C++ 语法、语义和常见易错点。
+## 功能
 
-组织原则：
+本目录用于沉淀阅读 Xyce 源码时真正会遇到的 C++ 语法、语义和工程结构知识。
 
-- 优先记录“读 Xyce 源码时真的会碰到”的语法点，而不是一次性铺开整本 C++ 教材。
-- 每个主题尽量按“本质问题、最小例子、常见误区、自测问题”四段来写。
-- 能和项目代码建立对应关系时，优先补一条“在源码里通常长什么样”。
+它不是完整 C++ 教材；这里优先记录能帮助读懂 Xyce 的内容。
 
-## 当前主题
+## 本级模块职责
 
-- `syntax-basics.md`：声明、定义、头文件、匿名命名空间等基础语法
-- `xyce-cpp-development-skills.md`：围绕 Xyce 真正有开发价值的 C/C++ 技能优先级和学习顺序
-- `xyce-reading-structures.md`：阅读 Xyce 真正需要的接口、Manager、工厂、模板和 ownership 结构
-- `career-learning-path.md`：围绕 SPICE / HPC / EDA 自动化的简要学习路线
+- `README.md`：说明本目录职责、文件分工和维护约定。
+- `syntax-basics.md`：声明、定义、头文件、匿名命名空间等基础语法。
+- `xyce-cpp-development-skills.md`：围绕 Xyce 源码阅读和开发的 C/C++ 技能优先级。
+- `xyce-reading-structures.md`：阅读 Xyce 时常见的接口、manager、factory、模板和 ownership 结构。
+- `career-learning-path.md`：围绕 SPICE / HPC / EDA 自动化方向的 C++ 学习路线。
+- `non-eda-cpp-directions.md`：非 EDA 场景下的 C++ 技术方向参考。
+- `two-project-research-checklist.md`：对比项目或横向调研时使用的检查清单。
 
-## 后续建议补充
+## 命名规则
 
-- `references-and-pointers.md`：引用、指针、`const` 与参数传递
-- `classes-and-lifetime.md`：类、构造函数、析构函数与对象生命周期
-- `containers-and-strings.md`：`std::vector`、`std::string` 与常见遍历方式
-- `inheritance-and-interfaces.md`：继承、虚函数与抽象接口
-- `templates-and-auto.md`：模板、`auto`、`decltype` 与类型推导
+- 文件名使用英文小写和连字符，例如 `syntax-basics.md`。
+- 新主题优先按能力主题命名，不使用 `new`、`final`、`tmp`、`v2` 这类阶段性词。
 
-## 使用方式
+## 当前约定
 
-后续如果我们在对话里讲了新的语法点，可以继续往这个模块里增补：
-
-1. 先把结论沉淀到对应主题文档。
-2. 再补最小示例和一两个判断题。
-3. 如果该语法在 Xyce 里很常见，再附一条源码阅读提示。
+- 每篇专题尽量回答“本质问题、最小例子、常见误区、源码阅读提示”。
+- 只有当某个 C++ 点在 Xyce 阅读中反复出现时，才沉淀为独立文档。
+- 具体源码阅读结论仍放在 `../notes/`，本目录只维护可复用的 C++ 背景知识。

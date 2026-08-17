@@ -1,34 +1,23 @@
-# device 扩展阅读
+# 07-device-model-contributions / device
 
-记录日期：2026-06-04
+## 功能
 
-这个目录放的是 `07-device-model-contributions` 的扩展阅读。
+本目录是器件模型贡献专题的扩展阅读，用于建立 `DeviceModelPKG` 器件家族地图和 ADMS 接入方式背景。
 
-根目录那几篇主线笔记，重点在回答：
+本目录不逐个深入每种器件模型的方程实现。
 
-- 一个器件怎样贡献 `Q / F / dQdx / dFdx`
-- 这些贡献怎样进入 `time integration` 和 `Newton`
-- `MOSFET_B4` 这种复杂 compact model 怎样把这些贡献合在一起
+## 本级模块职责
 
-而这个 `device/` 目录更偏“器件家族地图”和“模型接入方式”：
+- `README.md`：说明本扩展目录职责和阅读顺序。
+- `01-device-modelpkg-map.md`：`DeviceModelPKG` 器件家族地图。
+- `02-specialized-device-families.md`：混合信号、神经元、TCAD、IBIS、外部耦合等专门器件家族。
+- `03-adms-integration.md`：ADMS 接入方式及其与手写模型的区别。
 
-- `DeviceModelPKG` 里到底有哪些器件家族
-- 哪些属于常规 `OpenModels`，比如最熟悉的模型 BSIM 就属于这里。
-- 哪些是混合信号、神经元、TCAD、IBIS、外部耦合这类专门方向
-- `ADMS` 到底是什么，它和手工写 `OpenModels` 的差别是什么
+## 使用建议
 
-## 推荐阅读顺序
+如果主线只关心 `Q/F/dQdx/dFdx` 贡献，可以先跳过本目录；当需要理解 Xyce 支持哪些模型家族时再读。
 
-1. 先读 [01-device-modelpkg-map.md](01-device-modelpkg-map.md)
-2. 再读 [02-specialized-device-families.md](02-specialized-device-families.md)
-3. 最后读 [03-adms-integration.md](03-adms-integration.md)
+## 当前约定
 
-## 这一组笔记的定位
-
-如果只压成一句话，这一组笔记要补上的，是下面这个背景问题：
-
-```text
-除了我们已经精读过的 resistor / capacitor / diode / MOSFET_B4，
-Xyce 整体到底支持哪些模型家族，它们是按什么方式组织和接入进来的？
-就目前而言，这些仅仅作为了解，完全不必每种模型大类深入发掘。
-```
+- 本目录作为背景地图，不承担每个器件模型的精读任务。
+- 具体模型精读应回到上一级创建独立子专题。

@@ -1,27 +1,25 @@
-# mosfet b4
+# 07-device-model-contributions / 05-mosfet-b4
 
-这个子专题承接上一级的：
+## 功能
 
-- [04-from-device-equations-to-stamp.md](../04-from-device-equations-to-stamp.md)
+本目录把 `MOSFET_B4` 作为复杂 compact model 独立追踪，观察它如何组织 unknown、stamp、`F/dFdx` 和 `Q/dQdx`。
 
-它只做一件事：
+本目录不作为 BSIM4 物理模型完整教材，只服务于理解 Xyce 器件实现结构。
 
-```text
-把 MOSFET_B4 当成一个独立的复杂 compact model，
-顺着 unknown structure -> F -> Q -> merge summary
-这条线单独读透
-```
+## 本级模块职责
 
-## 推荐阅读顺序
+- `README.md`：说明本子专题职责和阅读顺序。
+- `01-roadmap.md`：`MOSFET_B4` 阅读路线图。
+- `02-unknowns-and-stamp.md`：unknown 与 stamp 结构。
+- `03-f-and-dfdx.md`：`F` 和 `dFdx` 贡献。
+- `04-q-and-dqdx.md`：`Q` 和 `dQdx` 贡献。
+- `05-merge-summary.md`：与前面简单器件贡献方式的合并总结。
 
-1. 先读 [01-roadmap.md](01-roadmap.md)
-2. 再读 [02-unknowns-and-stamp.md](02-unknowns-and-stamp.md)
-3. 再读 [03-f-and-dfdx.md](03-f-and-dfdx.md)
-4. 再读 [04-q-and-dqdx.md](04-q-and-dqdx.md)
-5. 最后读 [05-merge-summary.md](05-merge-summary.md)
+## 使用建议
 
-## 这个子专题最想回答的 3 个问题
+建议先读上一级的 [../04-from-device-equations-to-stamp.md](../04-from-device-equations-to-stamp.md)，再进入本目录按编号阅读。
 
-1. `B4` 的 unknown / stamp 结构为什么会比简单器件复杂很多？
-2. 它如何分别贡献 `F/dFdx` 和 `Q/dQdx`？
-3. 为什么说 `B4` 是前面 `resistor / capacitor / diode` 三类贡献方式的大合体？
+## 当前约定
+
+- 本目录只追踪 `MOSFET_B4` 这一个复杂模型。
+- 其它器件家族背景放在上一级 `device/`。

@@ -1,13 +1,20 @@
 # FV-001: resistor operating point
 
-## 目的
+## 功能
 
-确认基础 netlist 解析、线性器件、MNA 装配、DC operating point 和输出链路可用。
+本用例验证基础 netlist 解析、线性器件、MNA 装配、DC operating point 和输出链路是否可用。
 
-## 预期
+## 本级文件职责
+
+- `README.md`：说明本用例目标和验收标准。
+- `resistor-op.cir`：输入 netlist。
+- `resistor-op.cir.prn`：Xyce 输出结果。
+- `run.log`：Xyce 运行日志。
+
+## 验收标准
 
 ```text
-V(1)  = 1 V
+V(1)    = 1 V
 |I(V1)| = 1 mA
 ```
 

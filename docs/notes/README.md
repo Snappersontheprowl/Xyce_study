@@ -1,44 +1,49 @@
 # 笔记目录
 
-这个目录用于存放按学习阶段和专题整理的笔记。
+## 功能
 
-当前目录结构按学习顺序组织：
+本目录用于存放按学习阶段和专题整理的 Xyce 源码阅读笔记、构建安装记录和阶段性学习材料。
 
-- `01-overview/`：整体导航地图与高层结构
-- `build-and-install/`：编译、安装、依赖栈与构建验证
-- `02-startup/`：程序启动流程与顶层 `Simulator`
-- `03-netlist-and-circuit-build/`：`netlist` 解析与电路构建
-- `04-device-trace/`：普通器件到实例化、装配的纵向追踪
-- `05-analysis-flow/`：按“基础 / 进阶”两层组织分析调度专题
-  - `01-basic/`：`.OP / .DC / .TRAN` 的入口、注册、生命周期、基础设施初始化
-  - `02-advanced/`：`AC / NOISE / HB / MPDE` 的调度地图
-  - `03-sensitivity/`：灵敏度作为附着在主分析上的能力层，其调度与生命周期
-- `06-solver-and-assembly/`：按“基础 / 进阶”两层组织方程与求解专题
-  - `01-basic/`：电路 DAE 的建立与 `DC / transient` 求解骨架
-  - `02-advanced/`：`AC / NOISE / HB / MPDE` 的进阶求解路线
-  - `03-sensitivity/`：解敏感度、输出敏感度、direct / adjoint 的数学与求解
-- `07-device-model-contributions/`：从求解器继续下钻，研究器件如何贡献 `Q/F/B/dQdx/dFdx`
-  - 其中 `05-mosfet-b4/` 是 `B4` 的独立子专题
-  - 其中 `device/` 是器件家族地图和 `ADMS` 接入方式的扩展阅读
-  - `05-mosfet-b4/`：把 `MOSFET_B4` 单独拆成一条复杂 compact model 学习支线
-- `08-interfaces/`：Xyce 被外部程序驱动、嵌入或包装时涉及的 C/Python/REST 接口层
+横向的 C++ 背景知识放在 [../cpp/](../cpp/)；功能验证用例和结果放在 [../../functional-verification/](../../functional-verification/)。
 
-其中需要单独沉淀但不属于主线顺序的横向内容，放到 `docs/` 下维护：
+## 本级模块职责
 
-- `docs/cpp/`：阅读 Xyce 时真正会遇到的 C++ 结构和语法补充
+- `README.md`：说明笔记目录的组织方式、命名规则和维护约定。
+- `01-overview/`：整体导航地图、高层结构和源码阅读顺序。
+- `02-startup/`：程序启动流程与顶层 `Simulator`。
+- `03-netlist-and-circuit-build/`：netlist 解析与电路构建。
+- `04-device-trace/`：普通器件从网表到实例化、装配的纵向追踪。
+- `05-analysis-flow/`：分析调度、对象关系和生命周期控制流。
+- `06-solver-and-assembly/`：电路方程、矩阵装配和求解结构。
+- `07-device-model-contributions/`：器件模型如何贡献 `Q/F/B/dQdx/dFdx`。
+- `08-interfaces/`：Xyce 被 C/Python/REST 等外部接口驱动时的实现层。
+- `build-and-install/`：Xyce 及依赖栈的编译、安装、补丁和验证记录。
+- `parallel/`：并行相关专题笔记。
 
-## Naming:
+## 使用建议
 
-- 文件名使用阶段内顺序编号，例如 `01-startup-flow.md`
-- 记录日期放在文件内容中，不再放在文件名里
-- 同一专题下的多篇笔记按阅读顺序递增编号
+源码阅读主线建议按编号推进：
 
-## 基本约定
-- 学习笔记引用的代码文件的出现顺序要有逻辑，不能突然毫无缘故的讲一个新的代码。
+1. `01-overview/`
+2. `02-startup/`
+3. `03-netlist-and-circuit-build/`
+4. `04-device-trace/`
+5. `05-analysis-flow/`
+6. `06-solver-and-assembly/`
+7. `07-device-model-contributions/`
+8. `08-interfaces/`
 
-- 每份笔记尽量保持简洁，至少回答这些问题：
+构建和安装问题直接进入 `build-and-install/`，不必等待源码阅读主线推进。
 
-  - 这次读了哪些文件
-  - 带着什么问题去读
-  - 当前得出了什么结论
-  - 下一步还要继续追踪什么
+## 命名规则
+
+- 阶段目录使用两位编号加短名，例如 `05-analysis-flow/`。
+- 文件名使用阶段内顺序编号，例如 `01-startup-flow.md`。
+- 记录日期写入正文，不放在文件名或 README 标题里。
+- 同一专题下的多篇笔记按推荐阅读顺序递增编号。
+
+## 当前约定
+
+- 每份笔记应尽量回答：读了哪些文件、带着什么问题读、当前结论是什么、下一步追踪什么。
+- 笔记引用代码文件时应保持阅读顺序，不突然跳入无上下文的新文件。
+- README 只维护目录职责和稳定入口；具体分析和阶段结论写入专题文档。

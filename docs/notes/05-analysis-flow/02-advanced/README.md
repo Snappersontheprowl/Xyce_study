@@ -1,60 +1,27 @@
-# advanced analysis flow
+# 05-analysis-flow / 02-advanced
 
-记录日期：2026-07-03
+## 功能
 
-这个子目录放的是进阶分析类型在 **工程代码实现层** 的地图。
+本目录记录进阶分析类型在工程代码中的注册、选择和生命周期地图，覆盖 `AC / NOISE / HB / MPDE`。
 
-这一组不先展开所有数学细节，而是先回答：
+本目录不展开 small-signal、noise、harmonic balance 或 MPDE 的数学推导。
 
-- `AC / NOISE / HB / MPDE` 在哪里注册
-- 它们怎样被 `AnalysisManager` 选中
-- 生命周期入口大致怎么组织
-- 它们和 `DCOP`、包装层分析的关系是什么
+## 本级模块职责
 
-## 当前内容
+- `README.md`：说明本组笔记职责和阅读顺序。
+- `01-advanced-analysis-type-map.md`：进阶分析类型总览。
+- `02-ac-lifecycle.md`：`AC` 生命周期。
+- `03-noise-lifecycle.md`：`NOISE` 生命周期。
+- `04-noise-adjoint-lifecycle-hook.md`：noise adjoint 在生命周期中的挂接位置。
+- `05-hb-lifecycle.md`：`HB` 生命周期。
+- `06-hb-time-frequency-lifecycle-hook.md`：HB 时域/频域桥接位置。
+- `07-mpde-lifecycle.md`：`MPDE` 生命周期。
 
-1. [01-advanced-analysis-type-map.md](01-advanced-analysis-type-map.md)
-2. [02-ac-lifecycle.md](02-ac-lifecycle.md)
-3. [03-noise-lifecycle.md](03-noise-lifecycle.md)
-4. [04-noise-adjoint-lifecycle-hook.md](04-noise-adjoint-lifecycle-hook.md)
-5. [05-hb-lifecycle.md](05-hb-lifecycle.md)
-6. [06-hb-time-frequency-lifecycle-hook.md](06-hb-time-frequency-lifecycle-hook.md)
-7. [07-mpde-lifecycle.md](07-mpde-lifecycle.md)
+## 使用建议
 
-## 灵敏度已单独拆出
+读完本目录后，如需横向比较进阶分析的数学对象，转到 [../../06-solver-and-assembly/02-advanced/08-advanced-analysis-comparison.md](../../06-solver-and-assembly/02-advanced/08-advanced-analysis-comparison.md)。
 
-灵敏度分析已经单独整理到同级目录：
+## 当前约定
 
-- [../03-sensitivity/README.md](../03-sensitivity/README.md)
-
-## 横向收束
-
-如果你已经走完这一组的生命周期地图，想把：
-
-- `AC`
-- `NOISE`
-- `HB`
-- `MPDE`
-
-在“数学目标 / 未知量 / 方程形态 / 求解骨架”上横向对齐，建议直接看：
-
-- [../../06-solver-and-assembly/02-advanced/08-advanced-analysis-comparison.md](../../06-solver-and-assembly/02-advanced/08-advanced-analysis-comparison.md)
-
-## 这一组的边界
-
-这一组仍然属于 `05-analysis-flow`，所以只讲：
-
-- 工程代码里的组织关系
-- 注册与选择
-- 生命周期控制流
-- 对象之间怎样接线
-
-真正涉及：
-
-- small-signal 方程
-- noise 数学对象
-- harmonic balance 方程形式
-- MPDE 多时间尺度求解
-- sensitivity 的数学推导
-
-这些内容应该放到 [../../06-solver-and-assembly/README.md](../../06-solver-and-assembly/README.md) 的进阶求解部分。
+- 灵敏度调度已单独放在同级 `03-sensitivity/`。
+- 本目录只讲工程控制流；数学与求解结构放在 `06-solver-and-assembly/02-advanced/`。

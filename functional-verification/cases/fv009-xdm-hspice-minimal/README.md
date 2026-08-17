@@ -1,53 +1,24 @@
-# FV-009 XDM HSPICE-like Minimal Conversion
+# FV-009: XDM HSPICE-like minimal conversion
 
-## 目标
+## 功能
 
-验证 XDM 2.7.0 binary 能否将一个最小 HSPICE-like 电阻网表转换为 Xyce 网表，并验证当前 Xyce 7.10.0 串行安装能否解析和运行转换结果。
+本用例验证 XDM binary 是否能将最小 HSPICE-like 电阻网表转换为 Xyce 网表，并验证当前 Xyce 是否能解析和运行转换结果。
 
-## 输入
+## 本级模块职责
 
-```text
-input/resistor-hspice.sp
-```
+- `README.md`：说明本用例目标和验收标准。
+- `input/`：保存原始 HSPICE-like 输入网表。
+- `out/`：保存 XDM 转换后的网表和 Xyce 输出结果。
 
-核心电路：
+## 验收标准
 
-```text
-V1 1 0 DC 1
-R1 1 0 1k
-.op
-.print dc V(1) I(V1)
-```
-
-## 输出
-
-XDM 转换后网表：
+- XDM 转换无 critical issue / error。
+- 转换后网表可被当前 Xyce 解析和运行。
+- 最小电阻电路结果符合：
 
 ```text
-out/resistor-hspice.sp
+V(1)    = 1 V
+|I(V1)| = 1 mA
 ```
 
-Xyce 结果文件：
-
-```text
-out/resistor-hspice.sp.csd
-```
-
-## 结果
-
-```text
-V(1)  =  1.00000000e+00
-I(V1) = -1.00000000e-03
-```
-
-判断：通过。结果符合 `1 V / 1 kΩ = 1 mA`，电源电流按 Xyce 符号约定为负。
-
-## 备注
-
-XDM 将 `.option post` 保留为注释并报告 1 条 warning：
-
-```text
-* .option post; HSpice Parser Retained (as a comment). Continuing.
-```
-
-该 warning 不影响本用例运行。
+`.option post` 被 XDM 作为注释保留时，属于本用例可接受 warning。

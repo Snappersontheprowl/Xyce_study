@@ -1,32 +1,24 @@
 # 01-overview
 
-本级目录只负责将 Xyce 的整体结构讲清楚，不展开具体算法细节，不追某条执行链的实现细节。
+## 功能
 
-这一级的目标只有 4 个：
+本目录用于建立 Xyce 源码学习的整体地图：项目顶层结构、核心源码包分工和后续阅读顺序。
 
-- 先知道 Xyce 作为一个项目，顶层目录怎么分层
-- 再知道 `src/` 作为核心源码区，主要 package 如何分工
-- 再把“程序从哪里进来、结构上怎么流动”讲清楚
-- 给出后续阅读主线，让读者知道下一步该读哪里
+本目录不展开具体分析算法、器件模型装配或求解器数学细节。
 
-## 文件索引
+## 本级模块职责
 
-- [01-project-structure-map.md](./01-project-structure-map.md)
-  先给整个项目的一句话总览、精简目录树和总分层。
-- [02-top-level-directories.md](./02-top-level-directories.md)
-  单独解释仓库顶层目录，各目录在学习中的优先级和职责边界。
-- [03-src-package-map.md](./03-src-package-map.md)
-  把 `src/` 里的核心 package 按职责分层整理，建立真正的源码地图。
-- [04-structure-reading-order.md](./04-structure-reading-order.md)
-  说明从入口到各主干子系统的结构主线，以及最适合的阅读顺序。
+- `README.md`：说明本目录职责和阅读顺序。
+- `01-project-structure-map.md`：Xyce 项目的一句话总览、精简目录树和分层地图。
+- `02-top-level-directories.md`：顶层目录职责、学习优先级和边界。
+- `03-src-package-map.md`：`src/` 核心 package 的职责分层。
+- `04-structure-reading-order.md`：从入口到主干子系统的阅读顺序。
 
-## 本目录的边界
+## 使用建议
 
-下面这些内容不在本级目录里展开：
+建议按文件编号顺序阅读。读完本目录后，再进入 `02-startup/` 追踪程序入口和顶层 `Simulator`。
 
-- 某个具体分析类型怎么实现
-- 某个器件模型怎么装配
-- 某个 solver 的数学与代码细节
-- 多线程、MPI、灵敏度、HB 等专题深挖
+## 当前约定
 
-这些属于后续专题目录或 `docs/` 下的横向文档。
+- 本目录只回答“项目如何分层”和“先读哪里”。
+- 具体执行链、器件模型、solver、并行和接口专题放在后续目录中。
