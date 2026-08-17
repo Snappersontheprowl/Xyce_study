@@ -232,11 +232,11 @@
 
 随着阅读推进，可以逐步建立这些笔记：
 
-- `notes/02-startup/01-startup-flow.md`
-- `notes/03-netlist-and-circuit-build/01-netlist-parsing-roadmap.md`
-- `notes/04-device-trace/03-resistor-end-to-end.md`
-- `notes/05-analysis-flow/01-basic/01-simulation-entry-to-analysis-manager.md`
-- `notes/07-device-model-contributions/01-device-model-roadmap.md`
+- `docs/notes/02-startup/01-startup-flow.md`
+- `docs/notes/03-netlist-and-circuit-build/01-netlist-parsing-roadmap.md`
+- `docs/notes/04-device-trace/03-resistor-end-to-end.md`
+- `docs/notes/05-analysis-flow/01-basic/01-simulation-entry-to-analysis-manager.md`
+- `docs/notes/07-device-model-contributions/01-device-model-roadmap.md`
 
 每份笔记尽量围绕这几项展开：
 

@@ -96,7 +96,7 @@ build/xyce-7.10-serial-release/           # 仅属于 Xyce 的 CMake build tree
 out/xyce-7.10-serial-release/             # 最终 Xyce 安装前缀
 ```
 
-`build/`、`out/` 和 `artifacts/source/` 已被本仓库忽略，适合保存本地构建物；`notes/` 只保存命令、版本、结果和诊断结论。
+`build/`、`out/` 和 `artifacts/source/` 已被本仓库忽略，适合保存本地构建物；`docs/notes/` 只保存命令、版本、结果和诊断结论。
 
 **保护规则：**
 

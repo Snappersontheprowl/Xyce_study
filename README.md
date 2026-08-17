@@ -22,7 +22,6 @@
 ├── build/
 ├── docs/
 ├── functional-verification/
-├── notes/
 ├── out/
 ├── scripts/
 └── vendor/
@@ -34,9 +33,8 @@
 - `README.md`：项目入口说明。
 - `artifacts/`：本地下载或保留的源码包、工具包等归档文件。
 - `build/`：本地构建目录、编译中间产物和构建日志。
-- `docs/`：横向专题文档，例如 C++ 阅读补充。
+- `docs/`：文档总目录，包含源码阅读笔记、构建安装记录和横向专题文档。
 - `functional-verification/`：当前 Xyce 安装的功能验证计划、用例和结果记录。
-- `notes/`：源码阅读笔记、构建安装笔记和阶段性学习记录。
 - `out/`：本地安装前缀，例如已安装的 Xyce、依赖库和工具。
 - `scripts/`：项目辅助脚本。
 - `vendor/`：本地展开的第三方/上游源码快照，例如 Xyce 源码。
@@ -46,13 +44,13 @@
 学习计划与笔记索引：
 
 ```text
-notes/README.md
+docs/notes/README.md
 ```
 
 构建与安装记录：
 
 ```text
-notes/build-and-install/
+docs/notes/build-and-install/
 ```
 
 功能验证工作区：
@@ -115,7 +113,7 @@ build/
 out/
 ```
 
-如需复现某个阶段，应优先查看 `notes/` 和 `functional-verification/` 中的记录，而不是依赖未纳入 Git 的构建产物。
+如需复现某个阶段，应优先查看 `docs/notes/` 和 `functional-verification/` 中的记录，而不是依赖未纳入 Git 的构建产物。
 
 ## 官方来源
 

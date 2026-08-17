@@ -3,7 +3,7 @@
 本目录用于记录当前已安装 Xyce 的功能验证工作，而不是记录编译过程本身。编译与安装全过程仍以：
 
 ```text
-notes/build-and-install/
+docs/notes/build-and-install/
 ```
 
 为主。

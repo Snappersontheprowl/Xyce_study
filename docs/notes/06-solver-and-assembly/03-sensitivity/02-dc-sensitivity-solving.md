@@ -177,7 +177,7 @@ $$
 \right)
 $$
 
-于是左边矩阵正好就是[原始 *DC Newton* 问题](/home/eda/my_lab/projects/study/xyce_study/notes/06-solver-and-assembly/01-basic/03-dc-operating-point-solving.md)用过的 Jacobian：
+于是左边矩阵正好就是[原始 *DC Newton* 问题](/home/eda/my_lab/projects/study/xyce_study/docs/notes/06-solver-and-assembly/01-basic/03-dc-operating-point-solving.md)用过的 Jacobian：
 
 $$
 J_{DC}=\frac{\partial F}{\partial x}

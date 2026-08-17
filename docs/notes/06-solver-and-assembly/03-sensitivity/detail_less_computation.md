@@ -393,4 +393,4 @@ $$
 如果你愿意，我下一步可以继续做两种展开中的一种：
 
 1. 用一个很小的 `2x2` 线性电路例子，把 direct 和 adjoint 都手算一遍  
-2. 直接把这个思路整理成一篇笔记，放到 `notes/06-solver-and-assembly/03-sensitivity/` 里，专门讲 “为什么 adjoint 更省”
+2. 直接把这个思路整理成一篇笔记，放到 `docs/notes/06-solver-and-assembly/03-sensitivity/` 里，专门讲 “为什么 adjoint 更省”

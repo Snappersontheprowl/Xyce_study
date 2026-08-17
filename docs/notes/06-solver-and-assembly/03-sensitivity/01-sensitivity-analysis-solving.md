@@ -113,7 +113,7 @@ f(x,p)=0
 $$
 
 对参数 $p$ 求导：
-*细节参考：*[detail_matrix](notes/06-solver-and-assembly/03-sensitivity/detail_matrix.md)
+*细节参考：*[detail_matrix](docs/notes/06-solver-and-assembly/03-sensitivity/detail_matrix.md)
 
 $$
 \frac{\partial f}{\partial x}\frac{\partial x}{\partial p}
@@ -150,7 +150,7 @@ $$
 $$
 J\frac{\partial x}{\partial p_i} = -\frac{\partial f}{\partial p_i}
 $$
-*细节参考：*[detail_solver_process](notes/06-solver-and-assembly/03-sensitivity/detail_solver_process.md)
+*细节参考：*[detail_solver_process](docs/notes/06-solver-and-assembly/03-sensitivity/detail_solver_process.md)
 所以如果参数有很多个，就意味着：
 
 - 左端矩阵都是同一个 $J$
@@ -225,7 +225,7 @@ $$
 这一步就是 adjoint 方法的核心。
 
 ## 第六步：为什么 adjoint 能省计算
-*细节参考：*[detail_less_computation](notes/06-solver-and-assembly/03-sensitivity/detail_less_computation.md)
+*细节参考：*[detail_less_computation](docs/notes/06-solver-and-assembly/03-sensitivity/detail_less_computation.md)
 现在可以直接看复杂度。
 
 ### direct 方法

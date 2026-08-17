@@ -146,7 +146,7 @@ $x_{n+1}$
 
 
 # 3. 什么是瞬态灵敏度仿真？
-更多**详细参考：**(/home/eda/my_lab/projects/study/xyce_study/notes/06-solver-and-assembly/03-sensitivity/README.md)
+更多**详细参考：**(/home/eda/my_lab/projects/study/xyce_study/docs/notes/06-solver-and-assembly/03-sensitivity/README.md)
 ## 3.1 灵敏度的含义
 
 灵敏度 Sensitivity 指的是：

@@ -17,7 +17,7 @@ Xyce Release 7.10.0-opensource
 构建安装来源：
 
 ```text
-notes/build-and-install/04-layered-minimal-build-execution-log.md
+docs/notes/build-and-install/04-layered-minimal-build-execution-log.md
 ```
 
 最终构建结论：

@@ -906,14 +906,14 @@ SPADDHandle(bool input_is_sorted)
 为保证后续可复现，已保存补丁文件：
 
 ```text
-notes/build-and-install/patches/trilinos-14.4-kokkoskernels-spadd-sort-option.patch
+docs/notes/build-and-install/patches/trilinos-14.4-kokkoskernels-spadd-sort-option.patch
 ```
 
 如果将来重新解压 Trilinos 源码，可在源码根目录应用：
 
 ```bash
 cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
-patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-kokkoskernels-spadd-sort-option.patch
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/docs/notes/build-and-install/patches/trilinos-14.4-kokkoskernels-spadd-sort-option.patch
 ```
 
 ### 下一步
@@ -1124,14 +1124,14 @@ artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_reorder.c
 为保证后续可复现，已保存补丁文件：
 
 ```text
-notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+docs/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
 ```
 
 如果将来重新解压 Trilinos 源码，可在源码根目录应用：
 
 ```bash
 cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
-patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/docs/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
 ```
 
 ### 下一步
@@ -1341,7 +1341,7 @@ artifacts/source/Trilinos-14.4/packages/aztecoo/src/az_c_util.c
 已扩展同一个 AztecOO 补丁文件：
 
 ```text
-notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+docs/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
 ```
 
 该补丁现在覆盖两组 `FORTRAN_DISABLED` C fallback 原型：
@@ -1353,7 +1353,7 @@ notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallbac
 
 ```bash
 cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
-patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/docs/notes/build-and-install/patches/trilinos-14.4-aztecoo-fortran-disabled-c-fallback-prototypes.patch
 ```
 
 ### 下一步
@@ -1552,14 +1552,14 @@ SSWAP_F77(...)
 为保证后续可复现，已保存补丁文件：
 
 ```text
-notes/build-and-install/patches/trilinos-14.4-aztecoo-az-c-util-sswap-f77-prototype.patch
+docs/notes/build-and-install/patches/trilinos-14.4-aztecoo-az-c-util-sswap-f77-prototype.patch
 ```
 
 如果将来重新解压 Trilinos 源码，可在源码根目录应用：
 
 ```bash
 cd /home/eda/my_lab/projects/study/xyce_study/artifacts/source/Trilinos-14.4
-patch -p1 < /home/eda/my_lab/projects/study/xyce_study/notes/build-and-install/patches/trilinos-14.4-aztecoo-az-c-util-sswap-f77-prototype.patch
+patch -p1 < /home/eda/my_lab/projects/study/xyce_study/docs/notes/build-and-install/patches/trilinos-14.4-aztecoo-az-c-util-sswap-f77-prototype.patch
 ```
 
 ### 下一步
